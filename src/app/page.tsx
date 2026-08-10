@@ -36,7 +36,7 @@ export default function Home() {
               <Link prefetch={false} href={`/challenge/${first.id}/`}>
                 <PixelButton className="text-sm">▸ Start for free</PixelButton>
               </Link>
-              <Link prefetch={false} href="/mathimata/">
+              <Link prefetch={false} href="/stages/">
                 <PixelButton variant="ghost" tone="amber">
                   See the map
                 </PixelButton>

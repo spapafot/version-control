@@ -7,6 +7,6 @@ export const metadata: Metadata = {
     "40 interactive Git missions across 9 worlds: git init, branches, merge conflicts, safe undos, stash and real Git disasters. Free.",
 };
 
-export default function MathimataPage() {
+export default function StagesPage() {
   return <LevelMap />;
 }

@@ -135,7 +135,7 @@ try {
   await new Promise((r) => setTimeout(r, 2500));
   await page.screenshot({ path: `${SHOTS}/07-landing.png`, fullPage: true });
 
-  await page.goto(`${BASE}/mathimata/`, { waitUntil: "networkidle0" });
+  await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
   if (!mapText.includes("40")) fail("level map missing progress counts");
@@ -195,7 +195,7 @@ try {
   await page.screenshot({ path: `${SHOTS}/13-stash.png` });
 
   // ── progress persisted on the map ──────────────────────────────────
-  await page.goto(`${BASE}/mathimata/`, { waitUntil: "networkidle0" });
+  await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
   if (!mapAfter.includes("4/40")) fail(`progress not persisted on map (expected 4/40)`);

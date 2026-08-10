@@ -81,7 +81,7 @@ export function SuccessOverlay() {
                 <PixelButton>Next mission ▸</PixelButton>
               </Link>
             ) : (
-              <Link prefetch={false} href="/mathimata/">
+              <Link prefetch={false} href="/stages/">
                 <PixelButton>Course complete. Back to the map 🏆</PixelButton>
               </Link>
             )}

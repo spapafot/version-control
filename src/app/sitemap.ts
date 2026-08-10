@@ -8,7 +8,7 @@ const BASE = "https://versioncontrol.gr";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${BASE}/`, priority: 1 },
-    { url: `${BASE}/mathimata/`, priority: 0.9 },
+    { url: `${BASE}/stages/`, priority: 0.9 },
     { url: `${BASE}/playground/`, priority: 0.6 },
     ...ALL_CHALLENGES.map((c) => ({
       url: `${BASE}/challenge/${c.id}/`,

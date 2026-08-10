@@ -122,7 +122,7 @@ export function MissionPanel() {
           <PixelButton variant="ghost" tone="red" onClick={() => void reset()}>
             ↺ Reset
           </PixelButton>
-          <Link prefetch={false} href="/mathimata/" className="ml-auto">
+          <Link prefetch={false} href="/stages/" className="ml-auto">
             <PixelButton variant="ghost" tone="line">
               ← Map
             </PixelButton>

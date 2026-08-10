@@ -43,7 +43,7 @@ export function PlaygroundScreen() {
             <PixelButton variant="ghost" tone="red" onClick={() => void reset()}>
               ↺ Reset
             </PixelButton>
-            <Link prefetch={false} href="/mathimata/">
+            <Link prefetch={false} href="/stages/">
               <PixelButton variant="ghost" tone="line">
                 Missions
               </PixelButton>
