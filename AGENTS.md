@@ -26,7 +26,7 @@ Fully static Next.js app (no backend): a real Git engine runs in the browser.
 - `src/git/` — GitEngine: isomorphic-git on a memfs Volume. Gap commands implemented on primitives: reset/revert/restore/switch/cherry-pick/stash (`ops/`). Merge conflicts via `abortOnConflict:false` + our own MERGE_HEAD state. `state.ts#buildRepoState` is THE snapshot read after every command (feeds graph, panels, validators).
 - `src/terminal/` — tokenizer (quotes, `>` redirection), CommandSpec parser, shell dispatch, xterm-agnostic readline (history/tab-complete), `commands/git/*` print **verbatim real-git English output**.
 - `src/validators/` — pure predicates over RepoState; challenges pass on final state, never on exact commands.
-- `src/challenges/` — 40 challenges in 9 sections; declarative `setup` steps run under a deterministic clock (stable hashes across resets); `solution` used only by the test harness.
+- `src/challenges/` — 56 challenges in 9 sections; declarative `setup` steps run under a deterministic clock (stable hashes across resets); `solution` used only by the test harness.
 - `src/lib/game-store.ts` — Zustand session store (engine/shell/snapshot/evaluation); `progress.ts` — persisted progress/achievements/settings.
 - UI: retro CRT arcade design system in `globals.css` + `components/ui/pixel.tsx`. Fonts: Inter Variable (titles), IBM Plex Sans (body), JetBrains Mono (terminal).
 

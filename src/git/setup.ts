@@ -15,6 +15,7 @@ export type SetupStep =
   | { do: "add"; paths: string[] | "*" }
   | { do: "commit"; message: string }
   | { do: "branch"; name: string; at?: string }
+  | { do: "deleteBranch"; name: string }
   | { do: "switch"; ref: string }
   | { do: "merge"; ref: string }
   | { do: "reset"; mode: "soft" | "mixed" | "hard"; target: string }
@@ -49,6 +50,9 @@ export async function runSetup(engine: GitEngine, steps: SetupStep[]): Promise<v
           break;
         case "branch":
           await engine.branch(step.name, { startPoint: step.at });
+          break;
+        case "deleteBranch":
+          await engine.deleteBranch(step.name);
           break;
         case "switch":
           await engine.switchTo(step.ref);

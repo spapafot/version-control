@@ -9,7 +9,7 @@ import { ALL_CHALLENGES, SECTIONS, challengesInSection } from "@/challenges";
 export const metadata: Metadata = {
   title: "VersionControl.gr — Learn Git, using Git",
   description:
-    "Free interactive Git course: a real terminal in your browser, live branch and commit visualization, and 40 missions. Nothing to install and no account needed.",
+    "Free interactive Git course: a real terminal in your browser, live branch and commit visualization, and 56 missions. Nothing to install and no account needed.",
 };
 
 export default function Home() {

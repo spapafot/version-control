@@ -230,7 +230,9 @@ export class GitEngine {
     await git.branch({
       ...this.common,
       ref: name,
-      object: opts.startPoint ?? "HEAD",
+      // isomorphic-git only resolves ref names / full oids (and swallows
+      // failures) — revparse first so HEAD~1, HEAD@{n}, short hashes work
+      object: opts.startPoint ? await this.resolve(opts.startPoint) : "HEAD",
       checkout: opts.checkout ?? false,
     });
   }
@@ -327,6 +329,16 @@ export class GitEngine {
         };
         await this.writeFile(".git/MERGE_HEAD", `${theirsOid}\n`);
         await this.writeFile(".git/MERGE_MSG", `${message}\n`);
+        // real git stages the cleanly-merged files; isomorphic-git only wrote
+        // them to the worktree. The tree was clean before the merge, so every
+        // non-conflicted difference here IS a merge result — mirror it into
+        // the index or the final merge commit silently drops it.
+        for (const [filepath, , workdir, stage] of await this.statusMatrix()) {
+          if (this.mergeState.conflicted.has(filepath)) continue;
+          if ((workdir === 2 && stage !== 2) || (workdir === 0 && stage !== 0)) {
+            await this.add(filepath);
+          }
+        }
         return { kind: "conflict", conflicted };
       }
       throw e;

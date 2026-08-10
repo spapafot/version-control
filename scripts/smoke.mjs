@@ -138,7 +138,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
-  if (!mapText.includes("40")) fail("level map missing progress counts");
+  if (!mapText.includes("56")) fail("level map missing progress counts");
   await page.screenshot({ path: `${SHOTS}/08-map.png`, fullPage: true });
 
   await page.goto(`${BASE}/playground/`, { waitUntil: "networkidle0" });
@@ -198,7 +198,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
-  if (!mapAfter.includes("4/40")) fail(`progress not persisted on map (expected 4/40)`);
+  if (!mapAfter.includes("4/56")) fail(`progress not persisted on map (expected 4/56)`);
   if (!mapAfter.includes("GIT DISASTERS")) fail("disasters world missing from map");
 
   // ── legal pages reachable from the footer ──────────────────────────

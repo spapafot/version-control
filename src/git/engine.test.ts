@@ -151,6 +151,44 @@ describe("branches and merges", () => {
     await engine.writeFile("README.md", "changed more\n");
     await expect(engine.switchTo("feature")).rejects.toThrow(GitOpError);
   });
+
+  it("branch with HEAD~1 start point (revparse, not raw ref)", async () => {
+    const engine = await seeded([
+      ...BASIC,
+      { do: "file", path: "x.txt", content: "x\n" },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "second" },
+    ]);
+    await engine.branch("old", { startPoint: "HEAD~1" });
+    const s = await engine.snapshot();
+    const first = s.commits.find((c) => c.message === "Initial commit")!.oid;
+    expect(s.branches.find((b) => b.name === "old")!.oid).toBe(first);
+  });
+
+  it("branch with short-oid start point", async () => {
+    const engine = await seeded([
+      ...BASIC,
+      { do: "file", path: "x.txt", content: "x\n" },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "second" },
+    ]);
+    const first = (await engine.snapshot()).commits.find((c) => c.message === "Initial commit")!.oid;
+    await engine.branch("pinned", { startPoint: first.slice(0, 7) });
+    expect((await engine.snapshot()).branches.find((b) => b.name === "pinned")!.oid).toBe(first);
+  });
+
+  it("deleteBranch setup step removes the branch but keeps its commits recoverable", async () => {
+    const engine = await seeded([...TWO_BRANCH, { do: "deleteBranch", name: "feature" }]);
+    const s = await engine.snapshot();
+    expect(s.branches.map((b) => b.name)).toEqual(["main"]);
+    // unreachable → hidden from the snapshot walk...
+    expect(s.commits.some((c) => c.message === "Add feature")).toBe(false);
+    // ...but the reflog still reaches it: the disasters-world recovery path
+    await engine.branch("rescued", { startPoint: "HEAD@{1}" });
+    const s2 = await engine.snapshot();
+    expect(s2.branches.find((b) => b.name === "rescued")).toBeDefined();
+    expect(s2.commits.some((c) => c.message === "Add feature")).toBe(true);
+  });
 });
 
 describe("merge conflicts (spike: abortOnConflict + statusMatrix overlay)", () => {
@@ -219,6 +257,28 @@ describe("merge conflicts (spike: abortOnConflict + statusMatrix overlay)", () =
       unstaged: null,
       conflicted: false,
     });
+  });
+
+  it("conflicted merge stages the non-conflicted files it brings in (real-git parity)", async () => {
+    const engine = await seeded([
+      ...CONFLICT.slice(0, -1), // stay on feature
+      { do: "file", path: "extra.css", content: "aside { color: teal; }\n" },
+      { do: "add", paths: ["extra.css"] },
+      { do: "commit", message: "extra file alongside the conflict" },
+      { do: "switch", ref: "main" },
+    ]);
+    const r = await engine.merge("feature");
+    expect(r.kind).toBe("conflict");
+    const s = await engine.snapshot();
+    expect(s.status.find((f) => f.path === "extra.css")).toMatchObject({ staged: "added" });
+
+    // resolve the conflict and close the merge → extra.css must be in the commit
+    await engine.writeFile("app.js", "console.log('merged');\n");
+    await engine.add("app.js");
+    await engine.commit({ message: "" });
+    const s2 = await engine.snapshot();
+    expect(s2.headFiles).toContain("extra.css");
+    expect(s2.status.every((f) => !f.staged && !f.unstaged && !f.untracked)).toBe(true);
   });
 
   it("setup can leave the user mid-conflict", async () => {
