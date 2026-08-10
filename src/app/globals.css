@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* ─── CRT arcade tokens ──────────────────────────────────────────────── */
+
+:root {
+  /* surfaces */
+  --vc-ink: #050807;
+  --vc-panel: #0a120c;
+  --vc-raised: #0f1a11;
+  --vc-line: #1c3322;
+
+  /* phosphor (primary channel) */
+  --vc-phos: #3dff74;
+  --vc-phos-dim: #23b24e;
+  --vc-fg: #c9e8ce;
+  --vc-muted: #7ea98a;
+
+  /* amber (secondary channel: HEAD, score, achievements) */
+  --vc-amber: #ffb000;
+  --vc-amber-dim: #b37c00;
+
+  /* branch lanes + status */
+  --vc-lane-cyan: #35e0e0;
+  --vc-lane-magenta: #ff5ca8;
+  --vc-red: #ff4d4d;
+
+  --glow-phos: 0 0 6px rgba(61, 255, 116, 0.55), 0 0 18px rgba(61, 255, 116, 0.18);
+  --glow-amber: 0 0 6px rgba(255, 176, 0, 0.55), 0 0 18px rgba(255, 176, 0, 0.18);
+}
+
+@theme inline {
+  --color-ink: var(--vc-ink);
+  --color-panel: var(--vc-panel);
+  --color-raised: var(--vc-raised);
+  --color-line: var(--vc-line);
+  --color-phos: var(--vc-phos);
+  --color-phos-dim: var(--vc-phos-dim);
+  --color-fg: var(--vc-fg);
+  --color-muted: var(--vc-muted);
+  --color-amber: var(--vc-amber);
+  --color-amber-dim: var(--vc-amber-dim);
+  --color-lane-cyan: var(--vc-lane-cyan);
+  --color-lane-magenta: var(--vc-lane-magenta);
+  --color-crt-red: var(--vc-red);
+
+  --font-display: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ─── base ───────────────────────────────────────────────────────────── */
+
+body {
+  background: var(--vc-ink);
+  color: var(--vc-fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--vc-phos);
+  color: var(--vc-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--vc-amber);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--vc-line) transparent;
+}
+
+/* ─── CRT chrome (scanlines + vignette), toggleable via html[data-crt] ─ */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 120% at 50% 45%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+}
+
+html[data-crt="off"] body::before,
+html[data-crt="off"] body::after {
+  display: none;
+}
+
+/* ─── HUD typography ─────────────────────────────────────────────────── */
+
+.hud {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 650;
+}
+
+.glow-text {
+  text-shadow: var(--glow-phos);
+}
+
+.glow-text-amber {
+  text-shadow: var(--glow-amber);
+}
+
+/* ─── pixel-stepped corners (8-bit panel silhouette) ─────────────────── */
+
+.px-corners {
+  clip-path: polygon(
+    0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0,
+    calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px)
+  );
+}
+
+/* ─── animation primitives ───────────────────────────────────────────── */
+
+@keyframes vc-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.blink {
+  animation: vc-blink 1.1s steps(1) infinite;
+}
+
+@keyframes vc-power-on {
+  0% { transform: scaleY(0.004) scaleX(0.7); filter: brightness(6); }
+  35% { transform: scaleY(0.004) scaleX(1); filter: brightness(6); }
+  70% { transform: scaleY(1) scaleX(1); filter: brightness(2.2); }
+  100% { transform: none; filter: none; }
+}
+
+.power-on {
+  animation: vc-power-on 0.5s steps(8, end) both;
+}
+
+@keyframes vc-flicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.86; }
+  100% { opacity: 1; }
+}
+
+@keyframes vc-marquee-pulse {
+  0%, 100% { text-shadow: var(--glow-phos); }
+  50% { text-shadow: 0 0 2px rgba(61, 255, 116, 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink,
+  .power-on {
+    animation: none;
+  }
+}
+
+/* ─── xterm host: blend the terminal into the cabinet ────────────────── */
+
+.terminal-host .xterm {
+  padding: 12px;
+}
+
+.terminal-host .xterm .xterm-viewport {
+  background: transparent !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vc-line) transparent;
+}

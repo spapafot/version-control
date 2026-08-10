@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "versioncontrol-gr",
+  "compatibility_date": "2026-08-01",
+  "routes": [
+    { "pattern": "www.versioncontrol.gr", "custom_domain": true },
+    { "pattern": "versioncontrol.gr", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}
