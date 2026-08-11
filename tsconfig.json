@@ -30,5 +30,16 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // the edge worker + api proxy compile against Workers runtime types via
+    // their own tsconfigs (worker/tsconfig.json, workers/api/tsconfig.json);
+    // worker-configuration.d.ts imports worker/index.ts, so it must stay out
+    // of the app program or it drags the worker (and DOM-vs-workerd type
+    // conflicts) in with it.
+    "worker/**/*",
+    "workers/**/*",
+    "backend/**/*",
+    "worker-configuration.d.ts"
+  ]
 }

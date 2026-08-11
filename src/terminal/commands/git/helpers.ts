@@ -1,9 +1,39 @@
 import * as git from "isomorphic-git";
 import { diffLines } from "diff";
 import type { GitEngine } from "@/git/engine";
+import type { MergeOutcome } from "@/git/types";
 import { diffTrees, readBlobText, type TreeChange } from "@/git/blobs";
+import type { ShellCommand } from "../types";
 
 export const short = (oid: string) => oid.slice(0, 7);
+
+/** Shared by `git merge` and `git pull` so their output can never drift. */
+export function printMergeOutcome(
+  ctx: Parameters<ShellCommand["run"]>[0],
+  outcome: MergeOutcome,
+  beforeOid: string,
+): number {
+  switch (outcome.kind) {
+    case "already-up-to-date":
+      ctx.stdout("Already up to date.");
+      return 0;
+    case "fast-forward":
+      ctx.stdout(`Updating ${short(beforeOid)}..${short(outcome.oid)}\nFast-forward`);
+      return 0;
+    case "merge-commit":
+      ctx.stdout("Merge made by the 'ort' strategy.");
+      return 0;
+    case "conflict": {
+      const lines = outcome.conflicted.flatMap((f) => [
+        `Auto-merging ${f}`,
+        `CONFLICT (content): Merge conflict in ${f}`,
+      ]);
+      lines.push("Automatic merge failed; fix conflicts and then commit the result.");
+      ctx.stdout(lines.join("\n"));
+      return 1;
+    }
+  }
+}
 
 /**
  * The `[main abc1234] message` + ` N files changed, …` block printed by

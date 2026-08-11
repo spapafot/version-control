@@ -1,4 +1,4 @@
-import type { ReactNode, ButtonHTMLAttributes } from "react";
+import type { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes } from "react";
 
 type Tone = "line" | "phos" | "amber" | "red";
 
@@ -23,6 +23,8 @@ const toneText: Record<Tone, string> = {
 export function PixelPanel({
   tone = "line",
   title,
+  /** render the panel title as a heading when it is the real heading for a section */
+  titleAs: TitleTag = "span",
   actions,
   className = "",
   bodyClassName = "",
@@ -30,6 +32,7 @@ export function PixelPanel({
 }: {
   tone?: Tone;
   title?: ReactNode;
+  titleAs?: "span" | "h2" | "h3";
   actions?: ReactNode;
   className?: string;
   bodyClassName?: string;
@@ -42,7 +45,7 @@ export function PixelPanel({
           <div
             className={`hud flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-1.5 text-[11px] ${toneText[tone]}`}
           >
-            <span className="truncate">{title}</span>
+            <TitleTag className="truncate">{title}</TitleTag>
             {actions}
           </div>
         )}
@@ -119,6 +122,62 @@ export function PixelProgress({
           className={`h-2.5 flex-1 ${i < filled ? on : "bg-line/50"}`}
         />
       ))}
+    </div>
+  );
+}
+
+/** Text input in the same clipped-frame style as the panels. */
+export function PixelInput({
+  tone = "line",
+  className = "",
+  ...rest
+}: {
+  tone?: Tone;
+  className?: string;
+} & InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <span className={`px-corners block p-[2px] ${frameBg[tone]} ${className}`}>
+      <input
+        {...rest}
+        className="px-corners block w-full bg-raised px-3 py-2 font-mono text-sm text-fg placeholder:text-muted"
+      />
+    </span>
+  );
+}
+
+/**
+ * Label + control + optional hint/error row for the account forms.
+ * Pass `aria-describedby={\`${id}-error\`}` (or `-hint`) on the input inside
+ * when it should announce these; the ids below match that convention.
+ */
+export function PixelField({
+  label,
+  htmlFor,
+  hint,
+  error,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  hint?: string;
+  error?: string | null;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={htmlFor} className="hud text-[11px] text-muted">
+        {label}
+      </label>
+      {children}
+      {error ? (
+        <p id={`${htmlFor}-error`} role="alert" className="text-xs text-crt-red">
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${htmlFor}-hint`} className="text-xs text-muted">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

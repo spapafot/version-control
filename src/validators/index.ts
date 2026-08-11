@@ -36,6 +36,8 @@ export type ValidatorSpec =
   | { type: "fileExists"; file: string }
   | { type: "fileMissing"; file: string }
   | { type: "stashCount"; count: number; atLeast?: boolean }
+  | { type: "branchPushed"; branch: string }
+  | { type: "trackingUpToDate"; branch: string }
   /** for read-only lessons (status, log) where the repo state cannot change */
   | { type: "ranCommand"; match: string };
 
@@ -168,6 +170,16 @@ function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolea
       return workdirContent(state, spec.file) === null;
     case "stashCount":
       return spec.atLeast ? state.stash.length >= spec.count : state.stash.length === spec.count;
+    case "branchPushed": {
+      const local = state.branches.find((b) => b.name === spec.branch);
+      const origin = state.remote?.branches.find((b) => b.name === spec.branch);
+      return Boolean(local && origin && local.oid === origin.oid);
+    }
+    case "trackingUpToDate": {
+      const tracking = state.remote?.tracking.find((t) => t.name === spec.branch);
+      const origin = state.remote?.branches.find((b) => b.name === spec.branch);
+      return Boolean(tracking && origin && tracking.oid === origin.oid);
+    }
     case "ranCommand":
       return history.some((line) => squeeze(line).startsWith(squeeze(spec.match)));
   }
@@ -238,6 +250,10 @@ function defaultLabel(spec: ValidatorSpec): string {
       return spec.atLeast
         ? `The stash holds at least ${spec.count} ${spec.count === 1 ? "entry" : "entries"}`
         : `The stash holds exactly ${spec.count} ${spec.count === 1 ? "entry" : "entries"}`;
+    case "branchPushed":
+      return `origin has the latest "${spec.branch}"`;
+    case "trackingUpToDate":
+      return `"origin/${spec.branch}" matches the remote`;
     case "ranCommand":
       return `You ran "${spec.match}"`;
   }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useProgress } from "@/lib/progress";
 import { ALL_CHALLENGES } from "@/challenges";
+import { AccountLink } from "@/components/layout/AccountLink";
 import { HudLabel, PixelProgress } from "@/components/ui/pixel";
 
 export function GameHeader({ right }: { right?: React.ReactNode }) {
@@ -34,6 +35,7 @@ export function GameHeader({ right }: { right?: React.ReactNode }) {
       </div>
       {right}
       <div className="flex items-center gap-1.5">
+        <AccountLink />
         <button
           onClick={toggleSound}
           className={`hud border px-2 py-1 text-[10px] ${soundOn ? "border-phos-dim text-phos" : "border-line text-muted"}`}

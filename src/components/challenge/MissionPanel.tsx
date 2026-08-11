@@ -1,35 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment } from "react";
 import { useGame } from "@/lib/game-store";
 import { useProgress } from "@/lib/progress";
 import { challengeNumber, SECTIONS } from "@/challenges";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
-
-/** renders `code` spans inside lesson/mission text */
-function RichText({ text, className = "" }: { text: string; className?: string }) {
-  return (
-    <>
-      {text.split(/\n{2,}/).map((para, i) => (
-        <p key={i} className={`mb-2.5 last:mb-0 ${className}`}>
-          {para.split(/(`[^`]+`)/).map((part, j) =>
-            part.startsWith("`") && part.endsWith("`") ? (
-              <code
-                key={j}
-                className="rounded-none bg-raised px-1 py-0.5 font-mono text-[0.92em] text-amber"
-              >
-                {part.slice(1, -1)}
-              </code>
-            ) : (
-              <Fragment key={j}>{part}</Fragment>
-            ),
-          )}
-        </p>
-      ))}
-    </>
-  );
-}
+import { RichText } from "./RichText";
 
 export function MissionPanel() {
   const challenge = useGame((s) => s.challenge);
@@ -54,9 +30,11 @@ export function MissionPanel() {
     >
       <div className="flex flex-col gap-4 p-4">
         <div>
-          <h1 className="hud glow-text-amber mb-3 text-lg leading-snug text-amber">
+          {/* h2, not h1: the server-rendered MissionBrief below owns the page's
+              single h1 so the static HTML has a real heading for crawlers */}
+          <h2 className="hud glow-text-amber mb-3 text-lg leading-snug text-amber">
             {challenge.title}
-          </h1>
+          </h2>
           <div className="text-[13px] leading-relaxed text-fg">
             <RichText text={challenge.lesson} />
           </div>

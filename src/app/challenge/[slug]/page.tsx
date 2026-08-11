@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { ALL_CHALLENGES, challengeBySlug, challengeNumber } from "@/challenges";
+import { notFound } from "next/navigation";
+import { ALL_CHALLENGES, challengeBySlug, challengeNumber, sectionOf } from "@/challenges";
+import { CHALLENGE_SEO } from "@/challenges/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { MissionBrief } from "@/components/challenge/MissionBrief";
+import { breadcrumbSchema, missionSchema } from "@/lib/schema";
+import { OG_IMAGE, SITE, canonical, snippet } from "@/lib/seo";
 import { ChallengeClient } from "./ChallengeClient";
 
 export function generateStaticParams() {
@@ -13,10 +19,32 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const challenge = challengeBySlug.get(slug);
-  if (!challenge) return { title: "Mission" };
+  const seo = CHALLENGE_SEO[slug];
+  if (!challenge || !seo) return { title: "Mission not found", robots: { index: false } };
+
+  const url = canonical(`challenge/${slug}`);
+  const description = snippet(seo.description);
   return {
-    title: `Mission ${String(challengeNumber(slug)).padStart(2, "0")}: ${challenge.title}`,
-    description: challenge.mission,
+    // absolute: mission pages skip the site-name suffix so the whole SERP
+    // title budget goes to the keyword
+    title: { absolute: seo.title },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: seo.title,
+      description,
+      url,
+      siteName: SITE.name,
+      locale: SITE.locale,
+      type: "article",
+      images: [OG_IMAGE],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.title,
+      description,
+      images: [OG_IMAGE.url],
+    },
   };
 }
 
@@ -26,5 +54,28 @@ export default async function ChallengePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <ChallengeClient slug={slug} />;
+  const challenge = challengeBySlug.get(slug);
+  if (!challenge) notFound();
+
+  const section = sectionOf(slug);
+  return (
+    <>
+      <ChallengeClient slug={slug} />
+      {/* static, crawlable counterpart to the client-only screen above */}
+      <MissionBrief challenge={challenge} />
+      <JsonLd
+        data={[
+          missionSchema(challenge),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "All missions", path: "/stages/" },
+            {
+              name: `Mission ${challengeNumber(slug)}: ${section?.title ?? "Mission"}`,
+              path: `/challenge/${slug}/`,
+            },
+          ]),
+        ]}
+      />
+    </>
+  );
 }

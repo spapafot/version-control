@@ -17,6 +17,12 @@ import {
   type StashPushResult,
 } from "./ops/stash";
 import { revparse } from "./revparse";
+import {
+  fetchFromOrigin,
+  pushToOrigin,
+  type FetchUpdate,
+  type PushResult,
+} from "./ops/remote";
 
 /** Fallback identity so `git commit` never fails on missing config (as if a global config existed). */
 export const LEARNER: Persona = { name: "dev", email: "dev@versioncontrol.gr" };
@@ -28,11 +34,16 @@ export interface ReflogEntry {
 }
 
 export class GitEngine {
-  readonly dir = "/repo";
+  readonly dir: string;
   readonly fsp: FsProvider;
   /** isomorphic-git object cache — MUST die together with the volume */
   cache: object = {};
   mergeState: MergeState | null = null;
+  /**
+   * The simulated origin: a second engine on the SAME volume at /origin,
+   * attached by the `publish` setup step. Dies with this engine on reset.
+   */
+  remote: GitEngine | null = null;
   /** HEAD reflog, newest first. In-memory only: engines are rebuilt per challenge. */
   reflog: ReflogEntry[] = [];
   /** stash stack, newest first (stash@{0}). In-memory, like the reflog. */
@@ -48,8 +59,9 @@ export class GitEngine {
    */
   private mtimeTick = 1_600_000_000;
 
-  constructor(fsp: FsProvider) {
+  constructor(fsp: FsProvider, dir = "/repo") {
     this.fsp = fsp;
+    this.dir = dir;
     this.fsp.fs.mkdirSync(this.dir, { recursive: true });
   }
 
@@ -274,7 +286,7 @@ export class GitEngine {
     return oid;
   }
 
-  async merge(theirsRef: string): Promise<MergeOutcome> {
+  async merge(theirsRef: string, opts: { message?: string } = {}): Promise<MergeOutcome> {
     if (this.mergeState)
       throw new GitOpError(
         "error: Merging is not possible because you have unmerged files.\nfatal: Exiting because of an unresolved conflict.",
@@ -296,7 +308,7 @@ export class GitEngine {
       timestamp: this.timestamp(),
       timezoneOffset: 0,
     };
-    const message = `Merge branch '${theirsRef}'`;
+    const message = opts.message ?? `Merge branch '${theirsRef}'`;
 
     try {
       const r = await git.merge({
@@ -405,6 +417,16 @@ export class GitEngine {
 
   stashClear(): void {
     this.stash = [];
+  }
+
+  // ── remote (simulated origin) ───────────────────────────────────────
+
+  async fetch(): Promise<FetchUpdate[]> {
+    return fetchFromOrigin(this);
+  }
+
+  async push(branch: string): Promise<PushResult> {
+    return pushToOrigin(this, branch);
   }
 
   async requireCleanTree(action: string): Promise<void> {

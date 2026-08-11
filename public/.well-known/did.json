@@ -1,0 +1,23 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:versioncontrol.gr",
+  "verificationMethod": [
+    {
+      "id": "did:web:versioncontrol.gr#key-0",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:versioncontrol.gr",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "qXac0uxbA3GbzyUbfIiugEa9-W41fhoyygis9NvNEcA",
+        "kid": "did:web:versioncontrol.gr#key-0"
+      }
+    }
+  ],
+  "assertionMethod": [
+    "did:web:versioncontrol.gr#key-0"
+  ]
+}

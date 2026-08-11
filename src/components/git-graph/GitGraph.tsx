@@ -93,7 +93,10 @@ export function GitGraph() {
           const refs = [...n.commit.refs].sort((a, b) => {
             const ah = isHead && state.head.ref === a ? -1 : 0;
             const bh = isHead && state.head.ref === b ? -1 : 0;
-            return ah - bh;
+            // remote-tracking labels after local ones
+            const ar = a.startsWith("origin/") ? 1 : 0;
+            const br = b.startsWith("origin/") ? 1 : 0;
+            return ah - bh || ar - br;
           });
           const tagDefs = [
             // detached HEAD: no branch carries the marker, so it stands alone
@@ -108,6 +111,8 @@ export function GitGraph() {
           let tx = labelX;
           const tags = tagDefs.map(({ key, label, hot }) => {
             const w = label.length * 6.4 + 12;
+            // remote-tracking refs render muted — they're knowledge, not position
+            const tone = hot ? "#ffb000" : key.startsWith("origin/") ? "#7d93a8" : c;
             const el = (
               <g key={key}>
                 <rect
@@ -116,7 +121,7 @@ export function GitGraph() {
                   width={w}
                   height={17}
                   fill="#0f1a11"
-                  stroke={hot ? "#ffb000" : c}
+                  stroke={tone}
                   strokeWidth={1.5}
                   shapeRendering="crispEdges"
                 />
@@ -125,7 +130,7 @@ export function GitGraph() {
                   y={y + 3.5}
                   fontSize={10.5}
                   fontFamily="var(--font-mono)"
-                  fill={hot ? "#ffb000" : c}
+                  fill={tone}
                 >
                   {label}
                 </text>

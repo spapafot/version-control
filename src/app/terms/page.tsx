@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage, LegalSection } from "@/components/layout/LegalPage";
+import { PAGE_SEO } from "@/lib/page-seo";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Use",
-  description: "The terms you use the free VersionControl.gr Git course under.",
-};
+const seo = PAGE_SEO["/terms/"];
+
+export const metadata = pageMetadata({
+  title: seo.title,
+  description: seo.description,
+  path: "/terms/",
+});
 
 export default function TermsPage() {
   return (
@@ -32,10 +36,29 @@ export default function TermsPage() {
 
       <LegalSection heading="Your progress can be lost">
         <p>
-          Progress and achievements are stored only in your browser. Clearing
-          site data, using private browsing, switching browsers or switching
-          devices will lose them. There is no account to restore from and no
-          backup on our side.
+          Progress and achievements are stored in your browser. Without an
+          account, clearing site data, using private browsing, switching
+          browsers or switching devices will lose them, and there is no backup
+          on our side. Creating a free account is optional and adds a synced
+          copy you can restore from, but syncing is best effort: it only
+          captures what has reached our servers.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Accounts and certificates">
+        <p>
+          Accounts are optional and free. You are responsible for the accuracy
+          of the name you put on a certificate: it must be your own name, and it
+          is shown publicly on the certificate&apos;s verification page along
+          with the issue date and the skills covered.
+        </p>
+        <p>
+          Certificates state that an account completed all course missions. We
+          may revoke a certificate if it was obtained by tampering with the
+          sync data, carries a misleading or offensive name, or is otherwise
+          abused; its verification link then reports it as revoked. If you want
+          your own certificate removed, use the contact address in the privacy
+          policy.
         </p>
       </LegalSection>
 

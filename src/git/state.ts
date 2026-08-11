@@ -1,7 +1,8 @@
 import * as git from "isomorphic-git";
 import type { GitEngine } from "./engine";
-import type { CommitNode, FileStatus, RepoState } from "./types";
+import type { CommitNode, FileStatus, RemoteState, RepoState } from "./types";
 import { EMPTY_REPO_STATE } from "./types";
+import { aheadBehind } from "./queries";
 
 /**
  * The single snapshot read after every command. Feeds the git graph, the
@@ -31,8 +32,32 @@ export async function buildRepoState(engine: GitEngine): Promise<RepoState> {
     // unborn HEAD (fresh init)
   }
 
-  const tips = [...new Set([...branches.map((b) => b.oid), ...(headOid ? [headOid] : [])])];
-  const commits = await walkCommits(engine, tips, branches);
+  const remote = await readRemote(engine);
+
+  // tips include TRACKING oids only, never origin's actual tips: their objects
+  // may not exist locally before a fetch (and "what you fetched" is the correct
+  // git knowledge model for the graph anyway)
+  const tips = [
+    ...new Set([
+      ...branches.map((b) => b.oid),
+      ...(headOid ? [headOid] : []),
+      ...(remote?.tracking.map((t) => t.oid) ?? []),
+    ]),
+  ];
+  const refSources = [
+    ...branches,
+    ...(remote?.tracking.map((t) => ({ name: `origin/${t.name}`, oid: t.oid })) ?? []),
+  ];
+  const commits = await walkCommits(engine, tips, refSources);
+
+  if (remote && headRef && headOid) {
+    const trackingTip = remote.tracking.find((t) => t.name === headRef);
+    if (trackingTip) {
+      const counts = aheadBehind(commits, headOid, trackingTip.oid);
+      remote.ahead = counts.ahead;
+      remote.behind = counts.behind;
+    }
+  }
 
   const conflicted = new Set(engine.mergeState?.conflicted ?? []);
   const matrix = await git.statusMatrix(common);
@@ -57,7 +82,29 @@ export async function buildRepoState(engine: GitEngine): Promise<RepoState> {
       conflicted: engine.mergeState ? [...engine.mergeState.conflicted] : undefined,
     },
     stash: engine.stash.map((e) => ({ label: e.label, files: e.files.map((f) => f.path) })),
+    remote,
   };
+}
+
+async function readRemote(engine: GitEngine): Promise<RemoteState | null> {
+  const origin = engine.remote;
+  if (!origin) return null;
+  const originCommon = { fs: origin.fsp.fs, dir: origin.dir, cache: origin.cache };
+  const localCommon = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
+
+  const branches: Array<{ name: string; oid: string }> = [];
+  for (const name of await git.listBranches(originCommon)) {
+    branches.push({ name, oid: await git.resolveRef({ ...originCommon, ref: `refs/heads/${name}` }) });
+  }
+  const tracking: Array<{ name: string; oid: string }> = [];
+  for (const name of await git.listBranches({ ...localCommon, remote: "origin" })) {
+    if (name === "HEAD") continue;
+    tracking.push({
+      name,
+      oid: await git.resolveRef({ ...localCommon, ref: `refs/remotes/origin/${name}` }),
+    });
+  }
+  return { branches, tracking, ahead: null, behind: null };
 }
 
 function classifyRow(

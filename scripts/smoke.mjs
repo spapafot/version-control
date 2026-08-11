@@ -138,7 +138,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
-  if (!mapText.includes("56")) fail("level map missing progress counts");
+  if (!mapText.includes("63")) fail("level map missing progress counts");
   await page.screenshot({ path: `${SHOTS}/08-map.png`, fullPage: true });
 
   await page.goto(`${BASE}/playground/`, { waitUntil: "networkidle0" });
@@ -198,8 +198,32 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
-  if (!mapAfter.includes("4/56")) fail(`progress not persisted on map (expected 4/56)`);
+  if (!mapAfter.includes("4/63")) fail(`progress not persisted on map (expected 4/63)`);
   if (!mapAfter.includes("GIT DISASTERS")) fail("disasters world missing from map");
+  if (!mapAfter.includes("THE REMOTE")) fail("remote world missing from map");
+
+  // ── account page: signed-out forms render without console errors ───
+  //    (Cognito/API are unreachable here; nothing may throw uncaught)
+  await page.goto(`${BASE}/account/`, { waitUntil: "networkidle0" });
+  await new Promise((r) => setTimeout(r, 1200));
+  const accountText = await page.evaluate(() => document.body.innerText);
+  if (!accountText.includes("SIGN IN")) fail("account page did not render the sign-in panel");
+  if (!accountText.includes("CREATE ACCOUNT")) fail("account page missing create-account toggle");
+  if (!accountText.includes("GIT CERTIFICATE")) fail("account page missing the certificate explainer");
+  await page.screenshot({ path: `${SHOTS}/10-account.png`, fullPage: true });
+
+  // ── verify page: bare shell with the ID lookup form ────────────────
+  //    NOTE: per-credential URLs (/verify/VC-GIT-F-XXXXXXXX/) are served by
+  //    the Cloudflare worker, which serve-out.mjs does not run. Check those
+  //    manually with `wrangler dev` — this only covers the static shell.
+  await page.goto(`${BASE}/verify/`, { waitUntil: "networkidle0" });
+  await new Promise((r) => setTimeout(r, 800));
+  const verifyText = await page.evaluate(() => document.body.innerText);
+  if (!verifyText.includes("VERIFY A VERSIONCONTROL.GR CERTIFICATE"))
+    fail("verify page heading missing");
+  const verifyInput = await page.evaluate(() => Boolean(document.querySelector("#verify-id")));
+  if (!verifyInput) fail("verify page did not render the credential ID input");
+  await page.screenshot({ path: `${SHOTS}/11-verify.png`, fullPage: true });
 
   // ── legal pages reachable from the footer ──────────────────────────
   await page.goto(`${BASE}/privacy/`, { waitUntil: "networkidle0" });

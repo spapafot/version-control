@@ -39,3 +39,34 @@ export function reachableFromHead(state: RepoState): CommitNode[] {
 export function headCommit(state: RepoState): CommitNode | null {
   return state.commits.find((c) => c.oid === state.head.oid) ?? null;
 }
+
+/**
+ * Commits each side has that the other doesn't (`main` vs `origin/main`).
+ * Both tips must be present in `commits` — tracking tips always are, since
+ * the snapshot walk starts from them.
+ */
+export function aheadBehind(
+  commits: Array<Pick<CommitNode, "oid" | "parents">>,
+  localOid: string,
+  trackingOid: string,
+): { ahead: number; behind: number } {
+  const byOid = new Map(commits.map((c) => [c.oid, c]));
+  const reach = (from: string): Set<string> => {
+    const seen = new Set<string>();
+    const queue = [from];
+    while (queue.length > 0) {
+      const oid = queue.shift()!;
+      if (seen.has(oid)) continue;
+      seen.add(oid);
+      queue.push(...(byOid.get(oid)?.parents ?? []));
+    }
+    return seen;
+  };
+  const local = reach(localOid);
+  const tracking = reach(trackingOid);
+  let ahead = 0;
+  let behind = 0;
+  for (const oid of local) if (!tracking.has(oid)) ahead++;
+  for (const oid of tracking) if (!local.has(oid)) behind++;
+  return { ahead, behind };
+}

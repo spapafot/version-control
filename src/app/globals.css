@@ -68,6 +68,19 @@ body {
   outline-offset: 2px;
 }
 
+/* Tailwind v4's preflight leaves buttons on the browser default `cursor: default`.
+   In @layer base so a `cursor-*` utility can still override it per element. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  label[for],
+  select,
+  input:where([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"]) {
+    cursor: pointer;
+  }
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--vc-line) transparent;
@@ -186,4 +199,51 @@ html[data-crt="off"] body::after {
   background: transparent !important;
   scrollbar-width: thin;
   scrollbar-color: var(--vc-line) transparent;
+}
+
+/* ─── print: the certificate sheet on /verify/, ink on paper ─────────── */
+
+@media print {
+  body::before,
+  body::after {
+    display: none; /* CRT scanlines + vignette */
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  body,
+  .bg-ink,
+  .bg-panel,
+  .bg-raised {
+    background: #fff !important;
+  }
+
+  .certificate-sheet {
+    break-inside: avoid;
+  }
+
+  /* phosphor-on-black wastes toner and prints illegibly; flip to dark ink */
+  .certificate-sheet .text-phos,
+  .certificate-sheet .text-fg,
+  .certificate-sheet .text-muted,
+  .certificate-sheet .text-amber {
+    color: #111 !important;
+    text-shadow: none !important;
+  }
+
+  .certificate-sheet .glow-text {
+    text-shadow: none !important;
+  }
+
+  .certificate-sheet .px-corners {
+    clip-path: none !important;
+  }
+
+  .certificate-sheet .bg-phos-dim,
+  .certificate-sheet .bg-amber-dim,
+  .certificate-sheet .bg-line {
+    background: #111 !important; /* the 2px panel frame becomes a plain border */
+  }
 }

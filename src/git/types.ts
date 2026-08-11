@@ -8,7 +8,7 @@ export interface CommitNode {
   message: string;
   parents: string[];
   author: Persona & { timestamp: number };
-  /** branch names whose tip is this commit */
+  /** branch names whose tip is this commit (remote-tracking as "origin/x") */
   refs: string[];
   isMerge: boolean;
   /** paths present in this commit's tree */
@@ -25,11 +25,21 @@ export interface FileStatus {
   conflicted: boolean;
 }
 
+export interface RemoteState {
+  /** origin's ACTUAL refs/heads — the ground truth validators check against */
+  branches: Array<{ name: string; oid: string }>;
+  /** local refs/remotes/origin/* — what fetch/push move; feeds graph + status */
+  tracking: Array<{ name: string; oid: string }>;
+  /** current branch vs its tracking ref; null when HEAD has no tracking ref */
+  ahead: number | null;
+  behind: number | null;
+}
+
 export interface RepoState {
   initialized: boolean;
   head: { ref: string | null; oid: string | null };
   branches: Array<{ name: string; oid: string }>;
-  /** BFS from all branch tips + HEAD, newest first */
+  /** BFS from all branch tips + HEAD + remote-tracking tips, newest first */
   commits: CommitNode[];
   status: FileStatus[];
   /** paths in the HEAD tree */
@@ -38,6 +48,8 @@ export interface RepoState {
   merge: { inProgress: boolean; theirs?: string; conflicted?: string[] };
   /** stash stack, newest first (stash@{0}) */
   stash: Array<{ label: string; files: string[] }>;
+  /** the simulated origin, when the challenge published one */
+  remote: RemoteState | null;
 }
 
 export type MergeOutcome =
@@ -65,4 +77,5 @@ export const EMPTY_REPO_STATE: RepoState = {
   workdir: [],
   merge: { inProgress: false },
   stash: [],
+  remote: null,
 };

@@ -17,6 +17,7 @@ export function makeCompleter(getState: () => RepoState | null) {
       const sub = tokens[1];
       if (sub === "stash") return [...STASH_SUBCOMMANDS];
       if (["switch", "merge", "branch"].includes(sub)) return branches;
+      if (["fetch", "pull", "push"].includes(sub)) return ["origin", ...branches];
       if (["checkout"].includes(sub)) return [...branches, ...files];
       return files;
     }

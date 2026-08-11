@@ -1,0 +1,143 @@
+{
+  "_note": "Snapshot of the course structure. Regenerate from src/challenges/*.ts (challenge `id:` fields, section order from src/challenges/types.ts SECTIONS, achievement ids from src/challenges/index.ts ACHIEVEMENTS) whenever the course changes.",
+  "total": 63,
+  "sections": [
+    {
+      "id": "basics",
+      "title": "First Steps",
+      "slugs": [
+        "first-repository",
+        "check-status",
+        "spot-the-change",
+        "two-kinds-of-change",
+        "stage-everything"
+      ]
+    },
+    {
+      "id": "commits",
+      "title": "Staging & Commits",
+      "slugs": [
+        "first-stage",
+        "your-first-commit",
+        "see-the-difference",
+        "selective-commit",
+        "two-commits",
+        "commit-shortcut",
+        "explore-the-log"
+      ]
+    },
+    {
+      "id": "branches",
+      "title": "Branches",
+      "slugs": [
+        "first-branch",
+        "switch-branch",
+        "commit-on-a-branch",
+        "back-to-main",
+        "where-am-i",
+        "branch-from-the-past",
+        "the-old-way"
+      ]
+    },
+    {
+      "id": "merge",
+      "title": "Merge",
+      "slugs": [
+        "first-merge",
+        "fast-forward",
+        "combine-branches",
+        "double-merge-day",
+        "update-your-branch",
+        "clean-up-branches"
+      ]
+    },
+    {
+      "id": "conflicts",
+      "title": "Merge Conflicts",
+      "slugs": [
+        "trigger-a-conflict",
+        "resolve-the-conflict",
+        "finish-the-merge",
+        "abort-the-merge",
+        "conflict-solo"
+      ]
+    },
+    {
+      "id": "remotes",
+      "title": "The Remote",
+      "slugs": [
+        "meet-the-remote",
+        "fetch-the-news",
+        "pull-it-in",
+        "push-your-work",
+        "the-rejected-push",
+        "pull-with-conflict",
+        "closing-time"
+      ]
+    },
+    {
+      "id": "undo",
+      "title": "Fixing Mistakes",
+      "slugs": [
+        "restore-a-file",
+        "unstage-a-file",
+        "undo-a-local-commit",
+        "rewrite-the-message",
+        "scorched-earth",
+        "undo-a-published-commit",
+        "choose-your-strategy"
+      ]
+    },
+    {
+      "id": "stash",
+      "title": "The Stash",
+      "slugs": [
+        "stash-and-switch",
+        "keep-a-copy",
+        "pick-the-right-stash",
+        "clear-the-shelf",
+        "stash-to-the-right-branch"
+      ]
+    },
+    {
+      "id": "final",
+      "title": "Final Missions",
+      "slugs": [
+        "fix-a-bad-commit",
+        "ship-the-feature",
+        "save-the-merge",
+        "clean-up-the-repo",
+        "grand-opening",
+        "mini-disaster"
+      ]
+    },
+    {
+      "id": "disasters",
+      "title": "Git Disasters",
+      "slugs": [
+        "wrong-branch",
+        "lost-commits",
+        "just-one-commit",
+        "detached-head",
+        "buried-mistake",
+        "bad-rebase",
+        "rescue-the-branch",
+        "conflict-hell"
+      ]
+    }
+  ],
+  "achievements": [
+    "first-commit",
+    "diff-detective",
+    "branch-explorer",
+    "escape-artist",
+    "merge-master",
+    "conflict-resolver",
+    "git-survivor",
+    "stash-keeper",
+    "time-traveler",
+    "disaster-hero",
+    "team-player",
+    "remote-hero"
+  ]
+}

@@ -1,7 +1,7 @@
 import { GitOpError } from "@/git/errors";
 import { isReachable } from "@/git/queries";
 import type { ShellCommand } from "../types";
-import { short } from "./helpers";
+import { printMergeOutcome, short } from "./helpers";
 
 export const branch: ShellCommand = {
   spec: {
@@ -20,7 +20,7 @@ export const branch: ShellCommand = {
       const target = state.branches.find((b) => b.name === name);
       if (!target) throw new GitOpError(`error: branch '${name}' not found.`);
       if (state.head.ref === name) {
-        throw new GitOpError(`error: cannot delete branch '${name}' checked out at '/repo'`);
+        throw new GitOpError(`error: cannot delete branch '${name}' checked out at '${engine.dir}'`);
       }
       if (args.flags.delete && !args.flags.forceDelete) {
         const merged = isReachable(state.commits, state.head.oid, target.oid);
@@ -169,25 +169,6 @@ export const merge: ShellCommand = {
     }
     const before = await engine.resolve("HEAD");
     const outcome = await engine.merge(target);
-    switch (outcome.kind) {
-      case "already-up-to-date":
-        ctx.stdout("Already up to date.");
-        return 0;
-      case "fast-forward":
-        ctx.stdout(`Updating ${short(before)}..${short(outcome.oid)}\nFast-forward`);
-        return 0;
-      case "merge-commit":
-        ctx.stdout("Merge made by the 'ort' strategy.");
-        return 0;
-      case "conflict": {
-        const lines = outcome.conflicted.flatMap((f) => [
-          `Auto-merging ${f}`,
-          `CONFLICT (content): Merge conflict in ${f}`,
-        ]);
-        lines.push("Automatic merge failed; fix conflicts and then commit the result.");
-        ctx.stdout(lines.join("\n"));
-        return 1;
-      }
-    }
+    return printMergeOutcome(ctx, outcome, before);
   },
 };

@@ -17,6 +17,14 @@ export function SiteFooter() {
         dev community
       </p>
       <p className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
+        <Link prefetch={false} href="/stages/" className="hover:text-phos">
+          All missions
+        </Link>
+        <span aria-hidden>·</span>
+        <Link prefetch={false} href="/cheatsheet/" className="hover:text-phos">
+          Cheat sheet
+        </Link>
+        <span aria-hidden>·</span>
         <Link prefetch={false} href="/privacy/" className="hover:text-phos">
           Privacy
         </Link>

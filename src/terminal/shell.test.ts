@@ -430,7 +430,137 @@ describe("plain shell commands", () => {
     let r = await run(shell, "npm install");
     expect(r.err).toContain("npm: command not found");
     expect(r.code).toBe(127);
+    r = await run(shell, "git rebase");
+    expect(r.err).toContain("'rebase' is not a git command");
+  });
+});
+
+describe("remotes through the shell", () => {
+  const PUBLISHED: SetupStep[] = [...BASIC, { do: "publish" }];
+  const BEHIND: SetupStep[] = [
+    ...PUBLISHED,
+    {
+      do: "onRemote",
+      steps: [
+        { do: "file", path: "orario.html", content: "<h2>Hours</h2>\n" },
+        { do: "add", paths: ["orario.html"] },
+        { do: "commit", message: "Opening hours page" },
+      ],
+    },
+  ];
+
+  it("git remote -v lists origin; silent without a remote", async () => {
+    const shell = await shellWith(PUBLISHED);
+    let r = await run(shell, "git remote -v");
+    expect(r.out).toBe("origin\t/origin (fetch)\norigin\t/origin (push)\n");
+    r = await run(shell, "git remote");
+    expect(r.out).toBe("origin\n");
+
+    const bare = await shellWith(BASIC); // no publish → playground-like
+    r = await run(bare, "git remote -v");
+    expect(r.out).toBe("");
+    expect(r.code).toBe(0);
+  });
+
+  it("fetch prints update lines, then goes silent", async () => {
+    const shell = await shellWith(BEHIND);
+    let r = await run(shell, "git fetch");
+    expect(r.out).toContain("From /origin");
+    expect(r.out).toMatch(/ {3}[0-9a-f]{7}\.\.[0-9a-f]{7} {2}main {1}-> origin\/main/);
+    expect(r.code).toBe(0);
+    r = await run(shell, "git fetch");
+    expect(r.out).toBe("");
+    expect(r.code).toBe(0);
+  });
+
+  it("status shows the tracking line in all its moods", async () => {
+    const shell = await shellWith(PUBLISHED);
+    let r = await run(shell, "git status");
+    expect(r.out).toContain("Your branch is up to date with 'origin/main'.");
+    expect(r.out).toContain("nothing to commit, working tree clean");
+
+    // ahead
+    await run(shell, "echo x > events.html");
+    await run(shell, "git add events.html");
+    await run(shell, 'git commit -m "Events"');
+    r = await run(shell, "git status");
+    expect(r.out).toContain("Your branch is ahead of 'origin/main' by 1 commit.");
+
+    // behind (fresh repo, Maria pushed, we fetched)
+    const behind = await shellWith(BEHIND);
+    await run(behind, "git fetch");
+    r = await run(behind, "git status");
+    expect(r.out).toContain(
+      "Your branch is behind 'origin/main' by 1 commit, and can be fast-forwarded.",
+    );
+  });
+
+  it("push: up-to-date, ok, and the rejected block", async () => {
+    const shell = await shellWith(PUBLISHED);
+    let r = await run(shell, "git push");
+    expect(r.out).toBe("Everything up-to-date\n");
+
+    await run(shell, "echo x > events.html");
+    await run(shell, "git add events.html");
+    await run(shell, 'git commit -m "Events"');
     r = await run(shell, "git push");
-    expect(r.err).toContain("'push' is not a git command");
+    expect(r.out).toContain("To /origin");
+    expect(r.out).toMatch(/ {3}[0-9a-f]{7}\.\.[0-9a-f]{7} {2}main -> main/);
+
+    // diverge: Maria pushed meanwhile → rejected
+    const diverged = await shellWith([
+      ...BEHIND,
+      { do: "file", path: "gallery.html", content: "<h2>Gallery</h2>\n" },
+      { do: "add", paths: ["gallery.html"] },
+      { do: "commit", message: "Photo gallery" },
+    ]);
+    r = await run(diverged, "git push");
+    expect(r.err).toContain("! [rejected]        main -> main (fetch first)");
+    expect(r.err).toContain("error: failed to push some refs to '/origin'");
+    expect(r.err).toContain("hint: Updates were rejected because the remote contains work");
+    expect(r.code).toBe(1);
+
+    // the taught recovery: pull (merge), push again
+    r = await run(diverged, "git pull");
+    expect(r.out).toContain("Merge made by the 'ort' strategy.");
+    r = await run(diverged, "git push");
+    expect(r.out).toContain("main -> main");
+    expect(r.code).toBe(0);
+  });
+
+  it("pull fast-forwards when local hasn't moved", async () => {
+    const shell = await shellWith(BEHIND);
+    const r = await run(shell, "git pull");
+    expect(r.out).toContain("From /origin");
+    expect(r.out).toContain("Fast-forward");
+    expect(r.code).toBe(0);
+    const r2 = await run(shell, "git pull");
+    expect(r2.out).toBe("Already up to date.\n");
+  });
+
+  it("no remote configured: real fatals, no crash", async () => {
+    const shell = await shellWith(BASIC); // playground-like
+    let r = await run(shell, "git fetch");
+    expect(r.err).toContain("fatal: No remote repository specified.");
+    expect(r.code).toBe(128);
+    r = await run(shell, "git push");
+    expect(r.err).toContain("fatal: No configured push destination.");
+    expect(r.code).toBe(128);
+    r = await run(shell, "git pull");
+    expect(r.err).toContain("fatal: No remote repository specified.");
+    expect(r.code).toBe(128);
+  });
+
+  it("push to a branch with no upstream explains --set-upstream", async () => {
+    const shell = await shellWith([...PUBLISHED, { do: "branch", name: "feature/x" }, { do: "switch", ref: "feature/x" }]);
+    let r = await run(shell, "git push");
+    expect(r.err).toContain("fatal: The current branch feature/x has no upstream branch.");
+    expect(r.err).toContain("git push --set-upstream origin feature/x");
+    expect(r.code).toBe(128);
+
+    r = await run(shell, "git push -u origin feature/x");
+    expect(r.out).toContain(" * [new branch]      feature/x -> feature/x");
+    expect(r.out).toContain("branch 'feature/x' set up to track 'origin/feature/x'.");
+    expect(r.code).toBe(0);
   });
 });

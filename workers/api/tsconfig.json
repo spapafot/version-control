@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "lib": ["es2022"],
+    // Runtime types come from the generated worker-configuration.d.ts
+    // (`pnpm cf-typegen`), which supersedes @cloudflare/workers-types.
+    "types": [],
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["worker-configuration.d.ts", "src"]
+}

@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import { useGame } from "@/lib/game-store";
 import { useProgress } from "@/lib/progress";
-import { ACHIEVEMENTS, challengeNumber, nextChallenge } from "@/challenges";
+import { ACHIEVEMENTS, ALL_CHALLENGES, challengeNumber, nextChallenge } from "@/challenges";
 import { playAchievement, playSuccess } from "@/lib/sound";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
 
@@ -53,6 +53,8 @@ export function SuccessOverlay() {
   const achievement = challenge.achievement
     ? ACHIEVEMENTS.find((a) => a.id === challenge.achievement)
     : null;
+  // a real aggregate, not "was this the last mission": finishing out of order counts
+  const allDone = ALL_CHALLENGES.every((c) => progress.completed[c.id]);
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/85 p-4">
@@ -75,14 +77,30 @@ export function SuccessOverlay() {
               <p className="mt-1 text-xs text-muted">{achievement.description}</p>
             </div>
           )}
+          {allDone && (
+            <p className="text-sm leading-relaxed text-fg">
+              That was the last one: all {ALL_CHALLENGES.length} missions complete. 🏆
+            </p>
+          )}
           <div className="mt-1 flex flex-wrap justify-center gap-2">
-            {next ? (
+            {allDone ? (
+              <>
+                <Link prefetch={false} href="/account/">
+                  <PixelButton tone="amber">Claim your certificate ▸</PixelButton>
+                </Link>
+                <Link prefetch={false} href="/stages/">
+                  <PixelButton variant="ghost" tone="line">
+                    Back to the map
+                  </PixelButton>
+                </Link>
+              </>
+            ) : next ? (
               <Link prefetch={false} href={`/challenge/${next.id}/`}>
                 <PixelButton>Next mission ▸</PixelButton>
               </Link>
             ) : (
               <Link prefetch={false} href="/stages/">
-                <PixelButton>Course complete. Back to the map 🏆</PixelButton>
+                <PixelButton>Back to the map</PixelButton>
               </Link>
             )}
             <PixelButton variant="ghost" tone="line" onClick={dismissOverlay}>

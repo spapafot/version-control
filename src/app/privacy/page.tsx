@@ -1,21 +1,24 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage, LegalSection } from "@/components/layout/LegalPage";
+import { PAGE_SEO } from "@/lib/page-seo";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy & Cookies",
-  description:
-    "What VersionControl.gr stores, what it doesn't, and how analytics consent works.",
-};
+const seo = PAGE_SEO["/privacy/"];
+
+export const metadata = pageMetadata({
+  title: seo.title,
+  description: seo.description,
+  path: "/privacy/",
+});
 
 export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy & Cookies" updated="10 August 2026">
       <p className="text-fg">
-        VersionControl.gr is a free Git course with no accounts, no payments and
-        no sign-up. The short version: your work stays on your own machine, and
-        the only thing that ever leaves it is anonymous visit counting, which
-        only happens if you agree to it.
+        VersionControl.gr is a free Git course with no payments and no required
+        sign-up. The short version: your work stays on your own machine unless
+        you choose to create an account, and nothing else leaves it except
+        anonymous visit counting, which only happens if you agree to it.
       </p>
 
       <LegalSection heading="Who is responsible">
@@ -51,7 +54,39 @@ export default function PrivacyPage() {
           </code>
           . Both live on your device only. Clearing your browser&apos;s site data
           for versioncontrol.gr deletes them, and also resets your course
-          progress.
+          progress on this device (an account, if you have one, keeps a copy —
+          see the next section).
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Accounts, sync and certificates">
+        <p>
+          Accounts are optional. The whole course works without one; an account
+          only adds progress sync and the certificate. If you create one, your
+          email address and password are handled by Amazon Web Services
+          (Cognito), acting as our processor, and we store your email, your
+          course progress (which missions you completed and when, hint counts,
+          achievements) and, if you set one, the display name for your
+          certificate. We never receive or store the contents of your practice
+          repositories or the commands you type.
+        </p>
+        <p>
+          Signing in never deletes local progress: what is in your browser and
+          what your account has seen from other devices are merged, and the
+          earliest completion for each mission is the one that counts. Signing
+          out leaves the progress in your browser untouched.
+        </p>
+        <p>
+          Certificates are public by design. The verification page for a
+          certificate shows the display name you chose, the issue date, the
+          credential ID and the skills covered, to anyone who has the link. The
+          machine-readable Open Badges credential identifies you only by a
+          salted hash of your email address, never the address itself. Your
+          email is never shown publicly.
+        </p>
+        <p>
+          To delete your account and its data, or to revoke a certificate,
+          write to the contact address above.
         </p>
       </LegalSection>
 
@@ -88,9 +123,10 @@ export default function PrivacyPage() {
 
       <LegalSection heading="What we never collect">
         <p>
-          No accounts, no passwords, no email addresses, no payment details, no
-          contact forms. There are no advertising trackers, social media embeds
-          or third-party fonts loaded from other servers.
+          No payment details and no contact forms. Unless you create an
+          account, no email addresses or passwords either. There are no
+          advertising trackers, social media embeds or third-party fonts loaded
+          from other servers, with or without an account.
         </p>
       </LegalSection>
 
@@ -98,11 +134,14 @@ export default function PrivacyPage() {
         <p>
           Under the GDPR you can ask for access to, correction of, or erasure of
           personal data held about you, and you can object to processing or
-          withdraw consent. Since the only personal data involved here is
-          collected by Google Analytics after you opt in, withdrawing consent and
-          clearing your browser data covers most of it. For anything else, use
-          the contact address above. You also have the right to complain to your
-          national data protection authority.
+          withdraw consent. Without an account, the only personal data involved
+          is collected by Google Analytics after you opt in, so withdrawing
+          consent and clearing your browser data covers most of it. With an
+          account, erasure means deleting your profile, progress and, if you
+          ask for it, your certificate (its verification link then stops
+          working). For any of this, use the contact address above. You also
+          have the right to complain to your national data protection
+          authority.
         </p>
       </LegalSection>
 

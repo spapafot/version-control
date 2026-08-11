@@ -10,6 +10,34 @@ export function formatStatus(state: RepoState): string {
       : `On branch ${state.head.ref ?? "main"}`,
   );
 
+  // "Your branch is …" tracking line, exactly where real git puts it
+  const hasTracking =
+    !detached &&
+    state.head.ref !== null &&
+    state.head.oid !== null &&
+    state.remote !== null &&
+    state.remote.tracking.some((t) => t.name === state.head.ref);
+  if (hasTracking) {
+    const upstream = `'origin/${state.head.ref}'`;
+    const ahead = state.remote!.ahead ?? 0;
+    const behind = state.remote!.behind ?? 0;
+    if (ahead === 0 && behind === 0) {
+      lines.push(`Your branch is up to date with ${upstream}.`);
+    } else if (ahead > 0 && behind === 0) {
+      lines.push(`Your branch is ahead of ${upstream} by ${ahead} commit${ahead === 1 ? "" : "s"}.`);
+      lines.push('  (use "git push" to publish your local commits)');
+    } else if (behind > 0 && ahead === 0) {
+      lines.push(
+        `Your branch is behind ${upstream} by ${behind} commit${behind === 1 ? "" : "s"}, and can be fast-forwarded.`,
+      );
+      lines.push('  (use "git pull" to update your local branch)');
+    } else {
+      lines.push(`Your branch and ${upstream} have diverged,`);
+      lines.push(`and have ${ahead} and ${behind} different commits each, respectively.`);
+      lines.push('  (use "git pull" if you want to integrate the remote branch with yours)');
+    }
+  }
+
   if (state.head.oid === null) {
     lines.push("");
     lines.push("No commits yet");
@@ -21,6 +49,7 @@ export function formatStatus(state: RepoState): string {
   const untracked = state.status.filter((f) => f.untracked && !f.staged && !f.conflicted);
 
   if (state.merge.inProgress) {
+    if (hasTracking) lines.push("");
     if (conflicted.length > 0) {
       lines.push("You have unmerged paths.");
       lines.push('  (fix conflicts and run "git commit")');
@@ -78,6 +107,7 @@ export function formatStatus(state: RepoState): string {
       lines.push("");
       lines.push('nothing to commit (create/copy files and use "git add" to track)');
     } else {
+      if (hasTracking) lines.push("");
       lines.push("nothing to commit, working tree clean");
     }
   } else if (!anyStaged && unstaged.length > 0) {

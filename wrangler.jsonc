@@ -2,12 +2,18 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "versioncontrol-gr",
   "compatibility_date": "2026-08-01",
+  // Edge worker for /verify/{credentialId}/ pages (per-certificate metadata).
+  // run_worker_first below keeps every other path on the pure asset fast path.
+  "main": "worker/index.ts",
   "routes": [
     { "pattern": "www.versioncontrol.gr", "custom_domain": true },
     { "pattern": "versioncontrol.gr", "custom_domain": true }
   ],
   "assets": {
     "directory": "./out",
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    "binding": "ASSETS",
+    "run_worker_first": ["/verify/*"]
+  },
+  "observability": { "enabled": true }
 }

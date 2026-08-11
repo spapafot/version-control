@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vc-api-proxy",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "routes": [{ "pattern": "api.versioncontrol.gr", "custom_domain": true }],
+  // No vars here on purpose. BOTH runtime values are plaintext variables set
+  // BY HAND in the Cloudflare dashboard (Workers -> vc-api-proxy -> Settings
+  // -> Variables), so neither ends up in git:
+  //   LAMBDA_URL    - the Function URL from scripts/aws/out/stack.env, no
+  //                   trailing slash. Kept out of the repo: anyone who learns
+  //                   it can hit the Lambda directly, bypassing Cloudflare's
+  //                   rate limits (requests still 403 without the proxy
+  //                   secret, but each one is a billed invocation).
+  //   PROXY_SECRET  - shared secret the Lambda middleware requires.
+  // keep_vars makes `wrangler deploy` preserve dashboard-set variables
+  // instead of wiping them on every deploy. For local dev put both in
+  // .dev.vars (gitignored).
+  "keep_vars": true,
+  "observability": {
+    "enabled": true,
+  },
+}

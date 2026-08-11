@@ -11,8 +11,8 @@ export const init: ShellCommand = {
     await ctx.engine.init("main");
     ctx.stdout(
       already
-        ? "Reinitialized existing Git repository in /repo/.git/"
-        : "Initialized empty Git repository in /repo/.git/",
+        ? `Reinitialized existing Git repository in ${ctx.engine.dir}/.git/`
+        : `Initialized empty Git repository in ${ctx.engine.dir}/.git/`,
     );
     return 0;
   },

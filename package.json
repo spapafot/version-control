@@ -9,7 +9,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "deploy": "next build && wrangler deploy",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "seo:check": "node scripts/seo-check.mjs",
+    "seo:keywords": "node scripts/gen-keyword-map.mjs",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.4",
@@ -21,6 +24,7 @@
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
+    "aws-amplify": "^6.20.0",
     "canvas-confetti": "^1.9.4",
     "codemirror": "^6.0.2",
     "diff": "^9.0.0",

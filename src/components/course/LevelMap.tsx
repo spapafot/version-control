@@ -10,13 +10,14 @@ import {
   SECTIONS,
 } from "@/challenges";
 import { GameHeader } from "@/components/layout/GameHeader";
-import { HudLabel, PixelPanel, PixelProgress } from "@/components/ui/pixel";
+import { HudLabel, PixelButton, PixelPanel, PixelProgress } from "@/components/ui/pixel";
 
 export function LevelMap() {
   const completed = useProgress((s) => s.completed);
   const achievements = useProgress((s) => s.achievements);
 
   const firstOpen = ALL_CHALLENGES.find((c) => !completed[c.id])?.id ?? null;
+  const courseDone = firstOpen === null;
 
   return (
     <div className="flex min-h-dvh flex-col gap-3 bg-ink p-2 pb-10">
@@ -31,6 +32,20 @@ export function LevelMap() {
           </p>
         </div>
 
+        {courseDone && (
+          <PixelPanel tone="phos" title="★ Course complete" titleAs="h2">
+            <div className="flex flex-col items-start gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm leading-relaxed text-fg">
+                All {ALL_CHALLENGES.length} missions cleared. You can issue a free
+                certificate with your name on it and share it anywhere.
+              </p>
+              <Link prefetch={false} href="/account/" className="shrink-0">
+                <PixelButton tone="amber">Claim your certificate ▸</PixelButton>
+              </Link>
+            </div>
+          </PixelPanel>
+        )}
+
         {SECTIONS.map((section) => {
           const list = challengesInSection(section.id);
           const done = list.filter((c) => completed[c.id]).length;
@@ -40,6 +55,7 @@ export function LevelMap() {
               key={section.id}
               tone={allDone ? "phos" : "line"}
               title={`World ${section.world} — ${section.title}`}
+              titleAs="h2"
               actions={
                 <span className={allDone ? "text-phos" : "text-muted"}>
                   {done}/{list.length} {allDone ? "★" : ""}
@@ -64,6 +80,9 @@ export function LevelMap() {
                           prefetch={false}
                           href={`/challenge/${c.id}/`}
                           title={c.title}
+                          // the visible text is just a number, so give screen
+                          // readers and crawlers the actual mission name
+                          aria-label={`Mission ${challengeNumber(c.id)}: ${c.title}`}
                           className={`px-corners flex h-11 w-11 items-center justify-center font-mono text-sm transition-transform hover:-translate-y-0.5 ${
                             isDone
                               ? "bg-phos text-ink [box-shadow:var(--glow-phos)]"

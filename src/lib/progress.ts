@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -39,6 +40,58 @@ export const useProgress = create<ProgressState>()(
       toggleSound: () => set({ soundOn: !get().soundOn }),
       toggleCrt: () => set({ crtOn: !get().crtOn }),
     }),
-    { name: "versioncontrol-progress" },
+    {
+      name: "versioncontrol-progress",
+      version: 1,
+      // Version 0 is the original unversioned blob. The migration only
+      // sanitizes shapes: pre-account blobs may have been hand-edited, and the
+      // sync engine assumes these fields hold what their types promise.
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Record<string, unknown>;
+        const completed: Record<string, string> = {};
+        if (p.completed && typeof p.completed === "object") {
+          for (const [k, v] of Object.entries(p.completed as Record<string, unknown>)) {
+            if (typeof v === "string") completed[k] = v;
+          }
+        }
+        const hintsUsed: Record<string, number> = {};
+        if (p.hintsUsed && typeof p.hintsUsed === "object") {
+          for (const [k, v] of Object.entries(p.hintsUsed as Record<string, unknown>)) {
+            if (typeof v === "number" && Number.isFinite(v) && v >= 0) hintsUsed[k] = v;
+          }
+        }
+        const achievements = Array.isArray(p.achievements)
+          ? (p.achievements as unknown[]).filter((a): a is string => typeof a === "string")
+          : [];
+        // Actions are restored by persist's shallow merge with the initial state.
+        return {
+          completed,
+          hintsUsed,
+          achievements,
+          soundOn: typeof p.soundOn === "boolean" ? p.soundOn : true,
+          crtOn: typeof p.crtOn === "boolean" ? p.crtOn : true,
+        } as ProgressState;
+      },
+    },
   ),
 );
+
+/**
+ * False until zustand has read localStorage. The static prerender has no
+ * storage, so anything gated on progress (certificate CTA, done counts used in
+ * decisions) must wait for this or it acts on the empty initial state.
+ */
+export function useProgressHydrated(): boolean {
+  // Always starts false so the client's first render matches the prerendered HTML.
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    if (useProgress.persist.hasHydrated()) {
+      setHydrated(true);
+      return;
+    }
+    return useProgress.persist.onFinishHydration(() => setHydrated(true));
+  }, []);
+
+  return hydrated;
+}

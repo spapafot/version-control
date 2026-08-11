@@ -1,0 +1,9 @@
+# Cloudflare Workers static-assets header rules. Next copies public/ into out/,
+# which is the assets directory wrangler.jsonc points at.
+#
+# Next's metadata image route writes an extensionless file (out/opengraph-image),
+# so nothing infers its type from a file extension. Social crawlers reject an
+# image served as application/octet-stream, so set it explicitly.
+/opengraph-image
+  Content-Type: image/png
+  Cache-Control: public, max-age=86400

@@ -5,6 +5,7 @@ import { reset, restore, revert } from "./undo";
 import { diff } from "./diff";
 import { cherryPick, reflog } from "./history";
 import { stash } from "./stash";
+import { fetch, pull, push, remote } from "./remotes";
 
 export const gitCommands: Record<string, ShellCommand> = {
   init,
@@ -23,6 +24,10 @@ export const gitCommands: Record<string, ShellCommand> = {
   stash,
   reflog,
   "cherry-pick": cherryPick,
+  remote,
+  fetch,
+  pull,
+  push,
 };
 
 export const GIT_USAGE = [
@@ -46,4 +51,8 @@ export const GIT_USAGE = [
   "   stash      Shelve uncommitted changes and pick them up later",
   "   reflog     History of HEAD's movements; finds \"lost\" commits",
   "   cherry-pick  Apply a single commit from another branch",
+  "   remote     Show the linked remote repositories",
+  "   fetch      Download the remote's news (updates origin/* only)",
+  "   pull       Fetch + merge the remote's work into your branch",
+  "   push       Upload your commits to the remote",
 ].join("\n");
