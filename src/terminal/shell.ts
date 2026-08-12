@@ -1,6 +1,7 @@
 import type { GitEngine } from "@/git/engine";
 import { GitOpError } from "@/git/errors";
 import { ShellParseError, tokenize } from "./tokenizer";
+import { painter } from "./format/color";
 import { parseArgs } from "./parser";
 import type { CommandContext, ShellCommand } from "./commands/types";
 import { gitCommands, GIT_USAGE } from "./commands/git";
@@ -47,6 +48,9 @@ export class Shell {
       stdout: redirect ? (t) => (buffer += t + "\n") : io.stdout,
       stderr: io.stderr,
       clear: io.clear,
+      // `git status > out.txt` must write plain text, exactly as real git does
+      // when stdout is not a terminal
+      paint: painter(!redirect),
     };
 
     try {

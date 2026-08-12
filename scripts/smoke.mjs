@@ -78,6 +78,34 @@ try {
   await new Promise((r) => setTimeout(r, 500));
   await page.screenshot({ path: `${SHOTS}/01-challenge-initial.png` });
 
+  // ── lesson notes: in the HTML, but in a dialog rather than on the page ──
+  //    (the whole point is that the game fits one screen with no scrolling)
+  const pageScrolls = await page.evaluate(
+    () => document.scrollingElement.scrollHeight > window.innerHeight + 2,
+  );
+  if (pageScrolls) fail("challenge page scrolls at 1440x900; notes belong in the dialog");
+  const beforeNotes = await page.evaluate(() => document.body.innerText);
+  if (beforeNotes.includes("LESSON NOTES —"))
+    fail("lesson notes are rendered on the page instead of inside the dialog");
+
+  await page.$$eval("button", (btns) => {
+    const b = btns.find((x) => x.textContent?.toUpperCase().includes("LESSON NOTES"));
+    if (b) b.click();
+  });
+  await new Promise((r) => setTimeout(r, 400));
+  const notesText = await page.evaluate(
+    () => document.querySelector('[role="dialog"]')?.innerText ?? "",
+  );
+  if (!notesText.includes("YOUR OBJECTIVE")) fail("lesson notes dialog did not open");
+  await page.screenshot({ path: `${SHOTS}/01b-lesson-notes.png` });
+
+  await page.keyboard.press("Escape");
+  await new Promise((r) => setTimeout(r, 300));
+  const stillOpen = await page.evaluate(() =>
+    Boolean(document.querySelector('[role="dialog"]')),
+  );
+  if (stillOpen) fail("lesson notes dialog did not close on Escape");
+
   await typeInTerminal("git status");
   await typeInTerminal("git init");
 
@@ -85,6 +113,21 @@ try {
     .waitForFunction(() => document.body.innerText.includes("COMPLETED"), { timeout: 8000 })
     .catch(() => null);
   if (!overlay) fail("success overlay did not appear after git init");
+
+  // the completion card must not cover the terminal: the command that finishes
+  // a mission is usually the one whose output is worth reading
+  const cardClears = await page.evaluate(() => {
+    const card = document.querySelector('[role="status"]')?.getBoundingClientRect();
+    const term = document.querySelector(".xterm")?.getBoundingClientRect();
+    if (!card || !term) return null;
+    return card.right < term.left || card.left > term.right || card.bottom < term.top;
+  });
+  if (cardClears === null) fail("completion card or terminal not found");
+  else if (!cardClears) fail("completion card overlaps the terminal");
+  const outputStillVisible = await page.evaluate(() =>
+    document.querySelector(".xterm").innerText.includes("Initialized empty Git repository"),
+  );
+  if (!outputStillVisible) fail("last command output is not readable behind the completion card");
   await page.screenshot({ path: `${SHOTS}/02-challenge-success.png` });
 
   // navigate to the next challenge via the overlay Link

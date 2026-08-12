@@ -36,7 +36,9 @@ export function ChallengeScreen({ slug }: { slug: string }) {
   return (
     <div className="flex min-h-dvh flex-col gap-2 bg-ink p-2 lg:h-dvh lg:min-h-0">
       <GameHeader />
-      <div className="grid flex-1 grid-cols-1 gap-2 lg:min-h-0 lg:grid-cols-[360px_1fr]">
+      {/* relative: the completion card anchors to this area's top-right corner
+          on lg, which keeps it clear of the header and off the terminal */}
+      <div className="relative grid flex-1 grid-cols-1 gap-2 lg:min-h-0 lg:grid-cols-[360px_1fr]">
         <div className="lg:min-h-0">
           <MissionPanel />
         </div>
@@ -68,8 +70,8 @@ export function ChallengeScreen({ slug }: { slug: string }) {
             <TerminalPanel banner={TERMINAL_BANNER} />
           </PixelPanel>
         </div>
+        <SuccessOverlay />
       </div>
-      <SuccessOverlay />
       <FileEditorModal />
     </div>
   );

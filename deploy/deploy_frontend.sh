@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# Build the static site and ship it to Cloudflare, including the /verify/*
-# edge worker bundled from worker/index.ts. Code only: no AWS resources, no
-# Worker variables, no infra changes.
-#
-# Usage:  ./deploy/deploy_frontend.sh
+
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

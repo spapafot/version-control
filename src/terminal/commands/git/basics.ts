@@ -21,7 +21,7 @@ export const init: ShellCommand = {
 export const status: ShellCommand = {
   spec: { flags: {} },
   async run(ctx) {
-    ctx.stdout(formatStatus(await ctx.engine.snapshot()));
+    ctx.stdout(formatStatus(await ctx.engine.snapshot(), ctx.paint));
     return 0;
   },
 };
@@ -71,7 +71,7 @@ export const commit: ShellCommand = {
     const state = await engine.snapshot();
     const hasStaged = state.status.some((f) => f.staged || f.conflicted);
     if (!hasStaged && !state.merge.inProgress) {
-      ctx.stdout(formatStatus(state));
+      ctx.stdout(formatStatus(state, ctx.paint));
       return 1;
     }
 
@@ -98,7 +98,7 @@ export const log: ShellCommand = {
         128,
       );
     }
-    ctx.stdout(formatLog(state, { oneline: Boolean(args.flags.oneline) }));
+    ctx.stdout(formatLog(state, { oneline: Boolean(args.flags.oneline), paint: ctx.paint }));
     return 0;
   },
 };

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useGame } from "@/lib/game-store";
+import { useNotesDialog } from "@/lib/notes-dialog";
 import { useProgress } from "@/lib/progress";
 import { challengeNumber, SECTIONS } from "@/challenges";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
@@ -15,6 +16,7 @@ export function MissionPanel() {
   const reset = useGame((s) => s.reset);
   const completed = useGame((s) => s.completed);
   const recordHints = useProgress((s) => s.recordHints);
+  const openNotes = useNotesDialog((s) => s.openNotes);
 
   if (!challenge) return null;
 
@@ -99,6 +101,11 @@ export function MissionPanel() {
         <div className="mt-auto flex flex-wrap gap-2 border-t border-line pt-3">
           <PixelButton variant="ghost" tone="red" onClick={() => void reset()}>
             ↺ Reset
+          </PixelButton>
+          {/* the written lesson used to sit under the game; it is a dialog now
+              so the mission fits one screen */}
+          <PixelButton variant="ghost" tone="amber" onClick={openNotes}>
+            ▪ Lesson notes
           </PixelButton>
           <Link prefetch={false} href="/stages/" className="ml-auto">
             <PixelButton variant="ghost" tone="line">

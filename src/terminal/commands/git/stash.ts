@@ -66,14 +66,14 @@ export const stash: ShellCommand = {
 
       case "apply": {
         await engine.stashApply(requireEntry(engine.stash.length, refArg));
-        ctx.stdout(formatStatus(await engine.snapshot()));
+        ctx.stdout(formatStatus(await engine.snapshot(), ctx.paint));
         return 0;
       }
 
       case "pop": {
         const index = requireEntry(engine.stash.length, refArg);
         const entry = await engine.stashPop(index);
-        ctx.stdout(formatStatus(await engine.snapshot()));
+        ctx.stdout(formatStatus(await engine.snapshot(), ctx.paint));
         ctx.stdout(`Dropped ${droppedName(refArg, index)} (${entry.oid})`);
         return 0;
       }

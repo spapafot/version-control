@@ -57,9 +57,23 @@ export function SuccessOverlay() {
   const allDone = ALL_CHALLENGES.every((c) => progress.completed[c.id]);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/85 p-4">
-      <PixelPanel tone="phos" className="power-on w-full max-w-md">
-        <div className="flex flex-col items-center gap-4 p-6 text-center">
+    // Deliberately a corner card, not a modal: the mission is usually finished
+    // by a command whose output is the thing worth reading ("git status" says
+    // the branch is up to date with origin/main), and a centred dialog with a
+    // dimmed backdrop hid exactly that. Nothing here dims, blocks or takes
+    // focus — the terminal stays live and keeps the caret, so the player can
+    // read the last output, run more commands, and continue when ready.
+    // On lg it is absolute inside the game grid, so it tucks under the header
+    // and over the graph; below that it pins to the top of the viewport.
+    <div
+      role="status"
+      className="fixed inset-x-2 top-2 z-40 mx-auto max-w-sm lg:absolute lg:inset-x-auto lg:right-0 lg:top-0 lg:mx-0 lg:w-full"
+    >
+      <PixelPanel
+        tone="phos"
+        className="power-on max-h-[calc(100dvh-1rem)] w-full overflow-y-auto"
+      >
+        <div className="flex flex-col items-center gap-3 p-5 text-center">
           <HudLabel tone="phos">Mission {String(challengeNumber(challenge.id)).padStart(2, "0")}</HudLabel>
           <h2 className="hud glow-text text-2xl text-phos">Completed!</h2>
           <p className="font-mono text-2xl tracking-[0.3em] text-amber" aria-hidden>

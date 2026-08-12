@@ -11,14 +11,21 @@ async function shellWith(steps: SetupStep[] = []): Promise<Shell> {
   return new Shell(engine);
 }
 
+/* eslint-disable no-control-regex */
+const ANSI = /\x1b\[[0-9;]*m/g;
+
+/**
+ * `out`/`err` come back decoloured so the wording assertions stay about the
+ * wording; `raw` keeps the escape codes for the colour tests at the bottom.
+ */
 async function run(shell: Shell, line: string) {
-  let out = "";
+  let raw = "";
   let err = "";
   const code = await shell.execute(line, {
-    stdout: (t) => (out += t + "\n"),
+    stdout: (t) => (raw += t + "\n"),
     stderr: (t) => (err += t + "\n"),
   });
-  return { out, err, code };
+  return { out: raw.replace(ANSI, ""), err: err.replace(ANSI, ""), raw, code };
 }
 
 const BASIC: SetupStep[] = [
@@ -562,5 +569,76 @@ describe("remotes through the shell", () => {
     expect(r.out).toContain(" * [new branch]      feature/x -> feature/x");
     expect(r.out).toContain("branch 'feature/x' set up to track 'origin/feature/x'.");
     expect(r.code).toBe(0);
+  });
+});
+
+describe("colour, following git's own defaults", () => {
+  const GREEN = "\x1b[32m";
+  const RED = "\x1b[31m";
+  const CYAN = "\x1b[36m";
+  const YELLOW = "\x1b[33m";
+  const BOLD = "\x1b[1m";
+
+  it("git status: staged green, unstaged and untracked red", async () => {
+    const shell = await shellWith(BASIC);
+    await run(shell, "echo changed > README.md");
+    await run(shell, "echo fresh > notes.txt");
+    await run(shell, "git add notes.txt");
+
+    const r = await run(shell, "git status");
+    expect(r.raw).toContain(`\t${GREEN}new file:   notes.txt\x1b[0m`);
+    expect(r.raw).toContain(`\t${RED}modified:   README.md\x1b[0m`);
+    // headers and hints stay uncoloured, as in git
+    expect(r.raw).toContain("\nChanges to be committed:\n");
+  });
+
+  it("git status: untracked files are red", async () => {
+    const shell = await shellWith(BASIC);
+    await run(shell, "echo fresh > notes.txt");
+    const r = await run(shell, "git status");
+    expect(r.raw).toContain(`\t${RED}notes.txt\x1b[0m`);
+  });
+
+  it("no colour once stdout is redirected into a file", async () => {
+    const shell = await shellWith(BASIC);
+    await run(shell, "echo fresh > notes.txt");
+    await run(shell, "git status > report.txt");
+    const r = await run(shell, "cat report.txt");
+    expect(r.raw).not.toMatch(ANSI);
+    expect(r.raw).toContain("\tnotes.txt");
+  });
+
+  it("git diff: meta bold, hunk header cyan, + green and - red", async () => {
+    const shell = await shellWith(BASIC);
+    await run(shell, "echo changed > README.md");
+    const r = await run(shell, "git diff");
+    expect(r.raw).toContain(`${BOLD}diff --git a/README.md b/README.md\x1b[0m`);
+    expect(r.raw).toContain(`${CYAN}@@ -1,1 +1,1 @@\x1b[0m`);
+    expect(r.raw).toContain(`${GREEN}+changed\x1b[0m`);
+    expect(r.raw).toContain(`${RED}-# hello\x1b[0m`);
+  });
+
+  it("git log: yellow commit line, HEAD cyan, branch green", async () => {
+    const shell = await shellWith(BASIC);
+    const r = await run(shell, "git log --oneline");
+    expect(r.raw).toMatch(/^\x1b\[33m[0-9a-f]{7}\x1b\[0m/);
+    expect(r.raw).toContain(`${CYAN}HEAD\x1b[0m${YELLOW} -> \x1b[0m${GREEN}main\x1b[0m`);
+    expect(r.out).toMatch(/^[0-9a-f]{7} \(HEAD -> main\) Initial commit\n$/);
+  });
+
+  it("git log: remote-tracking branches are red", async () => {
+    const shell = await shellWith([...BASIC, { do: "publish" }]);
+    const r = await run(shell, "git log --oneline");
+    expect(r.raw).toContain(`${RED}origin/main\x1b[0m`);
+    // a local branch with a slash is still a local branch
+    await run(shell, "git switch -c feature/menu");
+    const r2 = await run(shell, "git log --oneline");
+    expect(r2.raw).toContain(`${GREEN}feature/menu\x1b[0m`);
+  });
+
+  it("git branch: the checked-out branch is green, the marker is not", async () => {
+    const shell = await shellWith(BASIC);
+    const r = await run(shell, "git branch");
+    expect(r.raw).toBe(`* ${GREEN}main\x1b[0m\n`);
   });
 });

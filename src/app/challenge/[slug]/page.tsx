@@ -4,6 +4,7 @@ import { ALL_CHALLENGES, challengeBySlug, challengeNumber, sectionOf } from "@/c
 import { CHALLENGE_SEO } from "@/challenges/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { MissionBrief } from "@/components/challenge/MissionBrief";
+import { NotesDialog } from "@/components/challenge/NotesDialog";
 import { breadcrumbSchema, missionSchema } from "@/lib/schema";
 import { OG_IMAGE, SITE, canonical, snippet } from "@/lib/seo";
 import { ChallengeClient } from "./ChallengeClient";
@@ -61,8 +62,12 @@ export default async function ChallengePage({
   return (
     <>
       <ChallengeClient slug={slug} />
-      {/* static, crawlable counterpart to the client-only screen above */}
-      <MissionBrief challenge={challenge} />
+      {/* static, crawlable counterpart to the client-only screen above; the
+          dialog keeps it in the HTML but off the screen until asked for, so
+          the game itself fits one viewport */}
+      <NotesDialog label={`Lesson notes for ${challenge.title}`}>
+        <MissionBrief challenge={challenge} />
+      </NotesDialog>
       <JsonLd
         data={[
           missionSchema(challenge),

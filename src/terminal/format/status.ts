@@ -1,7 +1,15 @@
 import type { RepoState } from "@/git/types";
+import { plain, type Paint } from "./color";
 
-/** Renders `git status` exactly like real git (English, tab-indented paths). */
-export function formatStatus(state: RepoState): string {
+/**
+ * Renders `git status` exactly like real git (English, tab-indented paths).
+ *
+ * Colours follow git's own `color.status` defaults: staged entries green,
+ * unstaged, untracked and unmerged ones red, everything else — headers, hints,
+ * the branch line, the summary — left alone. As in git, the leading tab sits
+ * outside the colour.
+ */
+export function formatStatus(state: RepoState, paint: Paint = plain): string {
   const lines: string[] = [];
   const detached = state.head.ref === null && state.head.oid !== null;
   lines.push(
@@ -67,7 +75,7 @@ export function formatStatus(state: RepoState): string {
     for (const f of staged) {
       const label =
         f.staged === "added" ? "new file:" : f.staged === "deleted" ? "deleted:" : "modified:";
-      lines.push(`\t${label.padEnd(12)}${f.path}`);
+      lines.push(`\t${paint("green", `${label.padEnd(12)}${f.path}`)}`);
     }
   }
 
@@ -76,7 +84,7 @@ export function formatStatus(state: RepoState): string {
     lines.push("Unmerged paths:");
     lines.push('  (use "git add <file>..." to mark resolution)');
     for (const f of conflicted) {
-      lines.push(`\tboth modified:   ${f.path}`);
+      lines.push(`\t${paint("red", `both modified:   ${f.path}`)}`);
     }
   }
 
@@ -87,7 +95,7 @@ export function formatStatus(state: RepoState): string {
     lines.push('  (use "git restore <file>..." to discard changes in working directory)');
     for (const f of unstaged) {
       const label = f.unstaged === "deleted" ? "deleted:" : "modified:";
-      lines.push(`\t${label.padEnd(12)}${f.path}`);
+      lines.push(`\t${paint("red", `${label.padEnd(12)}${f.path}`)}`);
     }
   }
 
@@ -96,7 +104,7 @@ export function formatStatus(state: RepoState): string {
     lines.push("Untracked files:");
     lines.push('  (use "git add <file>..." to include in what will be committed)');
     for (const f of untracked) {
-      lines.push(`\t${f.path}`);
+      lines.push(`\t${paint("red", f.path)}`);
     }
   }
 

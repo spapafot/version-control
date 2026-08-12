@@ -37,14 +37,16 @@ export const branch: ShellCommand = {
     }
 
     if (args.positionals.length === 0) {
+      // git colours the checked-out entry green (color.branch.current) and
+      // leaves the "* " marker itself plain
       const detached =
         state.head.ref === null && state.head.oid !== null
-          ? [`* (HEAD detached at ${state.head.oid.slice(0, 7)})`]
+          ? [`* ${ctx.paint("green", `(HEAD detached at ${state.head.oid.slice(0, 7)})`)}`]
           : [];
       const lines = [
         ...detached,
         ...state.branches.map((b) =>
-          b.name === state.head.ref ? `* ${b.name}` : `  ${b.name}`,
+          b.name === state.head.ref ? `* ${ctx.paint("green", b.name)}` : `  ${b.name}`,
         ),
       ].join("\n");
       if (lines) ctx.stdout(lines);

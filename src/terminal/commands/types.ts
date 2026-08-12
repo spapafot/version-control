@@ -1,4 +1,5 @@
 import type { GitEngine } from "@/git/engine";
+import type { Paint } from "../format/color";
 import type { CommandSpec, ParsedArgs } from "../parser";
 
 export interface CommandContext {
@@ -7,6 +8,8 @@ export interface CommandContext {
   stdout(text: string): void;
   stderr(text: string): void;
   clear?: () => void;
+  /** git's isatty rule: colours go dead once stdout is redirected to a file */
+  paint: Paint;
 }
 
 export interface ShellCommand {

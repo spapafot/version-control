@@ -1,5 +1,6 @@
 import { structuredPatch } from "diff";
 import { stagedText, textAt } from "@/git/blobs";
+import type { Paint } from "../../format/color";
 import type { ShellCommand } from "../types";
 
 export const diff: ShellCommand = {
@@ -32,7 +33,7 @@ export const diff: ShellCommand = {
         after = f.unstaged === "deleted" ? null : (state.workdir.find((w) => w.path === f.path)?.content ?? null);
       }
       if (before === after) continue;
-      out.push(renderFileDiff(f.path, before, after));
+      out.push(renderFileDiff(f.path, before, after, ctx.paint));
     }
 
     if (out.length > 0) ctx.stdout(out.join("\n"));
@@ -40,17 +41,30 @@ export const diff: ShellCommand = {
   },
 };
 
-function renderFileDiff(path: string, before: string | null, after: string | null): string {
-  const lines: string[] = [`diff --git a/${path} b/${path}`];
-  if (before === null) lines.push("new file mode 100644");
-  if (after === null) lines.push("deleted file mode 100644");
-  lines.push(before === null ? "--- /dev/null" : `--- a/${path}`);
-  lines.push(after === null ? "+++ /dev/null" : `+++ b/${path}`);
+/** git's `color.diff` defaults: meta bold, hunk headers cyan, +green, -red. */
+function renderFileDiff(
+  path: string,
+  before: string | null,
+  after: string | null,
+  paint: Paint,
+): string {
+  const meta = (text: string) => paint("bold", text);
+  const lines: string[] = [meta(`diff --git a/${path} b/${path}`)];
+  if (before === null) lines.push(meta("new file mode 100644"));
+  if (after === null) lines.push(meta("deleted file mode 100644"));
+  lines.push(meta(before === null ? "--- /dev/null" : `--- a/${path}`));
+  lines.push(meta(after === null ? "+++ /dev/null" : `+++ b/${path}`));
 
   const patch = structuredPatch(path, path, before ?? "", after ?? "", "", "", { context: 3 });
   for (const hunk of patch.hunks) {
-    lines.push(`@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@`);
-    lines.push(...hunk.lines);
+    lines.push(
+      paint("cyan", `@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@`),
+    );
+    for (const line of hunk.lines) {
+      if (line.startsWith("+")) lines.push(paint("green", line));
+      else if (line.startsWith("-")) lines.push(paint("red", line));
+      else lines.push(line);
+    }
   }
   return lines.join("\n");
 }

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useGame } from "@/lib/game-store";
+import { useNotesDialog } from "@/lib/notes-dialog";
 import { GameHeader } from "@/components/layout/GameHeader";
 import { FileExplorer } from "@/components/file-explorer/FileExplorer";
 import { GitGraph } from "@/components/git-graph/GitGraph";
@@ -19,6 +20,7 @@ export function PlaygroundScreen() {
   const loadPlayground = useGame((s) => s.loadPlayground);
   const reset = useGame((s) => s.reset);
   const ready = useGame((s) => s.slug === null && s.state !== null);
+  const openNotes = useNotesDialog((s) => s.openNotes);
 
   useEffect(() => {
     void loadPlayground();
@@ -40,6 +42,11 @@ export function PlaygroundScreen() {
         right={
           <div className="flex items-center gap-2">
             <HudLabel tone="amber">Playground</HudLabel>
+            {/* the About text used to sit under the sandbox; it is a dialog
+                now so the sandbox fits one screen */}
+            <PixelButton variant="ghost" tone="amber" onClick={openNotes}>
+              ▪ About
+            </PixelButton>
             <PixelButton variant="ghost" tone="red" onClick={() => void reset()}>
               ↺ Reset
             </PixelButton>

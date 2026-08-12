@@ -13,12 +13,16 @@ import { RichText } from "./RichText";
 /**
  * The written record of a mission, rendered on the server.
  *
- * The interactive screen above this sits behind a next/dynamic ssr:false
- * boundary (xterm, isomorphic-git and memfs must stay out of prerendering), so
- * without this section the page reaches a crawler as an empty body. This is
- * plain challenge data with no engine dependency, so it prerenders fine.
+ * The interactive screen sits behind a next/dynamic ssr:false boundary (xterm,
+ * isomorphic-git and memfs must stay out of prerendering), so without this
+ * section the page reaches a crawler as an empty body. This is plain challenge
+ * data with no engine dependency, so it prerenders fine.
  *
  * It also owns the page's single h1; MissionPanel renders an h2.
+ *
+ * A reader reaches it through the "Lesson notes" button in MissionPanel: the
+ * page renders it inside NotesDialog, which keeps it in the HTML but out of
+ * the layout until then.
  */
 export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) {
   const seo = CHALLENGE_SEO[challenge.id];
@@ -28,10 +32,9 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
   const next = nextChallenge(challenge.id);
 
   return (
-    <section
-      aria-labelledby="lesson-notes"
-      className="mx-auto w-full max-w-3xl px-4 pt-4 pb-16"
-    >
+    // no page-level container: this only ever renders inside NotesDialog,
+    // which owns the width and the padding
+    <section aria-labelledby="lesson-notes" className="w-full">
       <PixelPanel tone="line" title={`▪ Lesson notes — Mission ${number}`}>
         <div className="flex flex-col gap-5 p-5">
           <div>
