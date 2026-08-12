@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (9 top-level pages plus 63 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 66 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -25,8 +25,8 @@ written short enough to leave room for it.
 
 | URL | Primary keyword | Secondary | Title | Description |
 | --- | --- | --- | --- | --- |
-| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 63 missions, a live commit graph, an optional free certificate. |
-| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 63 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
+| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 66 missions, a live commit graph, an optional free certificate. |
+| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 66 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
 | `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
@@ -37,7 +37,7 @@ written short enough to leave room for it.
 
 ## Mission pages
 
-63 long-tail pages, one per mission, and the main reason this site can rank at all.
+66 long-tail pages, one per mission, and the main reason this site can rank at all.
 
 Two things are deliberate here. Mission titles are **absolute**, with no site-name
 suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
@@ -54,9 +54,11 @@ What Git is, what a repository is, and how to check its status.
 | --- | --- | --- | --- |
 | `/challenge/first-repository/` | git init | git init: turn a folder into a Git repository | git init; what a Git repository is |
 | `/challenge/check-status/` | git status | git status: read what Git sees in your project | git status; tracked and untracked files |
+| `/challenge/make-a-change/` | git status after editing a file | git status: see a file turn up as modified | git status; modified files; editing files in the terminal |
 | `/challenge/spot-the-change/` | git status modified file | Find the modified file with git status, then stage it | git status; git add; modified files |
 | `/challenge/two-kinds-of-change/` | modified vs untracked files git | Modified vs untracked files in Git | untracked files; modified files; git add |
 | `/challenge/stage-everything/` | git add all files | git add: stage every change at once | git add .; staging multiple files |
+| `/challenge/both-zones-at-once/` | file staged and modified git | When git status lists one file twice | staging area; git status; staged vs unstaged changes |
 
 ### World 2: Staging & Commits
 
@@ -66,6 +68,7 @@ Working tree, staging area, and your first commit.
 | --- | --- | --- | --- |
 | `/challenge/first-stage/` | git staging area explained | The Git staging area, explained by using it | staging area; git add |
 | `/challenge/your-first-commit/` | git commit -m | git commit -m: write your first commit | git commit; writing commit messages |
+| `/challenge/nothing-left-behind/` | git status after commit | git status after a commit: nothing left behind | git status; git commit; a clean working tree |
 | `/challenge/see-the-difference/` | git diff --staged | git diff and --staged: check before you commit | git diff; git diff --staged |
 | `/challenge/selective-commit/` | commit only one file git | Commit one file and leave the rest alone | selective staging; git add a single file |
 | `/challenge/two-commits/` | split changes into separate commits | Split your work into two separate commits | one change per commit; git add; git commit |
@@ -187,7 +190,7 @@ Each of these is a thing a checklist would tell you to add, left out on purpose:
 - **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.
 - **`SearchAction` in `WebSite`.** There is no site search to point it at.
 - **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.
-- **Per-mission OG images.** Social cards do not affect ranking, and 63 build-time images buy little over one good site-wide card.
+- **Per-mission OG images.** Social cards do not affect ranking, and 66 build-time images buy little over one good site-wide card.
 
 ## Known gap: apex vs www
 

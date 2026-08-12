@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  ALL_CHALLENGES,
   challengeNumber,
   nextChallenge,
   prevChallenge,
@@ -115,7 +116,7 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
               <span className="text-muted">This is the first mission.</span>
             )}
             <Link prefetch={false} href="/stages/" className="text-muted hover:text-phos">
-              All 63 missions
+              All {ALL_CHALLENGES.length} missions
             </Link>
             {next && (
               <Link

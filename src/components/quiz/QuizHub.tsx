@@ -60,6 +60,8 @@ function Choice({
 export function QuizHub() {
   const mode = useQuiz((s) => s.mode);
   const setMode = useQuiz((s) => s.setMode);
+  const ranked = useQuiz((s) => s.ranked);
+  const setRanked = useQuiz((s) => s.setRanked);
   const start = useQuiz((s) => s.start);
   const phase = useQuiz((s) => s.phase);
   const error = useQuiz((s) => s.error);
@@ -124,6 +126,29 @@ export function QuizHub() {
                 ))}
               </div>
             </div>
+
+            {/* Signed out, every run is already unranked and this would change
+                nothing, so the nudge below does the explaining instead. And while
+                the nickname prompt is up there is no Start button to qualify. */}
+            {signedIn && !needsNickname && (
+              <div className="flex flex-col gap-2">
+                <HudLabel tone="line">Leaderboard</HudLabel>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Choice
+                    active={ranked}
+                    onClick={() => setRanked(true)}
+                    title="Ranked"
+                    detail="Beat your best and it goes on the board."
+                  />
+                  <Choice
+                    active={!ranked}
+                    onClick={() => setRanked(false)}
+                    title="Practice"
+                    detail="Scored and reviewed, but kept off the board."
+                  />
+                </div>
+              </div>
+            )}
 
             {error !== null && (
               <p role="alert" className="text-sm text-crt-red">

@@ -248,6 +248,8 @@ class TestRankVerdict:
             "signed_in": True,
             "elapsed_ms": 60_000,
             "duration_ms": quiz.SET20_DURATION_MS,
+            "opted_out": False,
+            "answered": 20,
         }
         kwargs.update(overrides)
         return quiz.rank_verdict(**kwargs)
@@ -279,6 +281,8 @@ class TestRankVerdict:
             signed_in=True,
             elapsed_ms=40_000,
             duration_ms=quiz.SPRINT_DURATION_MS,
+            opted_out=False,
+            answered=30,
         ) is None
 
     def test_a_full_sprint_answered_at_speed_ranks(self):
@@ -288,11 +292,35 @@ class TestRankVerdict:
             signed_in=True,
             elapsed_ms=50_000,
             duration_ms=quiz.SPRINT_DURATION_MS,
+            opted_out=False,
+            answered=60,
         ) is None
 
     def test_anonymous_is_reported_ahead_of_other_problems(self):
         # the UI shows one reason; "sign in" is the actionable one
         assert self._verdict(signed_in=False, elapsed_ms=1) == "anonymous"
+
+    def test_opting_out_does_not_rank(self):
+        assert self._verdict(opted_out=True) == "opted_out"
+
+    def test_opting_out_is_reported_ahead_of_every_other_problem(self):
+        # A player who asked to stay off the board should not be told to sign in
+        # or that their run was too short. They did not ask to be ranked.
+        assert self._verdict(opted_out=True, signed_in=False) == "opted_out"
+        assert self._verdict(
+            opted_out=True, elapsed_ms=quiz.SET20_DURATION_MS + 60_000
+        ) == "opted_out"
+        assert self._verdict(opted_out=True, elapsed_ms=1) == "opted_out"
+        assert self._verdict(opted_out=True, answered=0) == "opted_out"
+
+    def test_a_run_with_no_answers_does_not_rank(self):
+        # The tab left open until the timer fires: elapsed lands inside the
+        # grace window, so nothing above this gate catches it.
+        assert self._verdict(answered=0, elapsed_ms=quiz.SET20_DURATION_MS) == "no_answers"
+
+    def test_an_empty_instant_submit_is_still_reported_as_too_short(self):
+        # Both gates apply; the earlier one wins, and the ordering is the point.
+        assert self._verdict(answered=0, elapsed_ms=1) == "too_short"
 
 
 def test_iso_seconds_matches_the_apps_timestamp_format():

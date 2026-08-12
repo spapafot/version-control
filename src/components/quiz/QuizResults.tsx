@@ -116,7 +116,13 @@ export function QuizResults() {
               ) : result.ranked ? (
                 <p className="text-muted">Counted, though your best still stands.</p>
               ) : (
-                <p className="text-amber">
+                // Amber is for something the player might want to fix. Staying
+                // off the board was their own choice, so it reads as a note.
+                <p
+                  className={
+                    result.rankReason === "opted_out" ? "text-muted" : "text-amber"
+                  }
+                >
                   {rankReasonMessage(result.rankReason ?? "anonymous")}
                 </p>
               )}

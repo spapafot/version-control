@@ -60,7 +60,13 @@ export interface QuizReviewItem {
 }
 
 /** Why a run is not on a board. Mirrors quiz.rank_verdict on the server. */
-export type RankReason = "anonymous" | "expired" | "too_short" | "no_nickname";
+export type RankReason =
+  | "opted_out"
+  | "anonymous"
+  | "expired"
+  | "too_short"
+  | "no_answers"
+  | "no_nickname";
 
 export interface QuizResult {
   score: number;
@@ -123,10 +129,12 @@ export function submitQuiz(
   sessionId: string,
   answers: SubmittedAnswer[],
   token?: string,
+  /** false for a practice run or a mid-run quit: scored and reviewed, not boarded */
+  rank = true,
 ): Promise<QuizResult> {
   return apiFetch<QuizResult>(
     `/v1/quiz/sessions/${encodeURIComponent(sessionId)}/submit`,
-    { method: "POST", body: { answers }, token },
+    { method: "POST", body: { answers, rank }, token },
   );
 }
 
@@ -170,5 +178,9 @@ export function rankReasonMessage(reason: RankReason): string {
       return "The clock had run out, so this run is not ranked.";
     case "too_short":
       return "That run was too short to rank.";
+    case "opted_out":
+      return "Practice run, so it is not on the leaderboard.";
+    case "no_answers":
+      return "No answers, so there is nothing to rank.";
   }
 }

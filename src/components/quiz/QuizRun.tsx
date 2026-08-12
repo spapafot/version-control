@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RichText } from "@/components/challenge/RichText";
 import { GameHeader } from "@/components/layout/GameHeader";
 import { HudLabel, PixelButton, PixelChoice, PixelPanel, PixelProgress } from "@/components/ui/pixel";
@@ -25,6 +25,10 @@ export function QuizRun() {
   const prev = useQuiz((s) => s.prev);
   const goTo = useQuiz((s) => s.goTo);
   const finish = useQuiz((s) => s.finish);
+
+  // Quit is a two-step confirm; moving on takes back the first step.
+  const [confirmQuit, setConfirmQuit] = useState(false);
+  useEffect(() => setConfirmQuit(false), [index]);
 
   const question = session?.questions[index];
   const answeredCount = Object.keys(answers).length;
@@ -164,6 +168,17 @@ export function QuizRun() {
             Skip →
           </PixelButton>
           <span className="flex-1" />
+          {/* "Finish early" is also one click, but this one additionally gives up
+              the board row, so a misclick here costs something. Two steps. */}
+          <PixelButton
+            tone={confirmQuit ? "red" : "line"}
+            variant="ghost"
+            onClick={() => (confirmQuit ? void finish({ rank: false }) : setConfirmQuit(true))}
+            disabled={submitting}
+            title="End the run now, scored and reviewed but off the leaderboard"
+          >
+            {confirmQuit ? "Confirm quit" : "Quit"}
+          </PixelButton>
           <PixelButton
             tone={allAnswered && !isSprint ? "phos" : "amber"}
             variant={allAnswered && !isSprint ? "solid" : "ghost"}

@@ -113,6 +113,11 @@ class QuizSubmitIn(BaseModel):
     # A sprint pool is the largest set we ever serve; anything beyond it cannot
     # belong to a real session.
     answers: List[QuizAnswerIn] = Field(default_factory=list, max_length=60)
+    #: Whether the player wants this run considered for the leaderboard. False
+    #: is a practice run or a mid-run bail-out: still scored, still reviewed,
+    #: just not boarded. Defaults to True so a client that predates the field
+    #: keeps ranking exactly as it did.
+    rank: bool = True
 
 
 class QuizReviewOut(BaseModel):
@@ -134,7 +139,8 @@ class QuizSubmitOut(BaseModel):
     elapsedMs: int
     mode: str
     ranked: bool
-    #: Why the run is not on a board: anonymous, expired or too_fast.
+    #: Why the run is not on a board: opted_out, anonymous, expired, too_short,
+    #: no_answers, or no_nickname.
     rankReason: Optional[str] = None
     #: Whether this run became the player's new best on the all-time board.
     personalBest: bool = False

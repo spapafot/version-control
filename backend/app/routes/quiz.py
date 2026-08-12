@@ -201,10 +201,15 @@ def submit_session(
 
     mode = session["mode"]
     spec = quiz.mode_spec(mode)
+    # An opted-out run has already consumed the session at claim_session above,
+    # which is right: the run happened and is about to be scored and reviewed.
+    # The only thing being declined is the board row.
     reason = quiz.rank_verdict(
         signed_in=owner is not None,
         elapsed_ms=elapsed_ms,
         duration_ms=spec.duration_ms,
+        opted_out=not body.rank,
+        answered=scored.answered,
     )
 
     nickname = None

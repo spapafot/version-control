@@ -37,8 +37,18 @@ function beats(candidate: LocalBest, incumbent: LocalBest): boolean {
 interface QuizLocalState {
   bests: Record<BestKey, LocalBest>;
   runs: number;
-  /** Records a finished run; returns true when it set a new local best. */
-  recordRun(mode: QuizMode, run: LocalBest): boolean;
+  /**
+   * Records a finished run; returns true when it set a new local best.
+   *
+   * `updateBest: false` still counts the run but leaves the best alone, for a
+   * practice run or a mid-run quit: a deliberate throwaway must not overwrite
+   * the figure the hub shows you.
+   */
+  recordRun(
+    mode: QuizMode,
+    run: LocalBest,
+    options?: { updateBest?: boolean },
+  ): boolean;
   clear(): void;
 }
 
@@ -47,10 +57,14 @@ export const useQuizLocal = create<QuizLocalState>()(
     (set, get) => ({
       bests: {},
       runs: 0,
-      recordRun: (mode, run) => {
+      recordRun: (mode, run, options) => {
         const key = bestKey(mode);
         const current = get().bests[key];
-        const improved = current === undefined || beats(run, current);
+        const improved =
+          options?.updateBest !== false &&
+          (current === undefined || beats(run, current));
+        // `runs` counts every finished run either way. It is the honest count,
+        // and it is the hub's leaderboard refresh token.
         set({
           runs: get().runs + 1,
           bests: improved ? { ...get().bests, [key]: run } : get().bests,

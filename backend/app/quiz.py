@@ -244,6 +244,8 @@ def rank_verdict(
     signed_in: bool,
     elapsed_ms: int,
     duration_ms: int,
+    opted_out: bool,
+    answered: int,
 ) -> Optional[str]:
     """Why this run cannot be ranked, or None when it can be.
 
@@ -251,15 +253,28 @@ def rank_verdict(
     stake here, which is why the reasons are strings the UI can explain rather
     than errors.
 
-    Note what is deliberately NOT checked: how fast the answers came. See
-    MIN_RUN_MS.
+    `opted_out` comes first because the alternative is telling a player who
+    asked to stay off the board that they should sign in or pick a nickname,
+    which is nagging about a choice they already made.
+
+    Note what is deliberately NOT checked: how fast the answers came (see
+    MIN_RUN_MS), and whether `opted_out` is honest. The latter is unverifiable
+    by design and needs no verifying, since the only thing it can cost is the
+    caller's own row.
     """
+    if opted_out:
+        return "opted_out"
     if not signed_in:
         return "anonymous"
     if elapsed_ms > duration_ms + SUBMIT_GRACE_MS:
         return "expired"
     if elapsed_ms < MIN_RUN_MS:
         return "too_short"
+    if answered <= 0:
+        # A run left open until the timer fires submits nothing, and lands
+        # inside the grace window, so every gate above waves it through. There
+        # is no score to put on a board.
+        return "no_answers"
     return None
 
 

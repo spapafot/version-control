@@ -29,6 +29,12 @@ interface QuizStore {
   phase: QuizPhase;
   /** current selection on the hub, kept across runs */
   mode: QuizMode;
+  /**
+   * Hub selection for whether the next run may reach the leaderboard, kept
+   * across runs alongside `mode`. A reload resets it to true, which is the
+   * right default for a control that only ever takes something away.
+   */
+  ranked: boolean;
   session: QuizSession | null;
   /** question index being shown */
   index: number;
@@ -43,12 +49,21 @@ interface QuizStore {
   localBest: boolean;
 
   setMode(mode: QuizMode): void;
+  setRanked(ranked: boolean): void;
   start(): Promise<void>;
   choose(questionId: string, choice: number): void;
   goTo(index: number): void;
   next(): void;
   prev(): void;
-  finish(): Promise<void>;
+  /**
+   * Submits the run. `rank: false` overrides the hub selection for this run
+   * only, which is how the in-run quit works.
+   *
+   * This lives here rather than in QuizRun because finish() fires from three
+   * places: the footer button, the auto-finish in choose() once the pool is
+   * exhausted, and QuizTimer at zero.
+   */
+  finish(options?: { rank?: boolean }): Promise<void>;
   backToHub(): void;
 }
 
@@ -58,6 +73,7 @@ let submitting: Promise<void> | null = null;
 export const useQuiz = create<QuizStore>((set, get) => ({
   phase: "hub",
   mode: "set20",
+  ranked: true,
   session: null,
   index: 0,
   answers: {},
@@ -68,6 +84,7 @@ export const useQuiz = create<QuizStore>((set, get) => ({
   localBest: false,
 
   setMode: (mode) => set({ mode }),
+  setRanked: (ranked) => set({ ranked }),
 
   start: async () => {
     const { mode } = get();
@@ -122,10 +139,11 @@ export const useQuiz = create<QuizStore>((set, get) => ({
   next: () => get().goTo(get().index + 1),
   prev: () => get().goTo(get().index - 1),
 
-  finish: async () => {
+  finish: async (options) => {
     if (submitting !== null) return submitting;
-    const { session, answers, phase } = get();
+    const { session, answers, phase, ranked } = get();
     if (session === null || (phase !== "running" && phase !== "loading")) return;
+    const rank = options?.rank ?? ranked;
 
     submitting = (async () => {
       set({ phase: "submitting" });
@@ -135,13 +153,18 @@ export const useQuiz = create<QuizStore>((set, get) => ({
           session.sessionId,
           Object.entries(answers).map(([id, choice]) => ({ id, choice })),
           token,
+          rank,
         );
-        const localBest = useQuizLocal.getState().recordRun(session.mode, {
-          score: result.score,
-          total: result.total,
-          elapsedMs: result.elapsedMs,
-          at: new Date().toISOString(),
-        });
+        const localBest = useQuizLocal.getState().recordRun(
+          session.mode,
+          {
+            score: result.score,
+            total: result.total,
+            elapsedMs: result.elapsedMs,
+            at: new Date().toISOString(),
+          },
+          { updateBest: rank },
+        );
         set({ phase: "results", result, localBest });
       } catch (err) {
         set({ phase: "error", error: describe(err) });

@@ -1,6 +1,6 @@
 {
   "_note": "Snapshot of the course structure. Regenerate from src/challenges/*.ts (challenge `id:` fields, section order from src/challenges/types.ts SECTIONS, achievement ids from src/challenges/index.ts ACHIEVEMENTS) whenever the course changes.",
-  "total": 63,
+  "total": 66,
   "sections": [
     {
       "id": "basics",
@@ -8,9 +8,11 @@
       "slugs": [
         "first-repository",
         "check-status",
+        "make-a-change",
         "spot-the-change",
         "two-kinds-of-change",
-        "stage-everything"
+        "stage-everything",
+        "both-zones-at-once"
       ]
     },
     {
@@ -19,6 +21,7 @@
       "slugs": [
         "first-stage",
         "your-first-commit",
+        "nothing-left-behind",
         "see-the-difference",
         "selective-commit",
         "two-commits",

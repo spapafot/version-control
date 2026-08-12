@@ -280,15 +280,21 @@ class TestScoring:
 
 
 class TestRanking:
-    def _ranked_run(self, client, auth_headers, sub="user-0000", correct=20, mode="set20"):
+    def _ranked_run(
+        self, client, auth_headers, sub="user-0000", correct=20, mode="set20", rank=None
+    ):
         headers = auth_headers(sub=sub)
         data = _start(client, mode=mode, headers=headers)
         entries = _entries(data["sessionId"])
         # a pace a human could actually manage
         _rewind(data["sessionId"], 60_000)
+        payload = {"answers": _answers(entries, count=correct)}
+        # rank=None omits the field, which is what a client predating it sends.
+        if rank is not None:
+            payload["rank"] = rank
         return client.post(
             f"/v1/quiz/sessions/{data['sessionId']}/submit",
-            json={"answers": _answers(entries, count=correct)},
+            json=payload,
             headers=headers,
         ).json()
 
@@ -517,6 +523,81 @@ class TestRanking:
         body = client.get("/v1/quiz/me", headers=auth_headers()).json()
         assert body["stats"]["attempts"] == 1
         assert body["stats"]["correct"] == 9
+
+    def test_opting_out_scores_and_reviews_the_run_but_boards_nothing(
+        self, client, seeded_bank, auth_headers
+    ):
+        _named_user()
+        body = self._ranked_run(client, auth_headers, correct=17, rank=False)
+        assert body["score"] == 17  # still told how they did
+        assert len(body["review"]) == 20  # and still get the whole lesson
+        assert body["ranked"] is False
+        assert body["rankReason"] == "opted_out"
+        assert body["personalBest"] is False
+        assert _lb_rows("set20", "ALL") == []
+        assert _lb_rows("set20", quiz.period_keys(quiz.utc_now())[1]) == []
+
+    def test_opting_out_still_counts_towards_lifetime_stats(
+        self, client, seeded_bank, auth_headers
+    ):
+        # Not being on a board is not the same as not having played. The counters
+        # belong to the player.
+        _named_user()
+        self._ranked_run(client, auth_headers, correct=11, rank=False)
+        body = client.get("/v1/quiz/me", headers=auth_headers()).json()
+        assert body["stats"]["attempts"] == 1
+        assert body["stats"]["answered"] == 11
+        assert body["stats"]["correct"] == 11
+
+    def test_omitting_rank_ranks_the_run(self, client, seeded_bank, auth_headers):
+        # The frontend deploys independently of the Lambda, so a client that
+        # predates the field has to keep behaving exactly as it used to.
+        _named_user()
+        body = self._ranked_run(client, auth_headers, correct=14)
+        assert "rank" not in body
+        assert body["ranked"] is True
+        assert body["rankReason"] is None
+        assert len(_lb_rows("set20", "ALL")) == 1
+
+    def test_opting_out_cannot_retire_a_row_already_earned(
+        self, client, seeded_bank, auth_headers
+    ):
+        # The dangerous shape: a practice run must not disturb the best you hold.
+        _named_user()
+        self._ranked_run(client, auth_headers, correct=16)
+        self._ranked_run(client, auth_headers, correct=20, rank=False)
+        rows = _lb_rows("set20", "ALL")
+        assert len(rows) == 1
+        assert int(rows[0]["score"]) == 16
+
+    def test_opting_out_beats_the_other_reasons_to_the_report(
+        self, client, seeded_bank, auth_headers
+    ):
+        # No nickname either, but the player asked to stay off the board, so
+        # telling them to pick a nickname would be nagging about a non-issue.
+        body = self._ranked_run(client, auth_headers, correct=8, rank=False)
+        assert body["rankReason"] == "opted_out"
+
+    def test_a_run_with_no_answers_does_not_rank(
+        self, client, seeded_bank, auth_headers
+    ):
+        # The tab left open until the timer fires. QuizTimer submits for the
+        # player, elapsed lands inside the grace window, and without this gate a
+        # 0/20 goes on the board.
+        _named_user()
+        headers = auth_headers()
+        data = _start(client, headers=headers)
+        _rewind(data["sessionId"], 60_000)
+        body = client.post(
+            f"/v1/quiz/sessions/{data['sessionId']}/submit",
+            json={"answers": []},
+            headers=headers,
+        ).json()
+        assert body["score"] == 0
+        assert body["answered"] == 0
+        assert body["ranked"] is False
+        assert body["rankReason"] == "no_answers"
+        assert _lb_rows("set20", "ALL") == []
 
 
 class TestLeaderboard:
