@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from .middleware import ProxySecretMiddleware
-from .routes import me, public
+from .routes import me, public, quiz
 
 
 def create_app() -> FastAPI:
@@ -23,6 +23,7 @@ def create_app() -> FastAPI:
     app.add_middleware(ProxySecretMiddleware)
     app.include_router(me.router)
     app.include_router(public.router)
+    app.include_router(quiz.router)
 
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(

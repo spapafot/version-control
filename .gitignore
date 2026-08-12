@@ -45,6 +45,7 @@ next-env.d.ts
 .wrangler/
 
 /src/challenges
+/src/quiz
 scripts/aws/
 
 scripts/aws/out/

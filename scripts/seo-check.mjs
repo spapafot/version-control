@@ -77,6 +77,14 @@ for (const file of walk(OUT)) {
   const noindex = /<meta name="robots"[^>]*content="[^"]*noindex/i.test(html);
   // Next emits the 404 body at both /404.html and /_not-found/
   const is404 = rel === "404.html" || rel.startsWith("_not-found/");
+  // Pages that deliberately ship no server-rendered content. Every other
+  // ssr:false route pairs its client boundary with a server-rendered sibling
+  // (MissionBrief, the playground About section) precisely so this check can
+  // stay on; /quiz/ dropped its sibling on purpose, so it has no h1 and an
+  // empty body and will not rank. Do NOT add to this list to silence a
+  // failure: an empty body is almost always a client boundary with no
+  // counterpart, which is a bug, not a decision.
+  const bodyless = rel === "quiz/index.html";
   checked++;
 
   // ── title ──────────────────────────────────────────────────────────────
@@ -112,11 +120,12 @@ for (const file of walk(OUT)) {
 
   // ── headings ───────────────────────────────────────────────────────────
   const h1s = html.match(/<h1[\s>]/g) ?? [];
-  if (h1s.length !== 1) fail(`has ${h1s.length} h1 elements, expected exactly 1`);
+  const wantH1 = bodyless ? 0 : 1;
+  if (h1s.length !== wantH1) fail(`has ${h1s.length} h1 elements, expected exactly ${wantH1}`);
 
   // ── real content ───────────────────────────────────────────────────────
   const text = bodyText(html);
-  if (!is404 && text.length < BODY_MIN) {
+  if (!is404 && !bodyless && text.length < BODY_MIN) {
     fail(`only ${text.length} chars of body text (min ${BODY_MIN}); is it behind a client boundary?`);
   }
 

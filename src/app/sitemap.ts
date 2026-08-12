@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: canonical("/"), lastModified, changeFrequency: "monthly", priority: 1 },
     { url: canonical("stages"), lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: canonical("cheatsheet"), lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: canonical("quiz"), lastModified, changeFrequency: "monthly", priority: 0.8 },
     ...ALL_CHALLENGES.map((c) => ({
       url: canonical(`challenge/${c.id}`),
       lastModified,

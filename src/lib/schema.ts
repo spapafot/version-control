@@ -114,6 +114,31 @@ export function webApplicationSchema() {
   };
 }
 
+export function quizSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    "@id": `${canonical("quiz")}#quiz`,
+    name: "Git quiz: timed multiple choice questions",
+    description: snippet(
+      "Timed multiple-choice questions on everyday Git: what a command does, and which command a given situation calls for. Sprint against the clock or take a set of twenty.",
+    ),
+    url: canonical("quiz"),
+    learningResourceType: "Quiz",
+    educationalUse: "Assessment",
+    inLanguage: "en",
+    isAccessibleForFree: true,
+    educationalLevel: "Beginner to intermediate",
+    about: SECTIONS.map((s) => ({ "@type": "Thing", name: s.title })),
+    isPartOf: { "@id": COURSE_ID },
+    provider: { "@id": ORG_ID },
+    // No hasPart questions and no FAQPage: the questions are drawn per run and
+    // are not on the page, and marking up Q&A a visitor cannot see is what earns
+    // a manual action. numberOfQuestions is left out too, because the bank lives
+    // in DynamoDB and any number here would drift out of date.
+  };
+}
+
 export function techArticleSchema({
   title,
   description,

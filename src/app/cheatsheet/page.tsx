@@ -6,7 +6,11 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { HudLabel, PixelPanel } from "@/components/ui/pixel";
 import { CHEATSHEET, SHELL_HELPERS } from "@/content/cheatsheet";
-import { breadcrumbSchema, itemListSchema, techArticleSchema } from "@/lib/schema";
+import {
+  breadcrumbSchema,
+  itemListSchema,
+  techArticleSchema,
+} from "@/lib/schema";
 import { PAGE_SEO } from "@/lib/page-seo";
 import { pageMetadata } from "@/lib/seo";
 
@@ -32,9 +36,14 @@ export default function CheatsheetPage() {
             Git commands cheat sheet
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-fg">
-            The {allEntries.length} Git commands this course covers, what each one is for,
-            and the flags worth remembering. Every command here also runs in the{" "}
-            <Link prefetch={false} href="/playground/" className="text-phos hover:underline">
+            The {allEntries.length} Git commands this course covers, what each
+            one is for, and the flags worth remembering. Every command here also
+            runs in the{" "}
+            <Link
+              prefetch={false}
+              href="/playground/"
+              className="text-phos hover:underline"
+            >
               browser playground
             </Link>
             , so you can try one instead of taking my word for it.
@@ -62,10 +71,15 @@ export default function CheatsheetPage() {
         <div className="flex flex-col gap-8">
           {CHEATSHEET.map((group) => (
             <section key={group.id} aria-labelledby={group.id}>
-              <h2 id={group.id} className="hud glow-text-amber text-lg text-amber">
+              <h2
+                id={group.id}
+                className="hud glow-text-amber text-lg text-amber"
+              >
                 {group.title}
               </h2>
-              <p className="mt-2 mb-4 text-sm leading-relaxed text-muted">{group.intro}</p>
+              <p className="mt-2 mb-4 text-sm leading-relaxed text-muted">
+                {group.intro}
+              </p>
 
               <div className="flex flex-col gap-4">
                 {group.entries.map((entry) => (
@@ -77,15 +91,21 @@ export default function CheatsheetPage() {
                       >
                         {entry.command}
                       </h3>
-                      <p className="text-sm leading-relaxed text-fg">{entry.summary}</p>
+                      <p className="text-sm leading-relaxed text-fg">
+                        {entry.summary}
+                      </p>
                       <dl className="flex flex-col gap-1.5">
                         {entry.examples.map((ex) => (
                           <div
                             key={ex.code}
                             className="flex flex-col gap-0.5 border-l-2 border-line pl-3 sm:flex-row sm:items-baseline sm:gap-3"
                           >
-                            <dt className="shrink-0 font-mono text-xs text-amber">{ex.code}</dt>
-                            <dd className="text-xs leading-relaxed text-muted">{ex.note}</dd>
+                            <dt className="shrink-0 font-mono text-xs text-amber">
+                              {ex.code}
+                            </dt>
+                            <dd className="text-xs leading-relaxed text-muted">
+                              {ex.note}
+                            </dd>
                           </div>
                         ))}
                       </dl>
@@ -119,8 +139,12 @@ export default function CheatsheetPage() {
                     key={h.code}
                     className="flex flex-col gap-0.5 border-l-2 border-line pl-3 sm:flex-row sm:items-baseline sm:gap-3"
                   >
-                    <dt className="shrink-0 font-mono text-xs text-amber">{h.code}</dt>
-                    <dd className="text-xs leading-relaxed text-muted">{h.note}</dd>
+                    <dt className="shrink-0 font-mono text-xs text-amber">
+                      {h.code}
+                    </dt>
+                    <dd className="text-xs leading-relaxed text-muted">
+                      {h.note}
+                    </dd>
                   </div>
                 ))}
               </dl>

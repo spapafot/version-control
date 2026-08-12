@@ -6,6 +6,7 @@ import json
 import re
 import unicodedata
 from datetime import datetime, timezone
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -41,6 +42,7 @@ def get_me(user: AuthedUser = Depends(require_user)) -> MeOut:
     profile = ProfileOut(
         email=profile_item.get("email") or user.email,
         displayName=profile_item.get("displayName"),
+        nickname=profile_item.get("nickname"),
     )
 
     progress = None
@@ -69,13 +71,52 @@ def _clean_display_name(raw: str) -> str:
     return re.sub(r"\s+", " ", without_control).strip()
 
 
+#: A nickname sits next to a score, so it is kept shorter than a certificate name.
+NICKNAME_MIN = 2
+NICKNAME_MAX = 24
+
+
 @router.put("/me")
 def put_me(body: ProfileUpdate, user: AuthedUser = Depends(require_user)) -> dict:
-    name = _clean_display_name(body.displayName)
-    if not (1 <= len(name) <= 60) or not any(ch.isalnum() for ch in name):
-        raise HTTPException(status_code=400, detail={"code": "invalid_display_name"})
-    db.put_profile(user.sub, email=user.email, now=_now_iso(), display_name=name)
-    return {"profile": {"email": user.email, "displayName": name}}
+    """Update the certificate name, the leaderboard nickname, or both.
+
+    Whichever field is absent from the body is left alone, so the two can be
+    edited independently from different screens.
+    """
+    if body.displayName is None and body.nickname is None:
+        raise HTTPException(status_code=400, detail={"code": "nothing_to_update"})
+
+    name: Optional[str] = None
+    if body.displayName is not None:
+        name = _clean_display_name(body.displayName)
+        if not (1 <= len(name) <= 60) or not any(ch.isalnum() for ch in name):
+            raise HTTPException(status_code=400, detail={"code": "invalid_display_name"})
+
+    nickname: Optional[str] = None
+    if body.nickname is not None:
+        nickname = _clean_display_name(body.nickname)
+        if not (NICKNAME_MIN <= len(nickname) <= NICKNAME_MAX) or not any(
+            ch.isalnum() for ch in nickname
+        ):
+            raise HTTPException(status_code=400, detail={"code": "invalid_nickname"})
+
+    db.put_profile(
+        user.sub,
+        email=user.email,
+        now=_now_iso(),
+        display_name=name,
+        nickname=nickname,
+    )
+    # Echo the stored profile, not just what changed, so the client never has to
+    # guess what the other field is now.
+    stored = db.get_profile(user.sub) or {}
+    return {
+        "profile": {
+            "email": user.email,
+            "displayName": stored.get("displayName"),
+            "nickname": stored.get("nickname"),
+        }
+    }
 
 
 @router.post("/sync")

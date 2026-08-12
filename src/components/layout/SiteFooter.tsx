@@ -21,6 +21,10 @@ export function SiteFooter() {
           All missions
         </Link>
         <span aria-hidden>·</span>
+        <Link prefetch={false} href="/quiz/" className="hover:text-phos">
+          Git quiz
+        </Link>
+        <span aria-hidden>·</span>
         <Link prefetch={false} href="/cheatsheet/" className="hover:text-phos">
           Cheat sheet
         </Link>

@@ -34,6 +34,13 @@ export const PAGE_SEO = {
     description:
       "An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong.",
   },
+  "/quiz/": {
+    keyword: "git quiz",
+    secondary: ["git interview questions", "git multiple choice questions", "test git knowledge"],
+    title: "Git quiz: timed multiple choice",
+    description:
+      "A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard.",
+  },
   "/cheatsheet/": {
     keyword: "git commands cheat sheet",
     secondary: ["git command list", "git commands with examples", "git reference"],

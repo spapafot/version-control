@@ -35,6 +35,7 @@ Target runtime is **python3.12** on Lambda; keep the code 3.12-compatible.
 | Variable                 | Required | Default                          | Purpose                                                        |
 | ------------------------ | -------- | -------------------------------- | -------------------------------------------------------------- |
 | `TABLE_NAME`             | yes      | —                                | DynamoDB table (single-table layout, `PK`/`SK` string keys)    |
+| `QUIZ_TABLE_NAME`        | quiz     | —                                | Quiz table: question bank, sessions, leaderboards (`vc-quiz`)  |
 | `AWS_REGION`             | yes      | `eu-central-1`                   | Region for DynamoDB + Cognito JWKS URL                         |
 | `COGNITO_USER_POOL_ID`   | yes      | —                                | ID-token issuer validation                                     |
 | `COGNITO_CLIENT_ID`      | yes      | —                                | ID-token audience validation                                   |
@@ -59,6 +60,14 @@ All routes require `X-Proxy-Secret`. Routes marked *auth* additionally require
 | GET    | `/v1/credentials/{id}`              | —    | OB 3.0 credential JSON (`?format=jwt` → compact JWS)     |
 | GET    | `/v1/credentials/{id}/badge.png`    | —    | Badge PNG with the JWS baked into an `openbadgecredential` iTXt chunk |
 | GET    | `/v1/credentials/{id}/card.png`     | —    | 1200×630 share card                                      |
+| POST   | `/v1/quiz/sessions`                 | opt  | Draw a run: questions **without** answers, plus the server clock |
+| POST   | `/v1/quiz/sessions/{id}/submit`     | opt  | Score it (single use), rank if eligible, return the full review  |
+| GET    | `/v1/quiz/leaderboard`              | —    | `?mode=sprint\|set20&period=ALL\|WEEK&limit=` top rows, cacheable |
+| GET    | `/v1/quiz/me`                       | auth | Personal bests for the live boards + lifetime counters    |
+
+"opt" means the `Authorization` header is optional: no header is an anonymous
+run, which is scored but never ranked. A header that is *present but invalid*
+still 401s, so a stale token is reported rather than silently downgraded.
 
 Error bodies are `{"code": "..."}` (e.g. `display_name_required`,
 `incomplete` + `missing[]`, `invalid_display_name`, `unauthorized`,
@@ -96,19 +105,39 @@ s-maxage 3600). The credential/badge/card endpoints intentionally keep serving
 
 For a subject `sub`:
 
-1. Delete all `USER#{sub}/*` items (PROFILE, PROGRESS, CERTREF).
+1. Delete all `USER#{sub}/*` items in `vc-app` (PROFILE, PROGRESS, CERTREF).
 2. Look up the CERTREF first to find `certId`, then delete `CERT#{certId}/CERT`.
    After that, verify/credential/badge/card return 404 (CDN copies age out per
    the cache headers). The credential itself contains no plain email — only a
    salted SHA-256 hash — but it does embed the recipient's display name in the
    DynamoDB item, so the CERT item must go too.
-3. Cognito account deletion is handled in the user pool, outside this service.
+3. **The quiz table holds personal data too.** In `vc-quiz`, `Query` for
+   `PK = USER#{sub}` and delete every item: the `STATS` counters and one
+   `BEST#{mode}#{period}` pointer per board. Each pointer's `rankKey` gives the
+   public leaderboard row to delete as well:
+   `LB#{mode}#{period} / {rankKey}#{sub}` — read the pointers *before* deleting
+   them, or the rows become orphans nobody can find. Those rows carry the
+   display name, so they are the part that must actually disappear. Weekly rows
+   would expire on their own via TTL; all-time rows never do.
+   `/v1/quiz/leaderboard` is edge-cached for 60s, so a purge is not needed.
+   Quiz sessions (`SESSION#*`) carry no name and expire by TTL within a day.
+4. Cognito account deletion is handled in the user pool, outside this service.
 
 ## Notes
 
 - `app/data/challenges.json` is a build-time snapshot of the course (63 slugs
   in 10 sections, 12 achievements). Regenerate from `src/challenges/*.ts`
   whenever the course changes; `app.merge` asserts the totals at import.
+- The quiz bank is **not** snapshotted into the zip: it lives in the `vc-quiz`
+  table, loaded there by `tools/seed_quiz.py` from `src/quiz/bank/*.json`, and
+  cached in Lambda memory keyed on `QBANK#META/VERSION.rev`. So questions can be
+  edited without a deploy, and the Lambda package stays the size it is (the
+  40-build script already warns near the 50 MB upload ceiling).
+- `tools/seed_quiz.py` re-implements the validation rules from
+  `src/quiz/quiz.test.ts` on purpose, so a bad bank cannot reach the table even
+  if the TypeScript suite was not run. `tests/test_seed_quiz.py` runs the Python
+  validator over the real authoring JSON, which is what keeps the two in step
+  (it skips when the gitignored bank is absent).
 - The VC-JWT `typ` header is the module constant
   `app.credential.CREDENTIAL_JWT_TYP` (`"vc+jwt"`). If the 1EdTech validator
   objects, flip it to `"JWT"` there — nothing else changes.

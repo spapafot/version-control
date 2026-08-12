@@ -31,8 +31,16 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8788",
 ];
 
-/** Public, unauthenticated GET routes that are safe to cache at the edge. */
-const CACHEABLE_PATH = /^\/v1\/(verify|credentials)\//;
+/**
+ * Public, unauthenticated GET routes that are safe to cache at the edge.
+ *
+ * The first alternative needs the trailing slash: those routes always carry a
+ * credential id. The leaderboard has no path segment after it and varies only by
+ * query string, which the cache key (the full URL) already covers, so it is
+ * matched with $ instead. Quiz session and submit routes match neither and are
+ * therefore never cached, which is what we want.
+ */
+const CACHEABLE_PATH = /^\/v1\/(verify|credentials)\/|^\/v1\/quiz\/leaderboard$/;
 
 /** CORS headers for a given request Origin (empty ACAO when not allowed). */
 function corsHeaders(origin: string | null): [string, string][] {

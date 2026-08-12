@@ -22,7 +22,8 @@ export class ApiError extends Error {
 }
 
 export interface MeResponse {
-  profile: { email: string; displayName: string | null };
+  /** displayName goes on the certificate; nickname goes on the quiz boards */
+  profile: { email: string; displayName: string | null; nickname: string | null };
   progress: ProgressBlob | null;
   certificate: Certificate | null;
 }
@@ -32,13 +33,25 @@ interface ApiOptions {
   body?: unknown;
   /** Bearer token; required for the authenticated endpoints. */
   token?: string;
+  /**
+   * Skip the browser's HTTP cache for this request.
+   *
+   * The leaderboard is sent with `max-age=30`, which is right for idle viewing
+   * and wrong immediately after finishing a run: the browser would answer from
+   * cache and show the player their previous score. Set this on the refetch
+   * that follows a run.
+   */
+  noStore?: boolean;
 }
 
 /**
  * Fetch against the certification API. Never throws anything but ApiError
  * (network failures become ApiError with status 0 / code "network").
  */
-export async function apiFetch<T>(path: string, { method = "GET", body, token }: ApiOptions = {}): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  { method = "GET", body, token, noStore }: ApiOptions = {},
+): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}${path}`, {
@@ -48,6 +61,7 @@ export async function apiFetch<T>(path: string, { method = "GET", body, token }:
         ...(token ? { authorization: `Bearer ${token}` } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
+      ...(noStore ? { cache: "no-store" as const } : {}),
     });
   } catch {
     throw new ApiError(0, "network", "The certification service is unreachable.");

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { ALL_CHALLENGES } from "@/challenges";
 import { ConfirmCodePanel, SignInPanel } from "./AuthPanels";
@@ -50,6 +51,8 @@ function Dashboard() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [nameSaved, setNameSaved] = useState(true);
+  const [nickname, setNickname] = useState("");
+  const [nicknameSaved, setNicknameSaved] = useState(true);
   const [working, setWorking] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [cert, setCert] = useState<Certificate | null>(null);
@@ -70,6 +73,7 @@ function Dashboard() {
         if (cancelled) return;
         setCert(data.certificate);
         setName(data.profile.displayName ?? "");
+        setNickname(data.profile.nickname ?? "");
         // account progress from other devices merges in, never overwrites
         if (data.progress) applyRemote(data.progress);
       } catch (err) {
@@ -91,6 +95,31 @@ function Dashboard() {
     setName(trimmed);
     setNameSaved(true);
     return true;
+  }
+
+  async function onSaveNickname(e: FormEvent) {
+    e.preventDefault();
+    setActionError(null);
+    const trimmed = nickname.trim().replace(/\s+/g, " ");
+    if (!trimmed) return;
+    setWorking(true);
+    try {
+      const token = await getIdToken();
+      if (!token) return;
+      // Sending only the nickname leaves the certificate name untouched.
+      await apiFetch("/v1/me", { method: "PUT", body: { nickname: trimmed }, token });
+      setNickname(trimmed);
+      setNicknameSaved(true);
+    } catch (err) {
+      console.warn("[account]", err);
+      setActionError(
+        err instanceof ApiError && err.code === "invalid_nickname"
+          ? "Use 2 to 24 characters, with at least one letter or number."
+          : errText(err),
+      );
+    } finally {
+      setWorking(false);
+    }
   }
 
   async function onSaveName(e: FormEvent) {
@@ -167,6 +196,47 @@ function Dashboard() {
           {loadError && <p className="text-xs text-amber">{loadError}</p>}
           <p className="text-xs text-muted">
             Signing out keeps your progress in this browser.
+          </p>
+        </div>
+      </PixelPanel>
+
+      <PixelPanel tone="line" title="▪ Quiz nickname" titleAs="h2">
+        <div className="flex flex-col gap-3 p-5">
+          <form onSubmit={onSaveNickname}>
+            <PixelField
+              label="Nickname"
+              htmlFor="acct-nickname"
+              hint="Shown next to your scores on the public quiz leaderboards. Separate from the name on your certificate, and you can change it whenever you like."
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <PixelInput
+                  id="acct-nickname"
+                  maxLength={24}
+                  autoComplete="nickname"
+                  placeholder="git-goblin"
+                  value={nickname}
+                  onChange={(e) => {
+                    setNickname(e.target.value);
+                    setNicknameSaved(false);
+                  }}
+                  className="min-w-56 flex-1"
+                />
+                <PixelButton
+                  tone="line"
+                  variant="ghost"
+                  type="submit"
+                  disabled={working || nicknameSaved || !nickname.trim()}
+                >
+                  {nicknameSaved && nickname ? "Saved" : "Save"}
+                </PixelButton>
+              </div>
+            </PixelField>
+          </form>
+          <p className="text-xs text-muted">
+            Without one you can still play, but your scores stay off the board.{" "}
+            <Link prefetch={false} href="/quiz/" className="text-amber hover:text-phos">
+              Take the quiz →
+            </Link>
           </p>
         </div>
       </PixelPanel>

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { apiFetch } from "./api";
-import { authConfigured, COGNITO_CLIENT_ID } from "./auth-config";
-import { getIdToken, useAuth } from "./auth";
+import { authConfigured } from "./auth-config";
+import { getIdToken, hasStoredSession, useAuth } from "./auth";
 import { useProgress } from "./progress";
 import { blobsEqual, mergeProgress, toBlob, type ProgressBlob } from "./progress-merge";
 
@@ -90,19 +90,6 @@ function scheduleSync(): void {
     debounceTimer = null;
     void syncNow();
   }, 3000);
-}
-
-/** True when Amplify has a session on this device, without loading Amplify. */
-function hasStoredSession(): boolean {
-  try {
-    return (
-      window.localStorage.getItem(
-        `CognitoIdentityServiceProvider.${COGNITO_CLIENT_ID}.LastAuthUser`,
-      ) !== null
-    );
-  } catch {
-    return false;
-  }
 }
 
 /**

@@ -31,37 +31,66 @@ export default function PlaygroundPage() {
               <HudLabel tone="line" className="mb-2 block">
                 Git sandbox
               </HudLabel>
-              <h1 id="about-playground" className="hud glow-text text-xl text-phos">
+              <h1
+                id="about-playground"
+                className="hud glow-text text-xl text-phos"
+              >
                 A Git sandbox that runs in your browser
               </h1>
             </div>
             <div className="flex flex-col gap-2.5 text-sm leading-relaxed text-fg">
               <p>
-                The playground is an empty Git repository with a real terminal, a file
-                explorer and a commit graph that redraws after every command. Nothing is
-                scored and there is no mission to finish, so it is the place to try a
-                command you are unsure about before running it on work that matters.
+                The playground is an empty Git repository with a real terminal,
+                a file explorer and a commit graph that redraws after every
+                command. Nothing is scored and there is no mission to finish, so
+                it is the place to try a command you are unsure about before
+                running it on work that matters.
               </p>
               <p>
-                Git runs entirely on your machine here. There is no server holding your
-                repository, no account required, and nothing to install. Reload the page
-                and you start over with an empty repository.
+                Git runs entirely on your machine here. There is no server
+                holding your repository, no account required, and nothing to
+                install. Reload the page and you start over with an empty
+                repository.
               </p>
               <p>
-                Commands cover the everyday ground: <code className="bg-raised px-1 py-0.5 font-mono text-amber">init</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">add</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">commit</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">branch</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">merge</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">stash</code>,{" "}
-                <code className="bg-raised px-1 py-0.5 font-mono text-amber">reflog</code> and
-                the rest. Type <code className="bg-raised px-1 py-0.5 font-mono text-amber">help</code>{" "}
+                Commands cover the everyday ground:{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  init
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  add
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  commit
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  branch
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  merge
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  stash
+                </code>
+                ,{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  reflog
+                </code>{" "}
+                and the rest. Type{" "}
+                <code className="bg-raised px-1 py-0.5 font-mono text-amber">
+                  help
+                </code>{" "}
                 in the terminal for the full list.
               </p>
               <p>
-                If you would rather be told what to do next, the course covers the same
-                ground as {ALL_CHALLENGES.length} guided missions across {SECTIONS.length}{" "}
-                topics.
+                If you would rather be told what to do next, the course covers
+                the same ground as {ALL_CHALLENGES.length} guided missions
+                across {SECTIONS.length} topics.
               </p>
             </div>
             <nav
@@ -75,7 +104,11 @@ export default function PlaygroundPage() {
               >
                 Start the first mission →
               </Link>
-              <Link prefetch={false} href="/stages/" className="text-muted hover:text-phos">
+              <Link
+                prefetch={false}
+                href="/stages/"
+                className="text-muted hover:text-phos"
+              >
                 See all {ALL_CHALLENGES.length} missions
               </Link>
               <Link
@@ -83,7 +116,7 @@ export default function PlaygroundPage() {
                 href="/cheatsheet/"
                 className="text-muted hover:text-phos"
               >
-                Git commands cheat sheet
+                Cheat sheet
               </Link>
             </nav>
           </div>

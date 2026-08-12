@@ -54,6 +54,25 @@ async function amplifyAuth() {
   return auth;
 }
 
+/**
+ * True when Amplify has a session on this device, WITHOUT loading Amplify.
+ *
+ * Reading the key Amplify itself writes lets anonymous visitors skip the auth
+ * chunk entirely. Call this before getIdToken on any path an anonymous visitor
+ * can reach, or they pay to download a library that has nothing to tell them.
+ */
+export function hasStoredSession(): boolean {
+  try {
+    return (
+      window.localStorage.getItem(
+        `CognitoIdentityServiceProvider.${COGNITO_CLIENT_ID}.LastAuthUser`,
+      ) !== null
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** Current Cognito ID token, refreshed by Amplify as needed; null when signed out. */
 export async function getIdToken(): Promise<string | null> {
   if (!authConfigured()) return null;
@@ -63,6 +82,12 @@ export async function getIdToken(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/** ID token when this device has a session, without loading Amplify otherwise. */
+export async function getIdTokenIfSignedIn(): Promise<string | null> {
+  if (!hasStoredSession()) return null;
+  return getIdToken();
 }
 
 function friendlyError(err: unknown): string {

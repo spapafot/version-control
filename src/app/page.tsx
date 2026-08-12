@@ -46,6 +46,11 @@ export default function Home() {
                   See the map
                 </PixelButton>
               </Link>
+              <Link prefetch={false} href="/quiz/">
+                <PixelButton variant="ghost" tone="line">
+                  Quiz
+                </PixelButton>
+              </Link>
               <Link prefetch={false} href="/playground/">
                 <PixelButton variant="ghost" tone="line">
                   Playground
@@ -107,6 +112,13 @@ export default function Home() {
               className="font-mono text-xs text-muted hover:text-phos"
             >
               or skim the Git commands cheat sheet
+            </Link>
+            <Link
+              prefetch={false}
+              href="/quiz/"
+              className="font-mono text-xs text-muted hover:text-phos"
+            >
+              or test yourself with the timed Git quiz
             </Link>
           </div>
         </section>

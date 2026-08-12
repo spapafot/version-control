@@ -93,3 +93,18 @@ def require_user(
         raise _unauthorized()
 
     return AuthedUser(sub=claims["sub"], email=email)
+
+
+def optional_user(
+    authorization: Annotated[Optional[str], Header()] = None,
+) -> Optional[AuthedUser]:
+    """Like ``require_user``, but anonymous callers are allowed through as None.
+
+    A *missing* header means "playing anonymously". A header that is present but
+    invalid still 401s rather than silently degrading to anonymous: that way a
+    signed-in player whose token has gone stale is told to refresh instead of
+    quietly losing their leaderboard placement.
+    """
+    if authorization is None or not authorization.strip():
+        return None
+    return require_user(authorization)

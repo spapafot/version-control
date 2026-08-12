@@ -18,10 +18,20 @@ const browser = await puppeteer.launch({
 
 const page = await browser.newPage();
 const errors = [];
+/**
+ * The local static server has no backend, so the quiz page's leaderboard fetch
+ * is expected to fail when BASE points at serve-out.mjs. Ignore failures from
+ * the API origin only; everything else still counts as a browser error.
+ */
+const OFFLINE_API = /api\.versioncontrol\.gr/;
 page.on("response", (r) => { if (r.status() === 404) console.error("404 URL:", r.url()); });
 page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 page.on("console", (m) => {
-  if (m.type() === "error") errors.push(`console.error: ${m.text()}`);
+  if (m.type() !== "error") return;
+  // A failed request reports the URL in location(), not in the message text
+  // ("Failed to load resource: ... 404"), so both have to be checked.
+  if (OFFLINE_API.test(m.text()) || OFFLINE_API.test(m.location()?.url ?? "")) return;
+  errors.push(`console.error: ${m.text()}`);
 });
 
 async function typeInTerminal(text) {
@@ -211,6 +221,22 @@ try {
   if (!accountText.includes("CREATE ACCOUNT")) fail("account page missing create-account toggle");
   if (!accountText.includes("GIT CERTIFICATE")) fail("account page missing the certificate explainer");
   await page.screenshot({ path: `${SHOTS}/10-account.png`, fullPage: true });
+
+  // ── quiz hub: renders and offers both modes ────────────────────────
+  //    NOTE: the API is unreachable here, so this covers the hub and the
+  //    crawlable About section only. Playing a run needs the real backend:
+  //    BASE=https://versioncontrol.gr pnpm smoke, or `pnpm dev`.
+  await page.goto(`${BASE}/quiz/`, { waitUntil: "networkidle0" });
+  await new Promise((r) => setTimeout(r, 1200));
+  const quizText = await page.evaluate(() => document.body.innerText);
+  // HUD text is uppercased in CSS, so innerText comes back uppercase.
+  if (!quizText.includes("GIT QUIZ")) fail("quiz page did not render the hub panel");
+  if (!quizText.includes("SPRINT")) fail("quiz hub missing the sprint mode");
+  if (!quizText.includes("SET OF 20")) fail("quiz hub missing the set-of-20 mode");
+  // Difficulty is dealt as a balanced mix, so a player never picks one.
+  if (quizText.includes("DIFFICULTY")) fail("quiz hub still offers a difficulty picker");
+  if (!quizText.includes("LEADERBOARD")) fail("quiz hub missing the leaderboard panel");
+  await page.screenshot({ path: `${SHOTS}/13-quiz.png`, fullPage: true });
 
   // ── verify page: bare shell with the ID lookup form ────────────────
   //    NOTE: per-credential URLs (/verify/VC-GIT-F-XXXXXXXX/) are served by

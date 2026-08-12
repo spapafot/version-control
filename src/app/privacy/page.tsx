@@ -52,8 +52,12 @@ export default function PrivacyPage() {
           <code className="bg-raised px-1 font-mono text-[0.92em] text-amber">
             versioncontrol-consent
           </code>
-          . Both live on your device only. Clearing your browser&apos;s site data
-          for versioncontrol.gr deletes them, and also resets your course
+          . Your best quiz results for this browser are saved under{" "}
+          <code className="bg-raised px-1 font-mono text-[0.92em] text-amber">
+            versioncontrol-quiz
+          </code>
+          . All three live on your device only. Clearing your browser&apos;s site
+          data for versioncontrol.gr deletes them, and also resets your course
           progress on this device (an account, if you have one, keeps a copy —
           see the next section).
         </p>
@@ -66,9 +70,12 @@ export default function PrivacyPage() {
           email address and password are handled by Amazon Web Services
           (Cognito), acting as our processor, and we store your email, your
           course progress (which missions you completed and when, hint counts,
-          achievements) and, if you set one, the display name for your
-          certificate. We never receive or store the contents of your practice
-          repositories or the commands you type.
+          achievements), and, if you set them, the display name for your
+          certificate and the nickname for the quiz leaderboards. Those two are
+          separate: the certificate name is not published on any leaderboard, and
+          the nickname is not printed on any certificate. We never receive or
+          store the contents of your practice repositories or the commands you
+          type.
         </p>
         <p>
           Signing in never deletes local progress: what is in your browser and
@@ -85,8 +92,20 @@ export default function PrivacyPage() {
           email is never shown publicly.
         </p>
         <p>
-          To delete your account and its data, or to revoke a certificate,
-          write to the contact address above.
+          The quiz leaderboards are public. You can take the quiz without an
+          account and nothing is stored on our side; a score only reaches a
+          leaderboard if you are signed in and have set a nickname, and what
+          appears there is that nickname, the score and the time taken. The name
+          on your certificate is never shown on a leaderboard, and your email is
+          never shown anywhere. If you would rather not appear at all, play
+          without signing in, or simply do not set a nickname. For signed-in
+          players we also keep a running count of quiz attempts and correct
+          answers alongside your best result for each mode.
+        </p>
+        <p>
+          To delete your account and its data, including your quiz results and
+          any leaderboard entries, or to revoke a certificate, write to the
+          contact address above.
         </p>
       </LegalSection>
 

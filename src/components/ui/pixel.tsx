@@ -182,6 +182,69 @@ export function PixelField({
   );
 }
 
+/**
+ * One multiple-choice answer: a letter key plus the option text.
+ *
+ * `state` covers both phases of a quiz question. During a run only "idle" and
+ * "picked" occur; the review afterwards uses "correct" and "wrong" to mark up
+ * what happened, and "missed" to point at the right answer on a question that
+ * was answered wrongly or never reached.
+ */
+export function PixelChoice({
+  letter,
+  state = "idle",
+  className = "",
+  children,
+  ...rest
+}: {
+  letter: string;
+  state?: "idle" | "picked" | "correct" | "wrong" | "missed";
+  className?: string;
+  children: ReactNode;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const frame: Record<string, string> = {
+    idle: "bg-line",
+    picked: "bg-amber-dim",
+    correct: "bg-phos-dim",
+    wrong: "bg-crt-red",
+    missed: "bg-phos-dim",
+  };
+  const body: Record<string, string> = {
+    idle: "bg-raised text-fg hover:bg-line/60",
+    picked: "bg-raised text-amber",
+    correct: "bg-raised text-phos",
+    wrong: "bg-raised text-crt-red",
+    missed: "bg-raised text-phos",
+  };
+  const key: Record<string, string> = {
+    idle: "bg-line text-muted",
+    picked: "bg-amber text-ink",
+    correct: "bg-phos text-ink",
+    wrong: "bg-crt-red text-ink",
+    missed: "bg-phos-dim text-ink",
+  };
+  return (
+    <button
+      {...rest}
+      className={`px-corners block w-full p-[2px] text-left transition-transform enabled:active:translate-y-[2px] disabled:pointer-events-none ${frame[state]} ${className}`}
+    >
+      <span
+        className={`px-corners flex items-start gap-3 px-3 py-2.5 text-sm ${body[state]}`}
+      >
+        <span
+          className={`hud mt-px flex h-5 w-5 shrink-0 items-center justify-center text-[11px] ${key[state]}`}
+          aria-hidden="true"
+        >
+          {letter}
+        </span>
+        {/* Body font, not mono: options are sentences at least as often as they
+            are bare commands, and mono is reserved here for scores and times. */}
+        <span className="min-w-0 flex-1 text-[13px] leading-relaxed">{children}</span>
+      </span>
+    </button>
+  );
+}
+
 /** Small uppercase HUD label, optionally with a blinking block cursor. */
 export function HudLabel({
   children,

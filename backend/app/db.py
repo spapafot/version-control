@@ -1,7 +1,8 @@
 """DynamoDB access layer — single table, lazy module-level Table handle.
 
 Item layout (PK / SK):
-  USER#{sub} / PROFILE            {email, displayName?, createdAt, updatedAt}
+  USER#{sub} / PROFILE            {email, displayName?, nickname?, createdAt,
+                                   updatedAt}
   USER#{sub} / PROGRESS           {completed, hintsUsed, achievements, v, syncedAt}
   USER#{sub} / CERTREF#VC-GIT-F   {certId, issuedOn}
   CERT#{id}  / CERT               {sub, recipientName, issuedOn, skills,
@@ -75,9 +76,19 @@ def get_profile(sub: str) -> Optional[dict]:
 
 
 def put_profile(
-    sub: str, *, email: str, now: str, display_name: Optional[str] = None
+    sub: str,
+    *,
+    email: str,
+    now: str,
+    display_name: Optional[str] = None,
+    nickname: Optional[str] = None,
 ) -> None:
-    """Upsert the PROFILE item, preserving email/createdAt once set."""
+    """Upsert the PROFILE item, preserving email/createdAt once set.
+
+    ``display_name`` is the name printed on the certificate; ``nickname`` is the
+    name shown on the public quiz leaderboards. They are deliberately separate,
+    so passing one never disturbs the other.
+    """
     update = (
         "SET #email = if_not_exists(#email, :email), "
         "#createdAt = if_not_exists(#createdAt, :now), #updatedAt = :now"
@@ -88,6 +99,10 @@ def put_profile(
         update += ", #displayName = :dn"
         names["#displayName"] = "displayName"
         values[":dn"] = display_name
+    if nickname is not None:
+        update += ", #nickname = :nick"
+        names["#nickname"] = "nickname"
+        values[":nick"] = nickname
     get_table().update_item(
         Key={"PK": f"USER#{sub}", "SK": "PROFILE"},
         UpdateExpression=update,

@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (8 top-level pages plus 63 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 63 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -28,6 +28,7 @@ written short enough to leave room for it.
 | `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 63 missions, a live commit graph, an optional free certificate. |
 | `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 63 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
+| `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
 | `/account/` | free git certificate | git certification online; git course certificate; sync git progress | Your account and free Git certificate | Create a free account to sync your mission progress across devices and issue a shareable Git certificate with a permanent verification link. |
 | `/verify/` | verify git certificate | certificate verification; open badges 3.0 verification; credential check | Verify a Git certificate | Check that a VersionControl.gr certificate is genuine. Enter a credential ID to see who earned it, when it was issued and the skills it covers. |

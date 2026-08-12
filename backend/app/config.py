@@ -15,6 +15,7 @@ from functools import lru_cache
 @dataclass(frozen=True)
 class Settings:
     table_name: str
+    quiz_table_name: str
     aws_region: str
     cognito_user_pool_id: str
     cognito_client_id: str
@@ -29,6 +30,7 @@ class Settings:
 def get_settings() -> Settings:
     return Settings(
         table_name=os.environ.get("TABLE_NAME", ""),
+        quiz_table_name=os.environ.get("QUIZ_TABLE_NAME", ""),
         aws_region=os.environ.get("AWS_REGION", "eu-central-1"),
         cognito_user_pool_id=os.environ.get("COGNITO_USER_POOL_ID", ""),
         cognito_client_id=os.environ.get("COGNITO_CLIENT_ID", ""),
