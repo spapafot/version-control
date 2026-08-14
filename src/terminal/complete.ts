@@ -2,7 +2,7 @@ import type { RepoState } from "@/git/types";
 import { gitCommands } from "./commands/git";
 import { STASH_SUBCOMMANDS } from "./commands/git/stash";
 
-const PLAIN = ["git", "ls", "cat", "touch", "rm", "echo", "clear", "help", "pwd"];
+const PLAIN = ["git", "ls", "cat", "touch", "mkdir", "mv", "cp", "rm", "echo", "clear", "help", "pwd"];
 const GIT_SUBS = Object.keys(gitCommands);
 
 /** Tab completion: command names, git subcommands, branches, files. */
@@ -21,6 +21,8 @@ export function makeCompleter(getState: () => RepoState | null) {
       if (["checkout"].includes(sub)) return [...branches, ...files];
       return files;
     }
-    return state?.workdir.map((f) => f.path) ?? [];
+    const paths = state?.workdir.map((f) => f.path) ?? [];
+    const dirs = state?.dirs.map((d) => `${d}/`) ?? [];
+    return [...paths, ...dirs];
   };
 }

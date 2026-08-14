@@ -1,6 +1,7 @@
 """Ordered mapping from course section id to the human-readable skill it certifies."""
 
 SECTION_SKILLS = {
+    "terminal": "Command-line basics",
     "basics": "Git fundamentals",
     "commits": "Staging & committing",
     "branches": "Branching",

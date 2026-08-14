@@ -18,6 +18,17 @@ export function FileExplorer() {
   const files = state.workdir.map((f) => f.path);
   const staged = state.status.filter((f) => f.staged && !f.conflicted);
   const deletedStaged = staged.filter((f) => !files.includes(f.path));
+  // folders with nothing inside — invisible to git, but the learner just made
+  // one with mkdir and needs to see it happened
+  const emptyDirs = state.dirs.filter(
+    (d) =>
+      !state.workdir.some((f) => f.path.startsWith(`${d}/`)) &&
+      !state.dirs.some((o) => o !== d && o.startsWith(`${d}/`)),
+  );
+  const entries = [
+    ...files.map((path) => ({ path, isDir: false })),
+    ...emptyDirs.map((path) => ({ path, isDir: true })),
+  ].sort((a, b) => a.path.localeCompare(b.path));
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">
@@ -25,11 +36,25 @@ export function FileExplorer() {
         <HudLabel tone="line" className="mb-1.5 block">
           Working Directory
         </HudLabel>
-        {files.length === 0 ? (
+        {entries.length === 0 ? (
           <p className="px-1 text-xs text-muted">No files yet. Create one with `echo "..." &gt; file.txt`</p>
         ) : (
           <ul className="flex flex-col gap-[3px]">
-            {files.map((path) => {
+            {entries.map(({ path, isDir }) => {
+              if (isDir) {
+                return (
+                  <li key={`${path}/`}>
+                    <div className="flex w-full items-center justify-between gap-2 bg-raised px-2 py-1.5 text-left font-mono text-xs text-fg">
+                      <span className="truncate">
+                        <span className="mr-1.5 text-muted" aria-hidden>
+                          ▸
+                        </span>
+                        {path}/
+                      </span>
+                    </div>
+                  </li>
+                );
+              }
               const st = byPath.get(path);
               return (
                 <li key={path}>

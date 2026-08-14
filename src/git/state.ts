@@ -10,7 +10,7 @@ import { aheadBehind } from "./queries";
  */
 export async function buildRepoState(engine: GitEngine): Promise<RepoState> {
   if (!(await engine.isInitialized())) {
-    return { ...EMPTY_REPO_STATE, workdir: await readWorkdir(engine) };
+    return { ...EMPTY_REPO_STATE, ...(await readWorkdir(engine)) };
   }
 
   const common = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
@@ -75,7 +75,7 @@ export async function buildRepoState(engine: GitEngine): Promise<RepoState> {
     commits,
     status,
     headFiles,
-    workdir: await readWorkdir(engine),
+    ...(await readWorkdir(engine)),
     merge: {
       inProgress: engine.mergeState !== null,
       theirs: engine.mergeState?.theirsRef,
@@ -184,10 +184,14 @@ async function walkCommits(
 
 async function readWorkdir(
   engine: GitEngine,
-): Promise<Array<{ path: string; content: string }>> {
+): Promise<{ workdir: Array<{ path: string; content: string }>; dirs: string[] }> {
   const out: Array<{ path: string; content: string }> = [];
-  await walkDir(engine, engine.dir, "", out);
-  return out.sort((a, b) => a.path.localeCompare(b.path));
+  const dirs: string[] = [];
+  await walkDir(engine, engine.dir, "", out, dirs);
+  return {
+    workdir: out.sort((a, b) => a.path.localeCompare(b.path)),
+    dirs: dirs.sort((a, b) => a.localeCompare(b)),
+  };
 }
 
 async function walkDir(
@@ -195,6 +199,7 @@ async function walkDir(
   absDir: string,
   relPrefix: string,
   out: Array<{ path: string; content: string }>,
+  dirs: string[],
 ): Promise<void> {
   let entries: string[];
   try {
@@ -208,7 +213,8 @@ async function walkDir(
     const rel = relPrefix ? `${relPrefix}/${entry}` : entry;
     const stat = await engine.fsp.promises.stat(abs);
     if (stat.isDirectory()) {
-      await walkDir(engine, abs, rel, out);
+      dirs.push(rel);
+      await walkDir(engine, abs, rel, out, dirs);
     } else {
       out.push({ path: rel, content: await engine.fsp.promises.readFile(abs, "utf8") });
     }

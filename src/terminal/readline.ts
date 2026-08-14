@@ -4,7 +4,8 @@ export interface TermLike {
 
 export interface LineEditorOptions {
   term: TermLike;
-  prompt: string;
+  /** a function is re-read on every draw, so a branch-aware prompt follows `git switch` */
+  prompt: string | (() => string);
   onLine(line: string): Promise<void> | void;
   /** completion candidates for the token being typed */
   complete?(tokens: string[], partial: string): string[];
@@ -25,8 +26,13 @@ export class LineEditor {
 
   constructor(private opts: LineEditorOptions) {}
 
+  private get prompt(): string {
+    const { prompt } = this.opts;
+    return typeof prompt === "function" ? prompt() : prompt;
+  }
+
   start(): void {
-    this.opts.term.write(this.opts.prompt);
+    this.opts.term.write(this.prompt);
   }
 
   handleData(data: string): void {
@@ -79,7 +85,7 @@ export class LineEditor {
         this.buf = "";
         this.pos = 0;
         this.histIdx = -1;
-        this.opts.term.write(this.opts.prompt);
+        this.opts.term.write(this.prompt);
         return 1;
       case "\x0c": // Ctrl+L
         this.opts.term.write("\x1b[2J\x1b[H");
@@ -180,8 +186,8 @@ export class LineEditor {
   }
 
   private render(): void {
-    const { term, prompt } = this.opts;
-    term.write("\r\x1b[K" + prompt + this.buf);
+    const { term } = this.opts;
+    term.write("\r\x1b[K" + this.prompt + this.buf);
     const back = this.buf.length - this.pos;
     if (back > 0) term.write(`\x1b[${back}D`);
   }
@@ -203,7 +209,9 @@ export class LineEditor {
       await this.opts.onLine(line);
     } finally {
       this.busy = false;
-      this.opts.term.write(this.opts.prompt);
+      // after onLine: the store already holds the post-command snapshot, so a
+      // `git switch` shows up in the very next prompt
+      this.opts.term.write(this.prompt);
       void this.drain();
     }
   }

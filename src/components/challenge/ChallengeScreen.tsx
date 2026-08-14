@@ -12,7 +12,7 @@ import { FileEditorModal } from "@/components/editor/FileEditorModal";
 import { PixelPanel, HudLabel } from "@/components/ui/pixel";
 
 const TERMINAL_BANNER =
-  "\x1b[38;2;61;255;116mVersionControl.gr\x1b[0m: a real Git terminal.\n" +
+  "\x1b[38;2;61;255;116mVersionControl.gr\x1b[0m: Before you do anything, run \x1b[38;2;255;176;0mgit status\x1b[0m.\n" +
   "Type \x1b[38;2;255;176;0mhelp\x1b[0m to see the available commands.";
 
 export function ChallengeScreen({ slug }: { slug: string }) {

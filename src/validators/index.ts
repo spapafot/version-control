@@ -35,6 +35,8 @@ export type ValidatorSpec =
   | { type: "headMessageContains"; text: string }
   | { type: "fileExists"; file: string }
   | { type: "fileMissing"; file: string }
+  | { type: "directoryExists"; dir: string }
+  | { type: "directoryMissing"; dir: string }
   | { type: "stashCount"; count: number; atLeast?: boolean }
   | { type: "branchPushed"; branch: string }
   | { type: "trackingUpToDate"; branch: string }
@@ -168,6 +170,10 @@ function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolea
       return workdirContent(state, spec.file) !== null;
     case "fileMissing":
       return workdirContent(state, spec.file) === null;
+    case "directoryExists":
+      return state.dirs.includes(spec.dir.replace(/\/+$/, ""));
+    case "directoryMissing":
+      return !state.dirs.includes(spec.dir.replace(/\/+$/, ""));
     case "stashCount":
       return spec.atLeast ? state.stash.length >= spec.count : state.stash.length === spec.count;
     case "branchPushed": {
@@ -245,6 +251,10 @@ function defaultLabel(spec: ValidatorSpec): string {
       return `File "${spec.file}" exists`;
     case "fileMissing":
       return `File "${spec.file}" does not exist`;
+    case "directoryExists":
+      return `Folder "${spec.dir}" exists`;
+    case "directoryMissing":
+      return `Folder "${spec.dir}" is gone`;
     case "stashCount":
       if (spec.count === 0) return "The stash is empty";
       return spec.atLeast

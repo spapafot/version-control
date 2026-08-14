@@ -22,15 +22,16 @@ CREDENTIAL_ID_RANDOM_CHARS = 8
 CREDENTIAL_NAME = "Git Foundations Certificate"
 ACHIEVEMENT_NAME = "Git Foundations — VersionControl.gr"
 ACHIEVEMENT_DESCRIPTION = (
-    "Awarded for having completed all 66 hands-on challenges of the "
-    "VersionControl.gr Git course — from `git init` to reflog recovery — "
-    "solved against a real Git engine running in the browser."
+    "Awarded for having completed all 74 hands-on challenges of the "
+    "VersionControl.gr Git course — from the command line and `git init` to "
+    "reflog recovery — solved against a real Git engine running in the browser."
 )
 CRITERIA_NARRATIVE = (
-    "The recipient completed every challenge across all 10 course sections of "
-    "VersionControl.gr (66/66): repository basics, staging & commits, "
-    "branching, merging, conflict resolution, remote collaboration, undoing "
-    "mistakes, stashing, applied workflows, and disaster recovery."
+    "The recipient completed every challenge across all 11 course sections of "
+    "VersionControl.gr (74/74): command-line basics, repository basics, "
+    "staging & commits, branching, merging, conflict resolution, remote "
+    "collaboration, undoing mistakes, stashing, applied workflows, and "
+    "disaster recovery."
 )
 
 # Per OB 3.0 / VC-JOSE the JWS typ should be "vc+jwt"; some validators still

@@ -4,6 +4,8 @@ import { GitEngine } from "@/git/engine";
 import { runSetup, type SetupStep } from "@/git/setup";
 import { Shell } from "./shell";
 import { tokenize } from "./tokenizer";
+import { renderPrompt } from "./format/prompt";
+import { LineEditor } from "./readline";
 
 async function shellWith(steps: SetupStep[] = []): Promise<Shell> {
   const engine = new GitEngine(createMemFs());
@@ -442,6 +444,134 @@ describe("plain shell commands", () => {
   });
 });
 
+describe("folders in the shell", () => {
+  it("mkdir creates a folder ls can see", async () => {
+    const shell = await shellWith(BASIC);
+    let r = await run(shell, "mkdir docs");
+    expect(r.code).toBe(0);
+    r = await run(shell, "ls");
+    expect(r.out).toBe("README.md  docs/\n");
+
+    r = await run(shell, "mkdir docs");
+    expect(r.err).toBe("mkdir: cannot create directory 'docs': File exists\n");
+    expect(r.code).toBe(1);
+
+    r = await run(shell, "mkdir a/b");
+    expect(r.err).toBe("mkdir: cannot create directory 'a/b': No such file or directory\n");
+    expect(r.code).toBe(1);
+
+    r = await run(shell, "mkdir -p a/b");
+    expect(r.code).toBe(0);
+    r = await run(shell, "ls a");
+    expect(r.out).toBe("b/\n");
+  });
+
+  it("ls takes a path", async () => {
+    const shell = await shellWith([
+      { do: "file", path: "docs/notes.txt", content: "x\n" },
+      { do: "file", path: "docs/plan.txt", content: "y\n" },
+    ]);
+    let r = await run(shell, "ls docs");
+    expect(r.out).toBe("notes.txt  plan.txt\n");
+    r = await run(shell, "ls docs/");
+    expect(r.out).toBe("notes.txt  plan.txt\n");
+    r = await run(shell, "ls docs/notes.txt");
+    expect(r.out).toBe("docs/notes.txt\n");
+    r = await run(shell, "ls nope");
+    expect(r.err).toBe("ls: cannot access 'nope': No such file or directory\n");
+    expect(r.code).toBe(2);
+  });
+
+  it("rm refuses folders without -r", async () => {
+    const shell = await shellWith([{ do: "file", path: "tmp/a.txt", content: "a\n" }]);
+    let r = await run(shell, "rm tmp");
+    expect(r.err).toBe("rm: cannot remove 'tmp': Is a directory\n");
+    expect(r.code).toBe(1);
+    r = await run(shell, "rm -r tmp");
+    expect(r.code).toBe(0);
+    r = await run(shell, "ls");
+    expect(r.out).toBe("");
+  });
+
+  it("mv renames and moves into folders", async () => {
+    const shell = await shellWith([
+      { do: "file", path: "notes.txt", content: "n\n" },
+      { do: "file", path: "docs/keep.txt", content: "k\n" },
+    ]);
+    let r = await run(shell, "mv notes.txt docs/");
+    expect(r.code).toBe(0);
+    r = await run(shell, "cat docs/notes.txt");
+    expect(r.out).toBe("n\n");
+    r = await run(shell, "ls");
+    expect(r.out).toBe("docs/\n");
+
+    r = await run(shell, "mv docs/keep.txt renamed.txt");
+    expect(r.code).toBe(0);
+    r = await run(shell, "ls");
+    expect(r.out).toBe("docs/  renamed.txt\n");
+
+    r = await run(shell, "mv ghost.txt docs/");
+    expect(r.err).toBe("mv: cannot stat 'ghost.txt': No such file or directory\n");
+    expect(r.code).toBe(1);
+
+    r = await run(shell, "mv renamed.txt renamed.txt");
+    expect(r.err).toBe("mv: 'renamed.txt' and 'renamed.txt' are the same file\n");
+    expect(r.code).toBe(1);
+  });
+
+  it("mv renames whole folders", async () => {
+    const shell = await shellWith([{ do: "file", path: "docs/deep/plan.txt", content: "p\n" }]);
+    let r = await run(shell, "mv docs archive");
+    expect(r.code).toBe(0);
+    r = await run(shell, "cat archive/deep/plan.txt");
+    expect(r.out).toBe("p\n");
+    r = await run(shell, "ls");
+    expect(r.out).toBe("archive/\n");
+
+    r = await run(shell, "mv archive archive/");
+    expect(r.err).toBe("mv: cannot move 'archive' to a subdirectory of itself, 'archive/archive'\n");
+    expect(r.code).toBe(1);
+  });
+
+  it("cp copies files and refuses folders", async () => {
+    const shell = await shellWith([
+      { do: "file", path: "index.html", content: "<h1>hi</h1>\n" },
+      { do: "file", path: "docs/keep.txt", content: "k\n" },
+    ]);
+    let r = await run(shell, "cp index.html index.html.bak");
+    expect(r.code).toBe(0);
+    r = await run(shell, "cat index.html.bak");
+    expect(r.out).toBe("<h1>hi</h1>\n");
+    r = await run(shell, "ls");
+    expect(r.out).toBe("docs/  index.html  index.html.bak\n");
+
+    r = await run(shell, "cp docs backup");
+    expect(r.err).toBe("cp: -r not specified; omitting directory 'docs'\n");
+    expect(r.code).toBe(1);
+
+    r = await run(shell, "cp index.html index.html");
+    expect(r.err).toBe("cp: 'index.html' and 'index.html' are the same file\n");
+    expect(r.code).toBe(1);
+  });
+
+  it("cat names the mistake when given a folder", async () => {
+    const shell = await shellWith([{ do: "file", path: "docs/keep.txt", content: "k\n" }]);
+    const r = await run(shell, "cat docs");
+    expect(r.err).toBe("cat: docs: Is a directory\n");
+    expect(r.code).toBe(1);
+  });
+
+  it("folders reach the snapshot for validators and the file panel", async () => {
+    const shell = await shellWith();
+    await run(shell, "mkdir docs");
+    let state = await shell.engine.snapshot();
+    expect(state.dirs).toEqual(["docs"]);
+    await run(shell, "rm -r docs");
+    state = await shell.engine.snapshot();
+    expect(state.dirs).toEqual([]);
+  });
+});
+
 describe("remotes through the shell", () => {
   const PUBLISHED: SetupStep[] = [...BASIC, { do: "publish" }];
   const BEHIND: SetupStep[] = [
@@ -640,5 +770,69 @@ describe("colour, following git's own defaults", () => {
     const shell = await shellWith(BASIC);
     const r = await run(shell, "git branch");
     expect(r.raw).toBe(`* ${GREEN}main\x1b[0m\n`);
+  });
+});
+
+describe("the prompt", () => {
+  const CYAN = "\x1b[36m";
+  const GREEN = "\x1b[32m";
+
+  it("carries the current branch, in cyan", async () => {
+    const shell = await shellWith(BASIC);
+    expect(renderPrompt(await shell.engine.snapshot())).toBe(
+      `${CYAN}(main)\x1b[0m ${GREEN}$\x1b[0m `,
+    );
+  });
+
+  it("follows git switch", async () => {
+    const shell = await shellWith(BASIC);
+    await run(shell, "git switch -c feature/footer");
+    expect(renderPrompt(await shell.engine.snapshot())).toContain("(feature/footer)");
+  });
+
+  it("shows a detached HEAD the way Git Bash does", async () => {
+    const shell = await shellWith(BASIC);
+    const oid = (await shell.engine.snapshot()).head.oid!;
+    await run(shell, `git checkout ${oid.slice(0, 7)}`);
+    expect(renderPrompt(await shell.engine.snapshot())).toContain(`((${oid.slice(0, 7)}...))`);
+  });
+
+  it("drops the branch segment before git init, where it would be a lie", async () => {
+    const shell = await shellWith();
+    expect(renderPrompt(await shell.engine.snapshot())).toBe(`${GREEN}$\x1b[0m `);
+    expect(renderPrompt(null)).toBe(`${GREEN}$\x1b[0m `);
+  });
+});
+
+describe("LineEditor", () => {
+  /** dumb sink standing in for xterm */
+  function editorWith(prompt: string | (() => string)) {
+    let written = "";
+    const editor = new LineEditor({
+      term: { write: (d) => (written += d) },
+      prompt,
+      onLine: () => {},
+    });
+    return { editor, read: () => written, clear: () => (written = "") };
+  }
+
+  it("re-reads a function prompt on every draw", async () => {
+    let branch = "main";
+    const { editor, read, clear } = editorWith(() => `(${branch}) $ `);
+    editor.start();
+    expect(read()).toBe("(main) $ ");
+
+    branch = "feature/footer";
+    clear();
+    editor.handleData("ls\r");
+    await Promise.resolve();
+    // the prompt drawn after the command reflects the new branch
+    expect(read()).toContain("(feature/footer) $ ");
+  });
+
+  it("still accepts a plain string prompt", () => {
+    const { editor, read } = editorWith("$ ");
+    editor.start();
+    expect(read()).toBe("$ ");
   });
 });

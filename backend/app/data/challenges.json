@@ -1,7 +1,21 @@
 {
   "_note": "Snapshot of the course structure. Regenerate from src/challenges/*.ts (challenge `id:` fields, section order from src/challenges/types.ts SECTIONS, achievement ids from src/challenges/index.ts ACHIEVEMENTS) whenever the course changes.",
-  "total": 66,
+  "total": 74,
   "sections": [
+    {
+      "id": "terminal",
+      "title": "The Terminal",
+      "slugs": [
+        "look-around",
+        "read-the-menu",
+        "first-file",
+        "write-it-down",
+        "append-a-line",
+        "make-a-folder",
+        "move-and-copy",
+        "spring-cleaning"
+      ]
+    },
     {
       "id": "basics",
       "title": "First Steps",
@@ -130,6 +144,7 @@
     }
   ],
   "achievements": [
+    "shell-native",
     "first-commit",
     "diff-detective",
     "branch-explorer",

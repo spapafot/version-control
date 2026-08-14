@@ -7,8 +7,7 @@ import { useProgress } from "@/lib/progress";
 import { playError } from "@/lib/sound";
 import { LineEditor } from "@/terminal/readline";
 import { makeCompleter } from "@/terminal/complete";
-
-const PROMPT = "\x1b[38;2;61;255;116m$\x1b[0m ";
+import { renderPrompt } from "@/terminal/format/prompt";
 
 /**
  * xterm.js host. Loaded client-side only (xterm touches `self` at module
@@ -82,7 +81,7 @@ export function TerminalPanel({ banner }: { banner?: string }) {
 
       const editor = new LineEditor({
         term,
-        prompt: PROMPT,
+        prompt: () => renderPrompt(useGame.getState().state),
         complete: makeCompleter(() => useGame.getState().state),
         onLine: async (line) => {
           if (!term) return;

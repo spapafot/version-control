@@ -5,13 +5,16 @@ import { painter } from "./format/color";
 import { parseArgs } from "./parser";
 import type { CommandContext, ShellCommand } from "./commands/types";
 import { gitCommands, GIT_USAGE } from "./commands/git";
-import { cat, echo, ls, pwd, rm, touch } from "./commands/fs";
+import { cat, cp, echo, ls, mkdir, mv, pwd, rm, touch } from "./commands/fs";
 import { clear, help } from "./commands/misc";
 
 const plainCommands: Record<string, ShellCommand> = {
   ls,
   cat,
   touch,
+  mkdir,
+  mv,
+  cp,
   rm,
   echo,
   pwd,

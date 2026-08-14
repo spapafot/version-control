@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (9 top-level pages plus 66 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 74 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -25,8 +25,8 @@ written short enough to leave room for it.
 
 | URL | Primary keyword | Secondary | Title | Description |
 | --- | --- | --- | --- | --- |
-| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 66 missions, a live commit graph, an optional free certificate. |
-| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 66 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
+| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 74 missions, a live commit graph, an optional free certificate. |
+| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 74 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
 | `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
@@ -37,7 +37,7 @@ written short enough to leave room for it.
 
 ## Mission pages
 
-66 long-tail pages, one per mission, and the main reason this site can rank at all.
+74 long-tail pages, one per mission, and the main reason this site can rank at all.
 
 Two things are deliberate here. Mission titles are **absolute**, with no site-name
 suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
@@ -46,7 +46,22 @@ suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
 Git command. See `src/challenges/seo.ts`.
 
 
-### World 1: First Steps
+### World 1: The Terminal
+
+The shell before the Git: look around, read and write files, and organise folders with paths.
+
+| URL | Primary keyword | Title | Teaches |
+| --- | --- | --- | --- |
+| `/challenge/look-around/` | pwd and ls commands | pwd and ls: find where you are in the terminal | pwd; ls; the working directory |
+| `/challenge/read-the-menu/` | cat command read file | cat: read a file without opening an editor | cat; reading files in the terminal |
+| `/challenge/first-file/` | touch command create file | touch: create an empty file in the terminal | touch; creating files |
+| `/challenge/write-it-down/` | echo write text to file | echo and the > redirect: write text into a file | echo; output redirection with > |
+| `/challenge/append-a-line/` | append to file terminal | The >> redirect: append without overwriting | the >> redirect; > versus >> |
+| `/challenge/make-a-folder/` | mkdir command | mkdir: make a folder and use paths to reach inside | mkdir; paths; ls with a folder argument |
+| `/challenge/move-and-copy/` | mv and cp commands | mv and cp: move, rename and copy files | mv; cp; renaming files |
+| `/challenge/spring-cleaning/` | rm remove file and directory | rm and rm -r: delete files and whole folders | rm; rm -r; deleting folders |
+
+### World 2: First Steps
 
 What Git is, what a repository is, and how to check its status.
 
@@ -60,7 +75,7 @@ What Git is, what a repository is, and how to check its status.
 | `/challenge/stage-everything/` | git add all files | git add: stage every change at once | git add .; staging multiple files |
 | `/challenge/both-zones-at-once/` | file staged and modified git | When git status lists one file twice | staging area; git status; staged vs unstaged changes |
 
-### World 2: Staging & Commits
+### World 3: Staging & Commits
 
 Working tree, staging area, and your first commit.
 
@@ -75,7 +90,7 @@ Working tree, staging area, and your first commit.
 | `/challenge/commit-shortcut/` | git commit -am | git commit -am: stage and commit in one step | git commit -am; tracked vs untracked files |
 | `/challenge/explore-the-log/` | git log --oneline | git log and --oneline: read your history | git log; git log --oneline |
 
-### World 3: Branches
+### World 4: Branches
 
 Parallel lines of work: creating, switching, HEAD.
 
@@ -89,7 +104,7 @@ Parallel lines of work: creating, switching, HEAD.
 | `/challenge/branch-from-the-past/` | git branch from an earlier commit | Create a Git branch from an earlier commit | branching from a commit; git branch |
 | `/challenge/the-old-way/` | git checkout vs git switch | git checkout vs git switch: the old way | git checkout; git checkout -b; checkout compared with switch |
 
-### World 4: Merge
+### World 5: Merge
 
 Merging branches: fast-forward and merge commits.
 
@@ -102,7 +117,7 @@ Merging branches: fast-forward and merge commits.
 | `/challenge/update-your-branch/` | merge main into feature branch | Merge main into your feature branch | merging main into a branch; keeping a branch up to date |
 | `/challenge/clean-up-branches/` | git branch -d delete branch | git branch -d: delete a merged branch | git branch -d; deleting branches |
 
-### World 5: Merge Conflicts
+### World 6: Merge Conflicts
 
 Why they happen, how to read them, and how to resolve them.
 
@@ -114,7 +129,7 @@ Why they happen, how to read them, and how to resolve them.
 | `/challenge/abort-the-merge/` | git merge --abort | git merge --abort: back out of a conflict | git merge --abort |
 | `/challenge/conflict-solo/` | git merge conflict practice exercise | Resolve a merge conflict with no hints | merge conflicts; resolving a merge conflict |
 
-### World 6: The Remote
+### World 7: The Remote
 
 A second copy of the repo lives on the café's server. fetch, pull, push: where your work meets Maria's.
 
@@ -128,7 +143,7 @@ A second copy of the repo lives on the café's server. fetch, pull, push: where 
 | `/challenge/pull-with-conflict/` | git pull merge conflict | git pull with a merge conflict, start to end | git pull; merge conflicts; git push |
 | `/challenge/closing-time/` | complete git workflow commit pull push | The full Git workflow: commit, pull, push, clean | git commit; git pull; git push; clean working tree |
 
-### World 7: Fixing Mistakes
+### World 8: Fixing Mistakes
 
 restore, reset, and revert: the right undo for every situation.
 
@@ -142,7 +157,7 @@ restore, reset, and revert: the right undo for every situation.
 | `/challenge/undo-a-published-commit/` | git revert pushed commit | git revert: safely undo a pushed commit | git revert; undoing a shared commit |
 | `/challenge/choose-your-strategy/` | git reset vs revert vs restore | git reset vs revert vs restore: pick one | git reset; git revert; git restore |
 
-### World 8: The Stash
+### World 9: The Stash
 
 Park unfinished work on a shelf, deal with the interruption, pick it back up.
 
@@ -154,7 +169,7 @@ Park unfinished work on a shelf, deal with the interruption, pick it back up.
 | `/challenge/clear-the-shelf/` | git stash drop clear | git stash drop and clear: empty the shelf | git stash drop; git stash clear |
 | `/challenge/stash-to-the-right-branch/` | git stash to a new branch | Move stashed work onto the right branch | git stash; git switch -c; moving work between branches |
 
-### World 9: Final Missions
+### World 10: Final Missions
 
 Scenarios with no hand-holding. You pick the command.
 
@@ -167,7 +182,7 @@ Scenarios with no hand-holding. You pick the command.
 | `/challenge/grand-opening/` | git merge resolve conflict delete branch | Merge, resolve, delete: a full Git workflow | git merge; merge conflicts; git branch -d |
 | `/challenge/mini-disaster/` | discard changes and revert a commit | Discard local changes and revert a commit | git restore; git revert |
 
-### World 10: Git Disasters
+### World 11: Git Disasters
 
 Things going badly wrong, and how to get out: reflog, cherry-pick, detached HEAD.
 
@@ -190,7 +205,7 @@ Each of these is a thing a checklist would tell you to add, left out on purpose:
 - **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.
 - **`SearchAction` in `WebSite`.** There is no site search to point it at.
 - **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.
-- **Per-mission OG images.** Social cards do not affect ranking, and 66 build-time images buy little over one good site-wide card.
+- **Per-mission OG images.** Social cards do not affect ranking, and 74 build-time images buy little over one good site-wide card.
 
 ## Known gap: apex vs www
 

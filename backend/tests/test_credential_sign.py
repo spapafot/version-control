@@ -54,12 +54,12 @@ def test_credential_shape(credential_and_salt):
     assert achievement["id"] == "https://versioncontrol.gr/achievements/git-foundations"
     assert achievement["type"] == ["Achievement"]
     assert achievement["name"] == "Git Foundations — VersionControl.gr"
-    assert "66" in achievement["description"]
-    assert "66/66" in achievement["criteria"]["narrative"]
+    assert "74" in achievement["description"]
+    assert "74/74" in achievement["criteria"]["narrative"]
     assert achievement["image"]["id"] == "https://versioncontrol.gr/badge-git-foundations.png"
 
     tags = achievement["tags"]
-    assert len(tags) == 12
+    assert len(tags) == 13
     assert tags[:2] == ["Git", "Version Control"]
     assert tags[2:] == SKILLS
 

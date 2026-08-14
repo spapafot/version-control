@@ -101,6 +101,55 @@ export class GitEngine {
     await this.fsp.promises.unlink(`${this.dir}/${relPath}`);
   }
 
+  async isDirectory(relPath: string): Promise<boolean> {
+    try {
+      const stat = await this.fsp.promises.stat(`${this.dir}/${relPath}`);
+      return stat.isDirectory();
+    } catch {
+      return false;
+    }
+  }
+
+  /** mkdir; without `parents` this rethrows EEXIST/ENOENT for the caller to word */
+  async makeDir(relPath: string, opts: { parents?: boolean } = {}): Promise<void> {
+    await this.fsp.promises.mkdir(`${this.dir}/${relPath}`, {
+      recursive: opts.parents ?? false,
+    });
+  }
+
+  /** every file under a directory, as sorted paths relative to it */
+  async listFilesUnder(relPath: string): Promise<string[]> {
+    const out: string[] = [];
+    const walk = async (abs: string, rel: string): Promise<void> => {
+      for (const entry of await this.fsp.promises.readdir(abs)) {
+        const stat = await this.fsp.promises.stat(`${abs}/${entry}`);
+        const r = rel ? `${rel}/${entry}` : entry;
+        if (stat.isDirectory()) await walk(`${abs}/${entry}`, r);
+        else out.push(r);
+      }
+    };
+    await walk(`${this.dir}/${relPath}`, "");
+    return out.sort();
+  }
+
+  /**
+   * Depth-first removal of a directory tree. No mtime bump needed: unlike
+   * same-size writes, existence changes are visible to statusMatrix via
+   * stat failure.
+   */
+  async deleteDir(relPath: string): Promise<void> {
+    const walk = async (dir: string): Promise<void> => {
+      for (const entry of await this.fsp.promises.readdir(dir)) {
+        const child = `${dir}/${entry}`;
+        const stat = await this.fsp.promises.stat(child);
+        if (stat.isDirectory()) await walk(child);
+        else await this.fsp.promises.unlink(child);
+      }
+      await this.fsp.promises.rmdir(dir);
+    };
+    await walk(`${this.dir}/${relPath}`);
+  }
+
   async author(): Promise<Persona> {
     if (this.defaultAuthor) return this.defaultAuthor;
     const name = await git.getConfig({ ...this.common, path: "user.name" });

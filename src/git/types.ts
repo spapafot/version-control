@@ -45,6 +45,8 @@ export interface RepoState {
   /** paths in the HEAD tree */
   headFiles: string[];
   workdir: Array<{ path: string; content: string }>;
+  /** every directory under the root (`.git` excluded), sorted, no trailing slash */
+  dirs: string[];
   merge: { inProgress: boolean; theirs?: string; conflicted?: string[] };
   /** stash stack, newest first (stash@{0}) */
   stash: Array<{ label: string; files: string[] }>;
@@ -75,6 +77,7 @@ export const EMPTY_REPO_STATE: RepoState = {
   status: [],
   headFiles: [],
   workdir: [],
+  dirs: [],
   merge: { inProgress: false },
   stash: [],
   remote: null,

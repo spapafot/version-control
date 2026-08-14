@@ -284,11 +284,15 @@ export const CHEATSHEET: CheatsheetGroup[] = [
 
 /** Shell helpers the sandbox also understands, listed for completeness. */
 export const SHELL_HELPERS = [
-  { code: "ls", note: "list files" },
+  { code: "pwd", note: "print where you are (always /repo here)" },
+  { code: "ls <folder>", note: "list files, or what a folder holds" },
   { code: "cat <file>", note: "print a file" },
   { code: "touch <file>", note: "create an empty file" },
-  { code: 'echo "text" > <file>', note: "write text to a file, replacing what was there" },
-  { code: "rm <file>", note: "delete a file" },
+  { code: 'echo "text" > <file>', note: "write text to a file, replacing what was there (>> appends)" },
+  { code: "mkdir <folder>", note: "create a folder" },
+  { code: "mv <from> <to>", note: "move or rename a file or folder" },
+  { code: "cp <from> <to>", note: "copy a file" },
+  { code: "rm <file>", note: "delete a file (rm -r <folder> for a folder)" },
   { code: "help", note: "every command available in the terminal" },
   { code: "clear", note: "clear the screen" },
 ];

@@ -36,6 +36,7 @@ OPTION_COUNT = 4
 
 #: Mirrors SECTIONS in src/challenges/types.ts; one bank file per section.
 TOPICS = (
+    "terminal",
     "basics",
     "commits",
     "branches",

@@ -1,1 +1,4 @@
+# These scripts run under Git Bash: they MUST stay LF. This machine has
+# core.autocrlf=true, which would otherwise rewrite them to CRLF on checkout
+# and break bash (shebang lines and heredoc delimiters with trailing \r).
 *.sh text eol=lf

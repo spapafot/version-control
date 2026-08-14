@@ -136,7 +136,7 @@ try {
     if (a) a.click();
   });
   const navigated = await page
-    .waitForFunction(() => document.body.innerText.includes("MISSION 02"), { timeout: 10000 })
+    .waitForFunction(() => document.body.innerText.includes("MISSION 10"), { timeout: 10000 })
     .catch(() => null);
   if (!navigated) fail("next-challenge Link navigation failed");
 
@@ -191,7 +191,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
-  if (!mapText.includes("66")) fail("level map missing progress counts");
+  if (!mapText.includes("74")) fail("level map missing progress counts");
   await page.screenshot({ path: `${SHOTS}/08-map.png`, fullPage: true });
 
   await page.goto(`${BASE}/playground/`, { waitUntil: "networkidle0" });
@@ -251,7 +251,8 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
-  if (!mapAfter.includes("4/66")) fail(`progress not persisted on map (expected 4/66)`);
+  if (!mapAfter.includes("4/74")) fail(`progress not persisted on map (expected 4/74)`);
+  if (!mapAfter.includes("THE TERMINAL")) fail("terminal world missing from map");
   if (!mapAfter.includes("GIT DISASTERS")) fail("disasters world missing from map");
   if (!mapAfter.includes("THE REMOTE")) fail("remote world missing from map");
 
