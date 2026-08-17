@@ -12,6 +12,10 @@ import {
   type QuizPeriod,
 } from "@/lib/quiz-api";
 
+/** A board is a top ten. The API sorts by rank, so this is a straight cut: a
+ *  player who beats the tenth row takes their place on it. */
+const BOARD_SIZE = 10;
+
 const PERIODS: { value: QuizPeriod; label: string }[] = [
   { value: "ALL", label: "All time" },
   { value: "WEEK", label: "This week" },
@@ -69,7 +73,7 @@ export function QuizLeaderboard({
     setError(null);
     // refreshToken > 0 means a run just finished, so bypass the cached copy;
     // idle tab switches keep using it.
-    fetchLeaderboard(mode, period, 25, refreshToken > 0)
+    fetchLeaderboard(mode, period, BOARD_SIZE, refreshToken > 0)
       .then((data) => {
         if (!cancelled) setBoard(data);
       })

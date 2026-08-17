@@ -105,7 +105,7 @@ export function MissionPanel() {
           {/* the written lesson used to sit under the game; it is a dialog now
               so the mission fits one screen */}
           <PixelButton variant="ghost" tone="amber" onClick={openNotes}>
-            ▪ Lesson notes
+            ▪ Notes
           </PixelButton>
           <Link prefetch={false} href="/stages/" className="ml-auto">
             <PixelButton variant="ghost" tone="line">

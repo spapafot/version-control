@@ -89,7 +89,7 @@ try {
     fail("lesson notes are rendered on the page instead of inside the dialog");
 
   await page.$$eval("button", (btns) => {
-    const b = btns.find((x) => x.textContent?.toUpperCase().includes("LESSON NOTES"));
+    const b = btns.find((x) => x.textContent?.toUpperCase().includes("NOTES"));
     if (b) b.click();
   });
   await new Promise((r) => setTimeout(r, 400));
