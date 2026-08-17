@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (9 top-level pages plus 74 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 76 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -25,8 +25,8 @@ written short enough to leave room for it.
 
 | URL | Primary keyword | Secondary | Title | Description |
 | --- | --- | --- | --- | --- |
-| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 74 missions, a live commit graph, an optional free certificate. |
-| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 74 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
+| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 76 missions, a live commit graph, an optional free certificate. |
+| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 76 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
 | `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
@@ -37,7 +37,7 @@ written short enough to leave room for it.
 
 ## Mission pages
 
-74 long-tail pages, one per mission, and the main reason this site can rank at all.
+76 long-tail pages, one per mission, and the main reason this site can rank at all.
 
 Two things are deliberate here. Mission titles are **absolute**, with no site-name
 suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
@@ -106,16 +106,18 @@ Parallel lines of work: creating, switching, HEAD.
 
 ### World 5: Merge
 
-Merging branches: fast-forward and merge commits.
+The full merge loop: branch, commit, switch, merge. Fast-forward and merge commits.
 
 | URL | Primary keyword | Title | Teaches |
 | --- | --- | --- | --- |
 | `/challenge/first-merge/` | git merge branch into main | git merge: bring a branch back into main | git merge |
-| `/challenge/fast-forward/` | git fast-forward merge | Fast-forward merge in Git, seen in the graph | fast-forward merge; git merge |
-| `/challenge/combine-branches/` | git merge commit diverged branches | Merge two diverged branches into one history | merge commit; diverged branches |
-| `/challenge/double-merge-day/` | fast-forward vs merge commit | Fast-forward or merge commit? Do both, compare | fast-forward merge; merge commit |
+| `/challenge/fast-forward/` | git fast-forward merge | Fast-forward merge in Git, seen in the graph | fast-forward merge; git merge; the feature branch workflow |
+| `/challenge/ship-the-specials/` | git feature branch merge practice | Create a branch, commit, and merge into main | git switch -c; git merge; the feature branch workflow |
+| `/challenge/combine-branches/` | git merge commit diverged branches | Merge two diverged branches into one history | merge commit; diverged branches; the feature branch workflow |
+| `/challenge/double-merge-day/` | fast-forward vs merge commit | Fast-forward or merge commit? Do both, compare | fast-forward merge; merge commit; the feature branch workflow |
 | `/challenge/update-your-branch/` | merge main into feature branch | Merge main into your feature branch | merging main into a branch; keeping a branch up to date |
-| `/challenge/clean-up-branches/` | git branch -d delete branch | git branch -d: delete a merged branch | git branch -d; deleting branches |
+| `/challenge/catch-up-and-land/` | update feature branch then merge | Catch up from main, then merge your branch | merging main into a branch; landing a feature; git merge |
+| `/challenge/clean-up-branches/` | git branch -d delete branch | git branch -d: delete a merged branch | git branch -d; deleting branches; the feature branch workflow |
 
 ### World 6: Merge Conflicts
 
@@ -205,7 +207,7 @@ Each of these is a thing a checklist would tell you to add, left out on purpose:
 - **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.
 - **`SearchAction` in `WebSite`.** There is no site search to point it at.
 - **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.
-- **Per-mission OG images.** Social cards do not affect ranking, and 74 build-time images buy little over one good site-wide card.
+- **Per-mission OG images.** Social cards do not affect ranking, and 76 build-time images buy little over one good site-wide card.
 
 ## Known gap: apex vs www
 

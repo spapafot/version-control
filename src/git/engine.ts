@@ -27,6 +27,27 @@ import {
 /** Fallback identity so `git commit` never fails on missing config (as if a global config existed). */
 export const LEARNER: Persona = { name: "dev", email: "dev@versioncontrol.gr" };
 
+const UNRESOLVED_MERGE =
+  "error: Committing is not possible because you have unmerged files.\n" +
+  "hint: Fix them up in the work tree, and then use 'git add <file>'\n" +
+  "hint: as appropriate to mark resolution and make a commit.\n" +
+  "fatal: Exiting because of an unresolved conflict.";
+
+function unmergedPathsOf(e: unknown): string[] | null {
+  if (
+    typeof e !== "object" ||
+    e === null ||
+    !("code" in e) ||
+    e.code !== "UnmergedPathsError"
+  ) {
+    return null;
+  }
+  const paths = (e as { data?: { filepaths?: unknown } }).data?.filepaths;
+  return Array.isArray(paths)
+    ? paths.filter((p): p is string => typeof p === "string")
+    : [];
+}
+
 export interface ReflogEntry {
   oid: string;
   action: string; // e.g. `commit: <msg>`, `reset: moving to HEAD~2`
@@ -226,9 +247,14 @@ export class GitEngine {
   async addAll(): Promise<void> {
     const matrix = await this.statusMatrix();
     for (const [filepath, , workdir, stage] of matrix) {
-      if (workdir === 0 && stage !== 0) {
+      const conflicted = this.mergeState?.conflicted.has(filepath) ?? false;
+      // Conflicted paths must always hit git.add/remove. statusMatrix for an
+      // unresolved (or resolved-to-ours) file is often [1, 1, 3]: workdir
+      // matches HEAD so stage!==2 is false, and a skip would leave isomorphic-git
+      // stages 1/2/3 in place while our overlay says "fixed".
+      if (workdir === 0 && (stage !== 0 || conflicted)) {
         await git.remove({ ...this.common, filepath });
-      } else if (workdir === 2 && stage !== 2) {
+      } else if (conflicted || (workdir === 2 && stage !== 2)) {
         await git.add({ ...this.common, filepath });
       }
       this.mergeState?.conflicted.delete(filepath);
@@ -270,22 +296,33 @@ export class GitEngine {
 
     if (this.mergeState) {
       if (this.mergeState.conflicted.size > 0) {
-        throw new GitOpError(
-          "error: Committing is not possible because you have unmerged files.\n" +
-            "hint: Fix them up in the work tree, and then use 'git add <file>'\n" +
-            "hint: as appropriate to mark resolution and make a commit.\n" +
-            "fatal: Exiting because of an unresolved conflict.",
-        );
+        throw new GitOpError(UNRESOLVED_MERGE);
       }
       const { oursOid, theirsOid } = this.mergeState;
       const message = opts.message || this.mergeState.message;
-      const oid = await git.commit({
+      const commitOpts = {
         ...this.common,
         message,
         author,
         committer: author,
         parent: [oursOid, theirsOid],
-      });
+      };
+      let oid: string;
+      try {
+        oid = await git.commit(commitOpts);
+      } catch (e) {
+        // Overlay can say "all conflicts fixed" while the index still has
+        // stages 1/2/3 (see addAll). isomorphic-git then throws UnmergedPathsError
+        // with a broken message (`${filepaths.toString}`). Re-add and retry once.
+        const leftover = unmergedPathsOf(e);
+        if (leftover === null) throw e;
+        for (const filepath of leftover) await this.add(filepath);
+        try {
+          oid = await git.commit(commitOpts);
+        } catch {
+          throw new GitOpError(UNRESOLVED_MERGE);
+        }
+      }
       await this.clearMergeState();
       this.recordReflog(
         oid,

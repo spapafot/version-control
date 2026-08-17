@@ -13,7 +13,7 @@ export default function OpengraphImage() {
     ogImage({
       eyebrow: "git init",
       title: "Learn Git, using Git.",
-      subtitle: "74 interactive missions in a real browser terminal. Free, nothing to install.",
+      subtitle: "76 interactive missions in a real browser terminal. Free, nothing to install.",
     }),
     OG_SIZE,
   );

@@ -233,6 +233,57 @@ describe("merge conflict through the shell", () => {
     expect(r.out).toContain("Merge branch 'feature'");
   });
 
+  it("keeping theirs, git add ., git commit -m still closes the merge", async () => {
+    const shell = await shellWith(CONFLICT);
+    await run(shell, "git merge feature");
+    await run(shell, 'echo "console.log(\'feature\');" > app.js');
+    await run(shell, "git add .");
+    const r = await run(shell, 'git commit -m "ok"');
+    expect(r.err).not.toMatch(/internal error|unmerged files|toString/);
+    expect(r.code).toBe(0);
+    const st = await run(shell, "git status");
+    expect(st.out).toContain("nothing to commit, working tree clean");
+  });
+
+  it("finish-the-merge: editor-style resolve, add, commit -m", async () => {
+    const shell = await shellWith([
+      {
+        do: "file",
+        path: "menu.html",
+        content: "<h2>Menu</h2>\n<p>Iced Espresso 2.00</p>\n",
+      },
+      { do: "init" },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "Initial menu" },
+      { do: "branch", name: "feature/prices" },
+      {
+        do: "file",
+        path: "menu.html",
+        content: "<h2>Menu</h2>\n<p>Iced Espresso 2.20</p>\n",
+      },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "Small price increase" },
+      { do: "switch", ref: "feature/prices" },
+      {
+        do: "file",
+        path: "menu.html",
+        content: "<h2>Menu</h2>\n<p>Iced Espresso 2.50</p>\n",
+      },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "New price list" },
+      { do: "switch", ref: "main" },
+      { do: "merge", ref: "feature/prices" },
+    ]);
+    await run(shell, 'echo "<h2>Menu</h2>" > menu.html');
+    await run(shell, 'echo "<p>Iced Espresso 2.50</p>" >> menu.html');
+    await run(shell, "git add menu.html");
+    const r = await run(shell, 'git commit -m "ok"');
+    expect(r.err).not.toMatch(/internal error|unmerged files|toString/);
+    expect(r.code).toBe(0);
+    const st = await run(shell, "git status");
+    expect(st.out).toContain("nothing to commit, working tree clean");
+  });
+
   it("merge --abort through shell", async () => {
     const shell = await shellWith(CONFLICT);
     await run(shell, "git merge feature");

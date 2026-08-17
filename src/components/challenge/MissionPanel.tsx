@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useGame } from "@/lib/game-store";
 import { useNotesDialog } from "@/lib/notes-dialog";
 import { useProgress } from "@/lib/progress";
-import { challengeNumber, SECTIONS } from "@/challenges";
+import { challengeNumber, nextUnsolved, SECTIONS } from "@/challenges";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
 import { RichText } from "./RichText";
 
@@ -16,25 +16,41 @@ export function MissionPanel() {
   const reset = useGame((s) => s.reset);
   const completed = useGame((s) => s.completed);
   const recordHints = useProgress((s) => s.recordHints);
+  const progressCompleted = useProgress((s) => s.completed);
   const openNotes = useNotesDialog((s) => s.openNotes);
 
   if (!challenge) return null;
 
   const number = String(challengeNumber(challenge.id)).padStart(2, "0");
   const section = SECTIONS.find((s) => s.id === challenge.section);
+  const previouslyCleared = Boolean(progressCompleted[challenge.id]) && !completed;
+  const resume = previouslyCleared
+    ? nextUnsolved(challenge.id, progressCompleted)
+    : null;
 
   return (
     <PixelPanel
-      tone={completed ? "phos" : "amber"}
+      tone={completed || previouslyCleared ? "phos" : "amber"}
       title={`Mission ${number} - ${section?.title ?? ""}`}
       className="h-full"
       bodyClassName="overflow-auto"
+      actions={
+        previouslyCleared ? (
+          <span className="text-phos">★ Cleared</span>
+        ) : undefined
+      }
     >
       <div className="flex flex-col gap-4 p-4">
         <div>
           {/* h2, not h1: the server-rendered MissionBrief below owns the page's
               single h1 so the static HTML has a real heading for crawlers */}
-          <h2 className="hud glow-text-amber mb-3 text-lg leading-snug text-amber">
+          <h2
+            className={`hud mb-3 text-lg leading-snug ${
+              completed || previouslyCleared
+                ? "glow-text text-phos"
+                : "glow-text-amber text-amber"
+            }`}
+          >
             {challenge.title}
           </h2>
           <div className="text-[13px] leading-relaxed text-fg">
@@ -112,7 +128,20 @@ export function MissionPanel() {
           <PixelButton variant="ghost" tone="amber" onClick={openNotes}>
             ▪ Notes
           </PixelButton>
-          <Link prefetch={false} href="/stages/" className="ml-auto">
+          {previouslyCleared && (
+            <Link
+              prefetch={false}
+              href={resume ? `/challenge/${resume.id}/` : "/stages/"}
+              className="ml-auto"
+            >
+              <PixelButton>Continue ▸</PixelButton>
+            </Link>
+          )}
+          <Link
+            prefetch={false}
+            href="/stages/"
+            className={previouslyCleared ? "" : "ml-auto"}
+          >
             <PixelButton variant="ghost" tone="line">
               ← Map
             </PixelButton>

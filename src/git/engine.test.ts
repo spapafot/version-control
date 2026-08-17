@@ -287,6 +287,44 @@ describe("merge conflicts (spike: abortOnConflict + statusMatrix overlay)", () =
     expect(s.merge.inProgress).toBe(true);
     expect(s.merge.conflicted).toEqual(["app.js"]);
   });
+
+  it("keeping theirs + addAll still produces a merge commit", async () => {
+    const engine = await seeded(CONFLICT);
+    await engine.merge("feature");
+    await engine.writeFile("app.js", "console.log('feature change');\n");
+    await engine.addAll();
+    const oid = await engine.commit({ message: "ok" });
+    const s = await engine.snapshot();
+    expect(s.merge.inProgress).toBe(false);
+    expect(s.commits[0].oid).toBe(oid);
+    expect(s.commits[0].parents).toHaveLength(2);
+  });
+
+  it("keeping ours + addAll still produces a merge commit", async () => {
+    // statusMatrix is [1, 1, 3] (workdir matches HEAD, stage is the base
+    // blob). The old addAll skip left stages 1/2/3 in place.
+    const engine = await seeded(CONFLICT);
+    await engine.merge("feature");
+    await engine.writeFile("app.js", "console.log('main change');\n");
+    await engine.addAll();
+    const oid = await engine.commit({ message: "ok" });
+    const s = await engine.snapshot();
+    expect(s.merge.inProgress).toBe(false);
+    expect(s.commits[0].parents).toHaveLength(2);
+    expect(s.commits[0].oid).toBe(oid);
+  });
+
+  it("merge commit re-adds leftover index stages if the overlay was cleared early", async () => {
+    const engine = await seeded(CONFLICT);
+    await engine.merge("feature");
+    await engine.writeFile("app.js", "console.log('feature change');\n");
+    engine.mergeState!.conflicted.clear();
+    const oid = await engine.commit({ message: "ok" });
+    const s = await engine.snapshot();
+    expect(s.merge.inProgress).toBe(false);
+    expect(s.commits[0].oid).toBe(oid);
+    expect(s.commits[0].parents).toHaveLength(2);
+  });
 });
 
 describe("restore (spike: resetIndex on file absent from HEAD)", () => {

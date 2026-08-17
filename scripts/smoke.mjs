@@ -193,7 +193,7 @@ try {
   await page.screenshot({ path: `${SHOTS}/04-conflict-success.png` });
 
   // ── graph rendering on a merge-history challenge ───────────────────
-  await page.goto(`${BASE}/challenge/clean-up-branches/`, {
+  await page.goto(`${BASE}/challenge/first-merge/`, {
     waitUntil: "networkidle0",
   });
   await page.waitForSelector(".xterm textarea", { timeout: 20000 });
@@ -204,7 +204,7 @@ try {
 
   // ── editor modal opens ─────────────────────────────────────────────
   await page.$$eval("button", (btns) => {
-    const b = btns.find((x) => x.textContent?.includes("menu.html"));
+    const b = btns.find((x) => x.textContent?.includes("index.html"));
     if (b) b.click();
   });
   await new Promise((r) => setTimeout(r, 700));
@@ -222,7 +222,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
-  if (!mapText.includes("74")) fail("level map missing progress counts");
+  if (!mapText.includes("76")) fail("level map missing progress counts");
   await page.screenshot({ path: `${SHOTS}/08-map.png`, fullPage: true });
 
   await page.goto(`${BASE}/playground/`, { waitUntil: "networkidle0" });
@@ -297,8 +297,8 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
-  if (!mapAfter.includes("4/74"))
-    fail(`progress not persisted on map (expected 4/74)`);
+  if (!mapAfter.includes("4/76"))
+    fail(`progress not persisted on map (expected 4/76)`);
   if (!mapAfter.includes("THE TERMINAL"))
     fail("terminal world missing from map");
   if (!mapAfter.includes("GIT DISASTERS"))

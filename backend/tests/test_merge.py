@@ -147,10 +147,10 @@ def test_sanitize_normalizes_offset_to_utc():
 
 
 def test_snapshot_totals():
-    assert SNAPSHOT["total"] == 74
-    assert len(ALL_SLUGS) == 74
-    assert len(set(ALL_SLUGS)) == 74
-    assert sum(len(s["slugs"]) for s in SNAPSHOT["sections"]) == 74
+    assert SNAPSHOT["total"] == 76
+    assert len(ALL_SLUGS) == 76
+    assert len(set(ALL_SLUGS)) == 76
+    assert sum(len(s["slugs"]) for s in SNAPSHOT["sections"]) == 76
     assert len(SNAPSHOT["sections"]) == 11
-    assert [len(s["slugs"]) for s in SNAPSHOT["sections"]] == [8, 7, 8, 7, 6, 5, 7, 7, 5, 6, 8]
+    assert [len(s["slugs"]) for s in SNAPSHOT["sections"]] == [8, 7, 8, 7, 8, 5, 7, 7, 5, 6, 8]
     assert len(ACHIEVEMENTS) == 13

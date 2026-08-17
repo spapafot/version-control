@@ -1,6 +1,6 @@
 {
   "_note": "Snapshot of the course structure. Regenerate from src/challenges/*.ts (challenge `id:` fields, section order from src/challenges/types.ts SECTIONS, achievement ids from src/challenges/index.ts ACHIEVEMENTS) whenever the course changes.",
-  "total": 74,
+  "total": 76,
   "sections": [
     {
       "id": "terminal",
@@ -62,9 +62,11 @@
       "slugs": [
         "first-merge",
         "fast-forward",
+        "ship-the-specials",
         "combine-branches",
         "double-merge-day",
         "update-your-branch",
+        "catch-up-and-land",
         "clean-up-branches"
       ]
     },

@@ -9,7 +9,7 @@ import {
   ACHIEVEMENTS,
   ALL_CHALLENGES,
   challengeNumber,
-  nextChallenge,
+  nextUnsolved,
 } from "@/challenges";
 import { playAchievement, playSuccess } from "@/lib/sound";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
@@ -57,12 +57,15 @@ export function SuccessOverlay() {
 
   if (!completed || !challenge || overlayDismissed) return null;
 
-  const next = nextChallenge(challenge.id);
+  // this session just passed, but markCompleted runs in an effect, so treat
+  // the current slug as cleared when picking the next unsolved mission
+  const completedNow = { ...progress.completed, [challenge.id]: "now" };
+  const next = nextUnsolved(challenge.id, completedNow);
   const achievement = challenge.achievement
     ? ACHIEVEMENTS.find((a) => a.id === challenge.achievement)
     : null;
   // a real aggregate, not "was this the last mission": finishing out of order counts
-  const allDone = ALL_CHALLENGES.every((c) => progress.completed[c.id]);
+  const allDone = ALL_CHALLENGES.every((c) => completedNow[c.id]);
 
   return (
     // Deliberately a corner card, not a modal: the mission is usually finished

@@ -26,9 +26,9 @@ SLUG_SET = frozenset(ALL_SLUGS)
 ACHIEVEMENTS = list(SNAPSHOT["achievements"])
 ACHIEVEMENT_SET = frozenset(ACHIEVEMENTS)
 
-assert len(ALL_SLUGS) == SNAPSHOT["total"] == 74, (
+assert len(ALL_SLUGS) == SNAPSHOT["total"] == 76, (
     "challenges.json snapshot out of sync: "
-    f"{len(ALL_SLUGS)} slugs vs total={SNAPSHOT['total']} (expected 74)"
+    f"{len(ALL_SLUGS)} slugs vs total={SNAPSHOT['total']} (expected 76)"
 )
 
 FLOOR = datetime(2025, 1, 1, tzinfo=timezone.utc)  # course launch

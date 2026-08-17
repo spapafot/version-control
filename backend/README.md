@@ -125,7 +125,7 @@ For a subject `sub`:
 
 ## Notes
 
-- `app/data/challenges.json` is a build-time snapshot of the course (74 slugs
+- `app/data/challenges.json` is a build-time snapshot of the course (76 slugs
   in 11 sections, 13 achievements). Regenerate from `src/challenges/*.ts`
   whenever the course changes; `app.merge` asserts the totals at import.
 - The quiz bank is **not** snapshotted into the zip: it lives in the `vc-quiz`

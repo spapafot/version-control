@@ -27,12 +27,17 @@ export function GameHeader({ right }: { right?: React.ReactNode }) {
       <Link prefetch={false} href="/" className="hud glow-text text-sm text-phos">
         ▚ VersionControl.gr
       </Link>
-      <div className="flex min-w-28 flex-1 items-center gap-2">
+      <Link
+        prefetch={false}
+        href="/stages/"
+        title="See the map"
+        className="flex min-w-28 flex-1 items-center gap-2"
+      >
         <PixelProgress value={done / ALL_CHALLENGES.length} segments={15} className="max-w-56 flex-1" />
         <HudLabel tone="line">
           {done}/{ALL_CHALLENGES.length}
         </HudLabel>
-      </div>
+      </Link>
       {right}
       <div className="flex items-center gap-1.5">
         <AccountLink />

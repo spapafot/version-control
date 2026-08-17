@@ -43,7 +43,7 @@ export function certTitle(p: VerifyPayload): string {
 
 export function certDescription(p: VerifyPayload): string {
   const date = p.issuedOn.slice(0, 10);
-  return `${p.recipientName} completed all 74 missions of the VersionControl.gr Git course on ${date}. Credential ${p.credentialId} covers branching, merging, conflict resolution and more.`;
+  return `${p.recipientName} completed all 76 missions of the VersionControl.gr Git course on ${date}. Credential ${p.credentialId} covers branching, merging, conflict resolution and more.`;
 }
 
 export function notFoundTitle(): string {
@@ -70,7 +70,7 @@ export function slotHtml(p: VerifyPayload): string {
   const skills = p.skills.map((s) => `<li>${esc(s)}</li>`).join("");
   return (
     `<p><strong>${esc(p.recipientName)}</strong> completed ${esc(p.achievementName)}, ` +
-    `the full VersionControl.gr interactive Git course (all 74 missions), on ${esc(date)}. ` +
+    `the full VersionControl.gr interactive Git course (all 76 missions), on ${esc(date)}. ` +
     `Credential ID ${esc(p.credentialId)}. ${statusLine}</p>` +
     `<p>Skills demonstrated:</p><ul>${skills}</ul>`
   );
