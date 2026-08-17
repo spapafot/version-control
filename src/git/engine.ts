@@ -36,7 +36,7 @@ export interface ReflogEntry {
 export class GitEngine {
   readonly dir: string;
   readonly fsp: FsProvider;
-  /** isomorphic-git object cache — MUST die together with the volume */
+  /** isomorphic-git object cache - MUST die together with the volume */
   cache: object = {};
   mergeState: MergeState | null = null;
   /**
@@ -111,7 +111,10 @@ export class GitEngine {
   }
 
   /** mkdir; without `parents` this rethrows EEXIST/ENOENT for the caller to word */
-  async makeDir(relPath: string, opts: { parents?: boolean } = {}): Promise<void> {
+  async makeDir(
+    relPath: string,
+    opts: { parents?: boolean } = {},
+  ): Promise<void> {
     await this.fsp.promises.mkdir(`${this.dir}/${relPath}`, {
       recursive: opts.parents ?? false,
     });
@@ -162,7 +165,11 @@ export class GitEngine {
   }
 
   recordReflog(oid: string, action: string, timestamp?: number): void {
-    this.reflog.unshift({ oid, action, timestamp: timestamp ?? this.timestamp() });
+    this.reflog.unshift({
+      oid,
+      action,
+      timestamp: timestamp ?? this.timestamp(),
+    });
   }
 
   async resolve(revish: string): Promise<string> {
@@ -198,7 +205,7 @@ export class GitEngine {
     await git.init({ fs: this.fsp.fs, dir: this.dir, defaultBranch });
   }
 
-  /** `git add <path>` — stages new/modified files, and deletions of tracked files. */
+  /** `git add <path>` - stages new/modified files, and deletions of tracked files. */
   async add(filepath: string): Promise<void> {
     const inWorkdir = await this.exists(`${this.dir}/${filepath}`);
     if (inWorkdir) {
@@ -233,15 +240,25 @@ export class GitEngine {
     return files.includes(filepath);
   }
 
-  async commit(opts: { message: string; author?: Persona; timestamp?: number }): Promise<string> {
+  async commit(opts: {
+    message: string;
+    author?: Persona;
+    timestamp?: number;
+  }): Promise<string> {
     const author = {
       ...(opts.author ?? (await this.author())),
       timestamp: opts.timestamp ?? this.timestamp(),
       timezoneOffset: 0,
     };
 
-    if (!this.mergeState && (await this.currentBranch()) === null && (await this.isInitialized())) {
-      const head = await git.resolveRef({ ...this.common, ref: "HEAD" }).catch(() => null);
+    if (
+      !this.mergeState &&
+      (await this.currentBranch()) === null &&
+      (await this.isInitialized())
+    ) {
+      const head = await git
+        .resolveRef({ ...this.common, ref: "HEAD" })
+        .catch(() => null);
       if (head !== null) {
         throw new GitOpError(
           "fatal: you are in 'detached HEAD' state; commits here are not supported in this environment.\n" +
@@ -270,7 +287,11 @@ export class GitEngine {
         parent: [oursOid, theirsOid],
       });
       await this.clearMergeState();
-      this.recordReflog(oid, `commit (merge): ${message.split("\n")[0]}`, author.timestamp);
+      this.recordReflog(
+        oid,
+        `commit (merge): ${message.split("\n")[0]}`,
+        author.timestamp,
+      );
       return oid;
     }
 
@@ -280,19 +301,29 @@ export class GitEngine {
       author,
       committer: author,
     });
-    this.recordReflog(oid, `commit: ${opts.message.split("\n")[0]}`, author.timestamp);
+    this.recordReflog(
+      oid,
+      `commit: ${opts.message.split("\n")[0]}`,
+      author.timestamp,
+    );
     return oid;
   }
 
-  async branch(name: string, opts: { checkout?: boolean; startPoint?: string } = {}): Promise<void> {
+  async branch(
+    name: string,
+    opts: { checkout?: boolean; startPoint?: string } = {},
+  ): Promise<void> {
     const existing = await this.listBranches();
     if (existing.includes(name))
-      throw new GitOpError(`fatal: a branch named '${name}' already exists`, 128);
+      throw new GitOpError(
+        `fatal: a branch named '${name}' already exists`,
+        128,
+      );
     await git.branch({
       ...this.common,
       ref: name,
       // isomorphic-git only resolves ref names / full oids (and swallows
-      // failures) — revparse first so HEAD~1, HEAD@{n}, short hashes work
+      // failures) - revparse first so HEAD~1, HEAD@{n}, short hashes work
       object: opts.startPoint ? await this.resolve(opts.startPoint) : "HEAD",
       checkout: opts.checkout ?? false,
     });
@@ -302,14 +333,19 @@ export class GitEngine {
     await git.deleteBranch({ ...this.common, ref: name });
   }
 
-  async switchTo(ref: string, opts: { create?: boolean; startPoint?: string } = {}): Promise<void> {
-    const from = (await this.currentBranch()) ?? (await this.resolve("HEAD").catch(() => "?"));
+  async switchTo(
+    ref: string,
+    opts: { create?: boolean; startPoint?: string } = {},
+  ): Promise<void> {
+    const from =
+      (await this.currentBranch()) ??
+      (await this.resolve("HEAD").catch(() => "?"));
     await switchBranch(this, ref, opts);
     const oid = await this.resolve("HEAD");
     this.recordReflog(oid, `checkout: moving from ${from} to ${ref}`);
   }
 
-  /** `git checkout <commit-ish>` / `git switch --detach` — HEAD at a raw oid. */
+  /** `git checkout <commit-ish>` / `git switch --detach` - HEAD at a raw oid. */
   async detach(target: string): Promise<string> {
     if (this.mergeState)
       throw new GitOpError(
@@ -325,17 +361,30 @@ export class GitEngine {
       // some versions refuse non-ref checkout targets
     }
     // verify detachment; fall back to a manual HEAD write (we own the fs)
-    const headNow = await git.resolveRef({ ...this.common, ref: "HEAD" }).catch(() => null);
+    const headNow = await git
+      .resolveRef({ ...this.common, ref: "HEAD" })
+      .catch(() => null);
     const branchNow = await this.currentBranch();
     if (headNow !== oid || branchNow !== null) {
-      await git.checkout({ ...this.common, ref: oid, noUpdateHead: true, force: true });
+      await git.checkout({
+        ...this.common,
+        ref: oid,
+        noUpdateHead: true,
+        force: true,
+      });
       await this.writeFile(".git/HEAD", `${oid}\n`);
     }
-    this.recordReflog(oid, `checkout: moving from ${from} to ${oid.slice(0, 7)}`);
+    this.recordReflog(
+      oid,
+      `checkout: moving from ${from} to ${oid.slice(0, 7)}`,
+    );
     return oid;
   }
 
-  async merge(theirsRef: string, opts: { message?: string } = {}): Promise<MergeOutcome> {
+  async merge(
+    theirsRef: string,
+    opts: { message?: string } = {},
+  ): Promise<MergeOutcome> {
     if (this.mergeState)
       throw new GitOpError(
         "error: Merging is not possible because you have unmerged files.\nfatal: Exiting because of an unresolved conflict.",
@@ -376,7 +425,10 @@ export class GitEngine {
         this.recordReflog(r.oid!, `merge ${theirsRef}: Fast-forward`);
         return { kind: "fast-forward", oid: r.oid! };
       }
-      this.recordReflog(r.oid!, `merge ${theirsRef}: Merge made by the 'ort' strategy.`);
+      this.recordReflog(
+        r.oid!,
+        `merge ${theirsRef}: Merge made by the 'ort' strategy.`,
+      );
       return { kind: "merge-commit", oid: r.oid! };
     } catch (e: any) {
       if (e?.code === "MergeConflictError") {
@@ -392,11 +444,14 @@ export class GitEngine {
         await this.writeFile(".git/MERGE_MSG", `${message}\n`);
         // real git stages the cleanly-merged files; isomorphic-git only wrote
         // them to the worktree. The tree was clean before the merge, so every
-        // non-conflicted difference here IS a merge result — mirror it into
+        // non-conflicted difference here IS a merge result - mirror it into
         // the index or the final merge commit silently drops it.
         for (const [filepath, , workdir, stage] of await this.statusMatrix()) {
           if (this.mergeState.conflicted.has(filepath)) continue;
-          if ((workdir === 2 && stage !== 2) || (workdir === 0 && stage !== 0)) {
+          if (
+            (workdir === 2 && stage !== 2) ||
+            (workdir === 0 && stage !== 0)
+          ) {
             await this.add(filepath);
           }
         }
@@ -408,7 +463,10 @@ export class GitEngine {
 
   async abortMerge(): Promise<void> {
     if (!this.mergeState)
-      throw new GitOpError("fatal: There is no merge to abort (MERGE_HEAD missing).", 128);
+      throw new GitOpError(
+        "fatal: There is no merge to abort (MERGE_HEAD missing).",
+        128,
+      );
     await git.abortMerge(this.common);
     await this.clearMergeState();
   }
@@ -445,7 +503,7 @@ export class GitEngine {
     return restoreOp(this, paths, opts);
   }
 
-  /** `git stash push` — no HEAD reflog entry: real git logs stashes to refs/stash. */
+  /** `git stash push` - no HEAD reflog entry: real git logs stashes to refs/stash. */
   async stashPush(
     opts: { message?: string; includeUntracked?: boolean } = {},
   ): Promise<StashPushResult> {
@@ -481,8 +539,14 @@ export class GitEngine {
   async requireCleanTree(action: string): Promise<void> {
     const matrix = await this.statusMatrix();
     const dirty = matrix
-      .filter(([, head, workdir, stage]) => !(head === 1 && workdir === 1 && stage === 1))
-      .filter(([, head, workdir, stage]) => !(head === 0 && workdir === 2 && stage === 0)) // untracked ok
+      .filter(
+        ([, head, workdir, stage]) =>
+          !(head === 1 && workdir === 1 && stage === 1),
+      )
+      .filter(
+        ([, head, workdir, stage]) =>
+          !(head === 0 && workdir === 2 && stage === 0),
+      ) // untracked ok
       .map(([f]) => f);
     if (dirty.length > 0) {
       throw new GitOpError(

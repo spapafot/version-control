@@ -53,7 +53,7 @@ def test_credential_shape(credential_and_salt):
     achievement = subject["achievement"]
     assert achievement["id"] == "https://versioncontrol.gr/achievements/git-foundations"
     assert achievement["type"] == ["Achievement"]
-    assert achievement["name"] == "Git Foundations — VersionControl.gr"
+    assert achievement["name"] == "Git Foundations - VersionControl.gr"
     assert "74" in achievement["description"]
     assert "74/74" in achievement["criteria"]["narrative"]
     assert achievement["image"]["id"] == "https://versioncontrol.gr/badge-git-foundations.png"
@@ -98,7 +98,7 @@ def test_verify_roundtrip(credential_and_salt, ed25519_key):
     assert claims["nbf"] == claims["iat"] == expected_epoch
     assert claims["validFrom"] == ISSUED_ON
     assert claims["credentialSubject"]["achievement"]["name"] == (
-        "Git Foundations — VersionControl.gr"
+        "Git Foundations - VersionControl.gr"
     )
 
 

@@ -18,7 +18,7 @@ export interface ParsedLine {
 /**
  * Shell-style tokenizer: '…' and "…" quoting (Greek commit messages with
  * spaces), backslash escapes, and > / >> output redirection.
- * No pipes, env vars, or globbing — attempts get a clear error.
+ * No pipes, env vars, or globbing - attempts get a clear error.
  */
 export function tokenize(line: string): ParsedLine {
   const tokens: string[] = [];
@@ -96,8 +96,11 @@ export function tokenize(line: string): ParsedLine {
     if (t === ">" || t === ">>") {
       const target = tokens[j + 1];
       if (!target || target === ">" || target === ">>")
-        throw new ShellParseError("syntax error near unexpected token `newline'");
-      if (redirect) throw new ShellParseError("syntax error: multiple redirections");
+        throw new ShellParseError(
+          "syntax error near unexpected token `newline'",
+        );
+      if (redirect)
+        throw new ShellParseError("syntax error: multiple redirections");
       redirect = { op: t, target };
       j++;
     } else {

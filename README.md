@@ -16,9 +16,9 @@ you used. There is usually more than one way to pass.
 
 ![Mission 01, with the file explorer, commit graph and terminal](docs/screenshots/02-challenge.png)
 
-Eleven worlds start at the terminal itself — ls, echo, folders, mv and rm — then
+Eleven worlds start at the terminal itself - ls, echo, folders, mv and rm - then
 take you from `git init` through staging, branches, merges and conflicts,
-then out to the world — fetching, pulling and pushing against a simulated remote —
+then out to the world - fetching, pulling and pushing against a simulated remote -
 before safe undo, the stash, capstone missions, and a final set of Git disasters:
 recovering lost commits from the reflog, cherry-picking one commit out of a messy
 branch, finding your way out of a detached HEAD.

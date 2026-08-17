@@ -29,12 +29,18 @@ describe("stash push", () => {
     const r = await engine.stashPush();
     expect(r.saved).toBe(true);
     expect(engine.stash).toHaveLength(1);
-    expect(engine.stash[0].label).toMatch(/^WIP on main: [0-9a-f]{7} Basic pages$/);
+    expect(engine.stash[0].label).toMatch(
+      /^WIP on main: [0-9a-f]{7} Basic pages$/,
+    );
     expect(engine.stash[0].files.map((f) => f.path)).toEqual(["prices.html"]);
 
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 1.80</p>\n");
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 1.80</p>\n",
+    );
     const s = await engine.snapshot();
-    expect(s.status.every((f) => !f.staged && !f.unstaged && !f.untracked)).toBe(true);
+    expect(
+      s.status.every((f) => !f.staged && !f.unstaged && !f.untracked),
+    ).toBe(true);
     expect(s.stash).toEqual([
       { label: engine.stash[0].label, files: ["prices.html"] },
     ]);
@@ -46,11 +52,15 @@ describe("stash push", () => {
     await engine.add("prices.html");
 
     await engine.stashPush();
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 1.80</p>\n");
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 1.80</p>\n",
+    );
 
     await engine.stashPop(0);
     const s = await engine.snapshot();
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 2.20</p>\n");
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 2.20</p>\n",
+    );
     // real git default (no --index): the change returns unstaged
     expect(status(s, "prices.html")?.unstaged).toBe("modified");
     expect(status(s, "prices.html")?.staged).toBeNull();
@@ -67,7 +77,9 @@ describe("stash push", () => {
     await engine.stashPop(0);
 
     const s = await engine.snapshot();
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 2.20</p>\n");
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 2.20</p>\n",
+    );
     expect(status(s, "prices.html")?.unstaged).toBe("modified");
   });
 
@@ -80,7 +92,9 @@ describe("stash push", () => {
 
     await engine.stashPop(0);
     expect(await engine.exists("/repo/prices.html")).toBe(false);
-    expect(status(await engine.snapshot(), "prices.html")?.unstaged).toBe("deleted");
+    expect(status(await engine.snapshot(), "prices.html")?.unstaged).toBe(
+      "deleted",
+    );
   });
 
   it("takes a staged new file off disk, and pop returns it untracked", async () => {
@@ -91,7 +105,9 @@ describe("stash push", () => {
     await engine.stashPush();
     expect(await engine.exists("/repo/hours.html")).toBe(false);
     const clean = await engine.snapshot();
-    expect(clean.status.every((f) => !f.staged && !f.unstaged && !f.untracked)).toBe(true);
+    expect(
+      clean.status.every((f) => !f.staged && !f.unstaged && !f.untracked),
+    ).toBe(true);
 
     await engine.stashPop(0);
     expect(status(await engine.snapshot(), "hours.html")?.untracked).toBe(true);
@@ -153,7 +169,11 @@ describe("stash stack", () => {
     ...BASE,
     { do: "file", path: "prices.html", content: "<p>Greek coffee 2.20</p>\n" },
     { do: "stash", message: "new prices" },
-    { do: "file", path: "index.html", content: "<h1>Central Café — open late</h1>\n" },
+    {
+      do: "file",
+      path: "index.html",
+      content: "<h1>Central Café - open late</h1>\n",
+    },
     { do: "stash", message: "late hours" },
   ];
 
@@ -169,7 +189,9 @@ describe("stash stack", () => {
     const engine = await seeded(TWO);
     await engine.stashPop(1);
 
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 2.20</p>\n");
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 2.20</p>\n",
+    );
     expect(await engine.readFile("index.html")).toBe("<h1>Central Café</h1>\n");
     expect(engine.stash.map((e) => e.label)).toEqual(["On main: late hours"]);
   });
@@ -178,7 +200,9 @@ describe("stash stack", () => {
     const engine = await seeded(TWO);
     await engine.stashApply(0);
     expect(engine.stash).toHaveLength(2);
-    expect(await engine.readFile("index.html")).toBe("<h1>Central Café — open late</h1>\n");
+    expect(await engine.readFile("index.html")).toBe(
+      "<h1>Central Café - open late</h1>\n",
+    );
 
     const dropped = engine.stashDrop(0);
     expect(dropped.label).toBe("On main: late hours");
@@ -191,8 +215,12 @@ describe("stash stack", () => {
   it("refuses to clobber local changes to a stashed path", async () => {
     const engine = await seeded(TWO);
     await engine.writeFile("prices.html", "<p>Greek coffee 9.99</p>\n");
-    await expect(engine.stashApply(1)).rejects.toThrow(/would be overwritten by merge/);
-    expect(await engine.readFile("prices.html")).toBe("<p>Greek coffee 9.99</p>\n");
+    await expect(engine.stashApply(1)).rejects.toThrow(
+      /would be overwritten by merge/,
+    );
+    expect(await engine.readFile("prices.html")).toBe(
+      "<p>Greek coffee 9.99</p>\n",
+    );
   });
 
   it("rejects an out-of-range entry", async () => {

@@ -77,7 +77,7 @@ def settings_env(monkeypatch, ed25519_seed_b64):
 
 
 class FakeJWKSClient:
-    """Stands in for PyJWKClient — always returns the test pool's public key."""
+    """Stands in for PyJWKClient - always returns the test pool's public key."""
 
     def __init__(self, public_key):
         self._public_key = public_key

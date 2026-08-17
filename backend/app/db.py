@@ -1,4 +1,4 @@
-"""DynamoDB access layer — single table, lazy module-level Table handle.
+"""DynamoDB access layer - single table, lazy module-level Table handle.
 
 Item layout (PK / SK):
   USER#{sub} / PROFILE            {email, displayName?, nickname?, createdAt,

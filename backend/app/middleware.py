@@ -26,7 +26,7 @@ def _matches(provided: str, expected: str) -> bool:
 
 
 class ProxySecretMiddleware:
-    """Pure ASGI middleware — applies to every HTTP request, including 404s."""
+    """Pure ASGI middleware - applies to every HTTP request, including 404s."""
 
     def __init__(self, app) -> None:
         self.app = app

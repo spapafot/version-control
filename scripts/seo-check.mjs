@@ -90,16 +90,22 @@ for (const file of walk(OUT)) {
   // ── title ──────────────────────────────────────────────────────────────
   const title = attr(html, /<title>([^<]*)<\/title>/);
   if (!title) fail("no <title>");
-  else if (title.length > TITLE_MAX) fail(`title is ${title.length} chars (max ${TITLE_MAX}): ${title}`);
+  else if (title.length > TITLE_MAX)
+    fail(`title is ${title.length} chars (max ${TITLE_MAX}): ${title}`);
 
   // ── description ────────────────────────────────────────────────────────
   const desc = attr(html, /<meta name="description" content="([^"]*)"/);
   if (!desc && !is404) fail("no meta description");
   if (desc) {
-    if (desc.length < DESC_MIN) fail(`description is ${desc.length} chars (min ${DESC_MIN})`);
-    if (desc.length > DESC_MAX) fail(`description is ${desc.length} chars (max ${DESC_MAX})`);
-    if (desc.includes("`")) fail("description contains a backtick, which renders literally in a snippet");
-    if (/[—–]/.test(desc)) fail("description contains an em or en dash");
+    if (desc.length < DESC_MIN)
+      fail(`description is ${desc.length} chars (min ${DESC_MIN})`);
+    if (desc.length > DESC_MAX)
+      fail(`description is ${desc.length} chars (max ${DESC_MAX})`);
+    if (desc.includes("`"))
+      fail(
+        "description contains a backtick, which renders literally in a snippet",
+      );
+    if (/[-–]/.test(desc)) fail("description contains an em or en dash");
   }
 
   // ── canonical ──────────────────────────────────────────────────────────
@@ -107,7 +113,8 @@ for (const file of walk(OUT)) {
     const canonical = attr(html, /<link rel="canonical" href="([^"]*)"/);
     const want = expectedCanonical(file);
     if (!canonical) fail("no canonical link");
-    else if (canonical !== want) fail(`canonical is ${canonical}, expected ${want}`);
+    else if (canonical !== want)
+      fail(`canonical is ${canonical}, expected ${want}`);
   }
 
   // ── social ─────────────────────────────────────────────────────────────
@@ -115,22 +122,30 @@ for (const file of walk(OUT)) {
     if (!/<meta property="og:image"/.test(html)) fail("no og:image");
     if (!/<meta property="og:url"/.test(html)) fail("no og:url");
     const card = attr(html, /<meta name="twitter:card" content="([^"]*)"/);
-    if (card !== "summary_large_image") fail(`twitter:card is ${card ?? "missing"}`);
+    if (card !== "summary_large_image")
+      fail(`twitter:card is ${card ?? "missing"}`);
   }
 
   // ── headings ───────────────────────────────────────────────────────────
   const h1s = html.match(/<h1[\s>]/g) ?? [];
   const wantH1 = bodyless ? 0 : 1;
-  if (h1s.length !== wantH1) fail(`has ${h1s.length} h1 elements, expected exactly ${wantH1}`);
+  if (h1s.length !== wantH1)
+    fail(`has ${h1s.length} h1 elements, expected exactly ${wantH1}`);
 
   // ── real content ───────────────────────────────────────────────────────
   const text = bodyText(html);
   if (!is404 && !bodyless && text.length < BODY_MIN) {
-    fail(`only ${text.length} chars of body text (min ${BODY_MIN}); is it behind a client boundary?`);
+    fail(
+      `only ${text.length} chars of body text (min ${BODY_MIN}); is it behind a client boundary?`,
+    );
   }
 
   // ── structured data ────────────────────────────────────────────────────
-  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+  const blocks = [
+    ...html.matchAll(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
+    ),
+  ];
   if (blocks.length === 0 && !is404) fail("no JSON-LD");
   for (const [i, block] of blocks.entries()) {
     let parsed;
@@ -141,8 +156,10 @@ for (const file of walk(OUT)) {
       continue;
     }
     for (const node of [parsed].flat()) {
-      if (!node || !node["@type"]) fail(`JSON-LD block ${i} has a node with no @type`);
-      if (node && !node["@context"]) fail(`JSON-LD block ${i} has a node with no @context`);
+      if (!node || !node["@type"])
+        fail(`JSON-LD block ${i} has a node with no @type`);
+      if (node && !node["@context"])
+        fail(`JSON-LD block ${i} has a node with no @context`);
     }
   }
 }
@@ -156,9 +173,12 @@ else {
   notes.push(`sitemap lists ${urls.length} URLs`);
   for (const url of urls) {
     const path = url.replace(BASE, "").replace(/^\/|\/$/g, "");
-    const target = path === "" ? join(OUT, "index.html") : join(OUT, path, "index.html");
-    if (!existsSync(target)) problems.push(`sitemap.xml: ${url} has no page at ${target}`);
-    if (!url.endsWith("/")) problems.push(`sitemap.xml: ${url} has no trailing slash`);
+    const target =
+      path === "" ? join(OUT, "index.html") : join(OUT, path, "index.html");
+    if (!existsSync(target))
+      problems.push(`sitemap.xml: ${url} has no page at ${target}`);
+    if (!url.endsWith("/"))
+      problems.push(`sitemap.xml: ${url} has no trailing slash`);
   }
   // anything indexable that the sitemap forgot
   for (const file of walk(OUT)) {
@@ -185,7 +205,9 @@ if (!existsSync(ogPath)) {
     ? readFileSync(join(OUT, "_headers"), "utf8")
     : "";
   if (!/\/opengraph-image[\s\S]*Content-Type:\s*image\/png/.test(headers)) {
-    problems.push("_headers: no Content-Type: image/png rule for /opengraph-image");
+    problems.push(
+      "_headers: no Content-Type: image/png rule for /opengraph-image",
+    );
   }
 }
 

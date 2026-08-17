@@ -23,8 +23,8 @@ export default function PrivacyPage() {
 
       <LegalSection heading="Who is responsible">
         <p>
-          The data controller for this site is Stratos Papafotiou / Markware. For
-          anything on this page, write to{" "}
+          The data controller for this site is Stratos Papafotiou / Markware.
+          For anything on this page, write to{" "}
           <a
             href="mailto:info@markware.gr"
             className="text-phos underline underline-offset-2 hover:text-amber"
@@ -56,10 +56,10 @@ export default function PrivacyPage() {
           <code className="bg-raised px-1 font-mono text-[0.92em] text-amber">
             versioncontrol-quiz
           </code>
-          . All three live on your device only. Clearing your browser&apos;s site
-          data for versioncontrol.gr deletes them, and also resets your course
-          progress on this device (an account, if you have one, keeps a copy —
-          see the next section).
+          . All three live on your device only. Clearing your browser&apos;s
+          site data for versioncontrol.gr deletes them, and also resets your
+          course progress on this device (an account, if you have one, keeps a
+          copy - see the next section).
         </p>
       </LegalSection>
 
@@ -72,10 +72,10 @@ export default function PrivacyPage() {
           course progress (which missions you completed and when, hint counts,
           achievements), and, if you set them, the display name for your
           certificate and the nickname for the quiz leaderboards. Those two are
-          separate: the certificate name is not published on any leaderboard, and
-          the nickname is not printed on any certificate. We never receive or
-          store the contents of your practice repositories or the commands you
-          type.
+          separate: the certificate name is not published on any leaderboard,
+          and the nickname is not printed on any certificate. We never receive
+          or store the contents of your practice repositories or the commands
+          you type.
         </p>
         <p>
           Signing in never deletes local progress: what is in your browser and
@@ -117,8 +117,8 @@ export default function PrivacyPage() {
           </code>
           ) to count visits and see which lessons people reach. Google sets
           cookies in your browser and receives your IP address, approximate
-          location, device and browser details, and the pages you open. That data
-          is processed by Google under its own terms.
+          location, device and browser details, and the pages you open. That
+          data is processed by Google under its own terms.
         </p>
         <p>
           If you decline, the Google script is never added to the page and no
@@ -127,8 +127,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           You can change your mind at any time with the{" "}
-          <span className="text-phos">Cookie settings</span> link at the bottom of
-          this page. It brings the banner back so you can answer again.
+          <span className="text-phos">Cookie settings</span> link at the bottom
+          of this page. It brings the banner back so you can answer again.
         </p>
       </LegalSection>
 
@@ -142,10 +142,10 @@ export default function PrivacyPage() {
 
       <LegalSection heading="What we never collect">
         <p>
-          No payment details and no contact forms. Unless you create an
-          account, no email addresses or passwords either. There are no
-          advertising trackers, social media embeds or third-party fonts loaded
-          from other servers, with or without an account.
+          No payment details and no contact forms. Unless you create an account,
+          no email addresses or passwords either. There are no advertising
+          trackers, social media embeds or third-party fonts loaded from other
+          servers, with or without an account.
         </p>
       </LegalSection>
 
@@ -156,17 +156,17 @@ export default function PrivacyPage() {
           withdraw consent. Without an account, the only personal data involved
           is collected by Google Analytics after you opt in, so withdrawing
           consent and clearing your browser data covers most of it. With an
-          account, erasure means deleting your profile, progress and, if you
-          ask for it, your certificate (its verification link then stops
-          working). For any of this, use the contact address above. You also
-          have the right to complain to your national data protection
-          authority.
+          account, erasure means deleting your profile, progress and, if you ask
+          for it, your certificate (its verification link then stops working).
+          For any of this, use the contact address above. You also have the
+          right to complain to your national data protection authority.
         </p>
       </LegalSection>
 
       <LegalSection heading="Changes">
         <p>
-          If this page changes, the date at the top changes with it. See also the{" "}
+          If this page changes, the date at the top changes with it. See also
+          the{" "}
           <Link
             prefetch={false}
             href="/terms/"

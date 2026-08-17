@@ -4,11 +4,14 @@ import type { GitEngine } from "../engine";
 import { blobOidAt, diffTrees } from "../blobs";
 
 /**
- * `git revert <commit>` — single-parent targets, clean reverts only
+ * `git revert <commit>` - single-parent targets, clean reverts only
  * (challenge content guarantees the touched files are unchanged since the
  * target commit; anything else is refused like a revert conflict).
  */
-export async function revert(engine: GitEngine, target: string): Promise<string> {
+export async function revert(
+  engine: GitEngine,
+  target: string,
+): Promise<string> {
   const common = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
 
   const oid = await engine.resolve(target);
@@ -54,7 +57,11 @@ export async function revert(engine: GitEngine, target: string): Promise<string>
       await git.remove({ ...common, filepath: ch.path });
     } else {
       // the commit modified/deleted it → write back the parent's version
-      const { blob } = await git.readBlob({ ...common, oid: parentOid, filepath: ch.path });
+      const { blob } = await git.readBlob({
+        ...common,
+        oid: parentOid,
+        filepath: ch.path,
+      });
       await engine.writeFile(ch.path, new TextDecoder().decode(blob));
       await git.add({ ...common, filepath: ch.path });
     }

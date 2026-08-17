@@ -21,7 +21,7 @@ export TABLE_NAME=vc-cert-dev PROXY_SECRET=dev-secret \
 uvicorn app.main:app --reload
 ```
 
-Run the tests (no network, no real AWS — DynamoDB is moto, Cognito is a local
+Run the tests (no network, no real AWS - DynamoDB is moto, Cognito is a local
 RSA keypair):
 
 ```bash
@@ -32,41 +32,41 @@ Target runtime is **python3.12** on Lambda; keep the code 3.12-compatible.
 
 ## Environment variables
 
-| Variable                 | Required | Default                          | Purpose                                                        |
-| ------------------------ | -------- | -------------------------------- | -------------------------------------------------------------- |
-| `TABLE_NAME`             | yes      | —                                | DynamoDB table (single-table layout, `PK`/`SK` string keys)    |
-| `QUIZ_TABLE_NAME`        | quiz     | —                                | Quiz table: question bank, sessions, leaderboards (`vc-quiz`)  |
-| `AWS_REGION`             | yes      | `eu-central-1`                   | Region for DynamoDB + Cognito JWKS URL                         |
-| `COGNITO_USER_POOL_ID`   | yes      | —                                | ID-token issuer validation                                     |
-| `COGNITO_CLIENT_ID`      | yes      | —                                | ID-token audience validation                                   |
-| `PROXY_SECRET`           | yes      | —                                | Shared secret the edge proxy sends as `X-Proxy-Secret`         |
-| `ISSUER_PRIVATE_KEY_B64` | yes      | —                                | Base64 of the 32-byte Ed25519 seed used to sign credentials    |
-| `ISSUER_KID`             | no       | `did:web:versioncontrol.gr#key-0`| `kid` header of issued VC-JWTs                                 |
-| `API_BASE`               | no       | `https://api.versioncontrol.gr`  | Base of credential URLs embedded in issued credentials         |
-| `SITE_BASE`              | no       | `https://versioncontrol.gr`      | Base of verify/badge/achievement URLs                          |
+| Variable                 | Required | Default                           | Purpose                                                       |
+| ------------------------ | -------- | --------------------------------- | ------------------------------------------------------------- |
+| `TABLE_NAME`             | yes      | -                                 | DynamoDB table (single-table layout, `PK`/`SK` string keys)   |
+| `QUIZ_TABLE_NAME`        | quiz     | -                                 | Quiz table: question bank, sessions, leaderboards (`vc-quiz`) |
+| `AWS_REGION`             | yes      | `eu-central-1`                    | Region for DynamoDB + Cognito JWKS URL                        |
+| `COGNITO_USER_POOL_ID`   | yes      | -                                 | ID-token issuer validation                                    |
+| `COGNITO_CLIENT_ID`      | yes      | -                                 | ID-token audience validation                                  |
+| `PROXY_SECRET`           | yes      | -                                 | Shared secret the edge proxy sends as `X-Proxy-Secret`        |
+| `ISSUER_PRIVATE_KEY_B64` | yes      | -                                 | Base64 of the 32-byte Ed25519 seed used to sign credentials   |
+| `ISSUER_KID`             | no       | `did:web:versioncontrol.gr#key-0` | `kid` header of issued VC-JWTs                                |
+| `API_BASE`               | no       | `https://api.versioncontrol.gr`   | Base of credential URLs embedded in issued credentials        |
+| `SITE_BASE`              | no       | `https://versioncontrol.gr`       | Base of verify/badge/achievement URLs                         |
 
 ## Endpoints
 
-All routes require `X-Proxy-Secret`. Routes marked *auth* additionally require
+All routes require `X-Proxy-Secret`. Routes marked _auth_ additionally require
 `Authorization: Bearer <Cognito ID token>` (verified email).
 
-| Method | Path                                | Auth | Description                                              |
-| ------ | ----------------------------------- | ---- | -------------------------------------------------------- |
-| GET    | `/v1/me`                            | auth | Profile + progress + certificate (if any)                |
-| PUT    | `/v1/me`                            | auth | Set `displayName` (1–60 chars, must contain letter/digit)|
-| POST   | `/v1/sync`                          | auth | Monotone-merge client progress; returns merged blob      |
-| POST   | `/v1/certificates`                  | auth | Issue (idempotent) the Git Foundations certificate       |
-| GET    | `/v1/verify/{id}`                   | —    | Verification oracle: `valid` / `revoked` / 404           |
-| GET    | `/v1/credentials/{id}`              | —    | OB 3.0 credential JSON (`?format=jwt` → compact JWS)     |
-| GET    | `/v1/credentials/{id}/badge.png`    | —    | Badge PNG with the JWS baked into an `openbadgecredential` iTXt chunk |
-| GET    | `/v1/credentials/{id}/card.png`     | —    | 1200×630 share card                                      |
-| POST   | `/v1/quiz/sessions`                 | opt  | Draw a run: questions **without** answers, plus the server clock |
-| POST   | `/v1/quiz/sessions/{id}/submit`     | opt  | Score it (single use), rank if eligible, return the full review  |
-| GET    | `/v1/quiz/leaderboard`              | —    | `?mode=sprint\|set20&period=ALL\|WEEK&limit=` top rows, cacheable |
-| GET    | `/v1/quiz/me`                       | auth | Personal bests for the live boards + lifetime counters    |
+| Method | Path                             | Auth | Description                                                           |
+| ------ | -------------------------------- | ---- | --------------------------------------------------------------------- |
+| GET    | `/v1/me`                         | auth | Profile + progress + certificate (if any)                             |
+| PUT    | `/v1/me`                         | auth | Set `displayName` (1–60 chars, must contain letter/digit)             |
+| POST   | `/v1/sync`                       | auth | Monotone-merge client progress; returns merged blob                   |
+| POST   | `/v1/certificates`               | auth | Issue (idempotent) the Git Foundations certificate                    |
+| GET    | `/v1/verify/{id}`                | -    | Verification oracle: `valid` / `revoked` / 404                        |
+| GET    | `/v1/credentials/{id}`           | -    | OB 3.0 credential JSON (`?format=jwt` → compact JWS)                  |
+| GET    | `/v1/credentials/{id}/badge.png` | -    | Badge PNG with the JWS baked into an `openbadgecredential` iTXt chunk |
+| GET    | `/v1/credentials/{id}/card.png`  | -    | 1200×630 share card                                                   |
+| POST   | `/v1/quiz/sessions`              | opt  | Draw a run: questions **without** answers, plus the server clock      |
+| POST   | `/v1/quiz/sessions/{id}/submit`  | opt  | Score it (single use), rank if eligible, return the full review       |
+| GET    | `/v1/quiz/leaderboard`           | -    | `?mode=sprint\|set20&period=ALL\|WEEK&limit=` top rows, cacheable     |
+| GET    | `/v1/quiz/me`                    | auth | Personal bests for the live boards + lifetime counters                |
 
 "opt" means the `Authorization` header is optional: no header is an anonymous
-run, which is scored but never ranked. A header that is *present but invalid*
+run, which is scored but never ranked. A header that is _present but invalid_
 still 401s, so a stale token is reported rather than silently downgraded.
 
 Error bodies are `{"code": "..."}` (e.g. `display_name_required`,
@@ -82,7 +82,7 @@ Environment variables are managed by hand in the Lambda console
 after creation. Only one `PROXY_SECRET` value is accepted at a time, so
 rotation is: update the value in the Lambda console, then immediately update
 the `PROXY_SECRET` variable on the `vc-api-proxy` Worker in the Cloudflare
-dashboard. Requests 403 in the window between the two edits — do them back to
+dashboard. Requests 403 in the window between the two edits - do them back to
 back (a few seconds of failed syncs is harmless; clients retry).
 
 ### Issuer key rotation
@@ -91,7 +91,7 @@ back (a few seconds of failed syncs is harmless; clients retry).
    `did:web:versioncontrol.gr` DID document **alongside** the old one.
 2. Deploy with the new `ISSUER_PRIVATE_KEY_B64` and a bumped `ISSUER_KID`
    (e.g. `...#key-1`). Already-issued JWS stay verifiable via the old
-   key in the DID document — never remove a key that live credentials
+   key in the DID document - never remove a key that live credentials
    reference.
 
 ### Revocation
@@ -108,14 +108,14 @@ For a subject `sub`:
 1. Delete all `USER#{sub}/*` items in `vc-app` (PROFILE, PROGRESS, CERTREF).
 2. Look up the CERTREF first to find `certId`, then delete `CERT#{certId}/CERT`.
    After that, verify/credential/badge/card return 404 (CDN copies age out per
-   the cache headers). The credential itself contains no plain email — only a
-   salted SHA-256 hash — but it does embed the recipient's display name in the
+   the cache headers). The credential itself contains no plain email - only a
+   salted SHA-256 hash - but it does embed the recipient's display name in the
    DynamoDB item, so the CERT item must go too.
 3. **The quiz table holds personal data too.** In `vc-quiz`, `Query` for
    `PK = USER#{sub}` and delete every item: the `STATS` counters and one
    `BEST#{mode}#{period}` pointer per board. Each pointer's `rankKey` gives the
    public leaderboard row to delete as well:
-   `LB#{mode}#{period} / {rankKey}#{sub}` — read the pointers *before* deleting
+   `LB#{mode}#{period} / {rankKey}#{sub}` - read the pointers _before_ deleting
    them, or the rows become orphans nobody can find. Those rows carry the
    display name, so they are the part that must actually disappear. Weekly rows
    would expire on their own via TTL; all-time rows never do.
@@ -140,9 +140,9 @@ For a subject `sub`:
   (it skips when the gitignored bank is absent).
 - The VC-JWT `typ` header is the module constant
   `app.credential.CREDENTIAL_JWT_TYP` (`"vc+jwt"`). If the 1EdTech validator
-  objects, flip it to `"JWT"` there — nothing else changes.
+  objects, flip it to `"JWT"` there - nothing else changes.
 - `app/assets/badge-template.png` is generated by
   `python scripts/make_badge_template.py` (Pillow, deterministic pixel art).
 - Fonts in `app/assets/fonts/` are the real OFL releases (JetBrains Mono
-  v2.304, Inter v4.1 static SemiBold), both with Greek coverage — no
+  v2.304, Inter v4.1 static SemiBold), both with Greek coverage - no
   placeholders.

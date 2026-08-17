@@ -38,7 +38,7 @@ export function islandJson(value: unknown): string {
 }
 
 export function certTitle(p: VerifyPayload): string {
-  return `${p.recipientName} — Git Foundations Certificate — VersionControl.gr`;
+  return `${p.recipientName} - Git Foundations Certificate - VersionControl.gr`;
 }
 
 export function certDescription(p: VerifyPayload): string {
@@ -47,11 +47,11 @@ export function certDescription(p: VerifyPayload): string {
 }
 
 export function notFoundTitle(): string {
-  return "Certificate not found — VersionControl.gr";
+  return "Certificate not found - VersionControl.gr";
 }
 
 export function revokedTitle(): string {
-  return "Certificate revoked — VersionControl.gr";
+  return "Certificate revoked - VersionControl.gr";
 }
 
 export function errorDescription(id: string, revoked: boolean): string {
@@ -87,7 +87,7 @@ export function credentialJsonLd(p: VerifyPayload): string {
     "@context": "https://schema.org",
     "@type": "EducationalOccupationalCredential",
     "@id": `${p.urls.verify}#credential`,
-    name: `${p.achievementName} Certificate — ${p.recipientName}`,
+    name: `${p.achievementName} Certificate - ${p.recipientName}`,
     credentialCategory: "certificate",
     url: p.urls.verify,
     dateCreated: p.issuedOn,

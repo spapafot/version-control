@@ -15,8 +15,8 @@ import { OG_IMAGE, SITE, canonical } from "@/lib/seo";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s — ${SITE.name}`,
+    default: `${SITE.name} - ${SITE.tagline}`,
+    template: `%s - ${SITE.name}`,
   },
   description:
     "Free interactive Git lessons. Real commands in a real terminal, with branches and commits drawn as you go. Nothing to install.",

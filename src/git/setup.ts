@@ -4,10 +4,13 @@ import type { Persona } from "./types";
 import { LEARNER } from "./engine";
 import { mirrorToOrigin, REMOTE_AUTHOR, REMOTE_DIR } from "./ops/remote";
 
-/** Fixed author for scripted history — commits sort before any user commit. */
-export const SETUP_AUTHOR: Persona = { name: "Alex", email: "alex@versioncontrol.gr" };
+/** Fixed author for scripted history - commits sort before any user commit. */
+export const SETUP_AUTHOR: Persona = {
+  name: "Alex",
+  email: "alex@versioncontrol.gr",
+};
 
-/** Epoch for scripted commits (Nov 2023) — far in the past of any user commit. */
+/** Epoch for scripted commits (Nov 2023) - far in the past of any user commit. */
 export const SETUP_T0 = 1_700_000_000;
 
 export type SetupStep =
@@ -25,7 +28,7 @@ export type SetupStep =
   | { do: "config"; key: string; value: string }
   /** mirror the current branch onto the simulated origin (creates it on first use) */
   | { do: "publish" }
-  /** run steps against the origin repo — Maria working "from her laptop" */
+  /** run steps against the origin repo - Maria working "from her laptop" */
   | { do: "onRemote"; steps: SetupStep[] };
 
 /** One plain step against one engine. `publish`/`onRemote` are top-level only. */
@@ -86,7 +89,10 @@ async function applyStep(target: GitEngine, step: SetupStep): Promise<void> {
  * The origin engine (when published) shares the SAME clock closure, so remote
  * scenarios reset to identical oids too.
  */
-export async function runSetup(engine: GitEngine, steps: SetupStep[]): Promise<void> {
+export async function runSetup(
+  engine: GitEngine,
+  steps: SetupStep[],
+): Promise<void> {
   let n = 0;
   const tick = () => SETUP_T0 + 60 * ++n;
   engine.clock = tick;
@@ -96,13 +102,18 @@ export async function runSetup(engine: GitEngine, steps: SetupStep[]): Promise<v
     for (const step of steps) {
       switch (step.do) {
         case "publish": {
-          if ((await engine.currentBranch()) === null || !(await engine.isInitialized())) {
-            throw new Error("setup: 'publish' needs an initialized repo on a branch");
+          if (
+            (await engine.currentBranch()) === null ||
+            !(await engine.isInitialized())
+          ) {
+            throw new Error(
+              "setup: 'publish' needs an initialized repo on a branch",
+            );
           }
           if (!engine.remote) {
             const origin = new GitEngine(engine.fsp, REMOTE_DIR);
             await origin.init("main");
-            origin.clock = tick; // shared counter — deterministic interleaving
+            origin.clock = tick; // shared counter - deterministic interleaving
             origin.defaultAuthor = REMOTE_AUTHOR;
             engine.remote = origin;
           }
@@ -110,7 +121,8 @@ export async function runSetup(engine: GitEngine, steps: SetupStep[]): Promise<v
           break;
         }
         case "onRemote": {
-          if (!engine.remote) throw new Error("setup: 'onRemote' before 'publish'");
+          if (!engine.remote)
+            throw new Error("setup: 'onRemote' before 'publish'");
           for (const s of step.steps) await applyStep(engine.remote, s);
           break;
         }
@@ -129,7 +141,17 @@ export async function runSetup(engine: GitEngine, steps: SetupStep[]): Promise<v
 
   // learner identity so the user's own commits never fail on missing config
   if (await engine.isInitialized()) {
-    await git.setConfig({ fs: engine.fsp.fs, dir: engine.dir, path: "user.name", value: LEARNER.name });
-    await git.setConfig({ fs: engine.fsp.fs, dir: engine.dir, path: "user.email", value: LEARNER.email });
+    await git.setConfig({
+      fs: engine.fsp.fs,
+      dir: engine.dir,
+      path: "user.name",
+      value: LEARNER.name,
+    });
+    await git.setConfig({
+      fs: engine.fsp.fs,
+      dir: engine.dir,
+      path: "user.email",
+      value: LEARNER.email,
+    });
   }
 }

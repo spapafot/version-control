@@ -1,4 +1,4 @@
-"""DynamoDB access for the quiz table — separate table, separate Table handle.
+"""DynamoDB access for the quiz table - separate table, separate Table handle.
 
 Item layout (PK / SK):
   QBANK#{tier}       / Q#{id}                {id, tier, topic, prompt, options,

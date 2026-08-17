@@ -3,7 +3,12 @@ import { apiFetch } from "./api";
 import { authConfigured } from "./auth-config";
 import { getIdToken, hasStoredSession, useAuth } from "./auth";
 import { useProgress } from "./progress";
-import { blobsEqual, mergeProgress, toBlob, type ProgressBlob } from "./progress-merge";
+import {
+  blobsEqual,
+  mergeProgress,
+  toBlob,
+  type ProgressBlob,
+} from "./progress-merge";
 
 export { mergeProgress } from "./progress-merge";
 
@@ -13,7 +18,12 @@ export { mergeProgress } from "./progress-merge";
  * misbehaving server can only ever ADD to local progress (see the invariant
  * in progress-merge.ts).
  */
-export type SyncStateValue = "idle" | "syncing" | "synced" | "error" | "offline";
+export type SyncStateValue =
+  | "idle"
+  | "syncing"
+  | "synced"
+  | "error"
+  | "offline";
 
 interface SyncState {
   syncState: SyncStateValue;
@@ -51,13 +61,19 @@ async function doSync(): Promise<void> {
   useSync.setState({ syncState: "syncing" });
   const local = toBlob(useProgress.getState());
   try {
-    const { progress: serverMerged } = await apiFetch<{ progress: ProgressBlob }>("/v1/sync", {
+    const { progress: serverMerged } = await apiFetch<{
+      progress: ProgressBlob;
+    }>("/v1/sync", {
       method: "POST",
       body: local,
       token,
     });
     applyRemote(serverMerged);
-    useSync.setState({ syncState: "synced", lastSyncedAt: new Date().toISOString(), dirty: false });
+    useSync.setState({
+      syncState: "synced",
+      lastSyncedAt: new Date().toISOString(),
+      dirty: false,
+    });
   } catch (err) {
     console.warn("[sync]", err);
     const offline = typeof navigator !== "undefined" && !navigator.onLine;
@@ -97,7 +113,7 @@ function scheduleSync(): void {
  * progress changes (debounced), and coming back online.
  *
  * Cheap for anonymous visitors: without a stored Cognito session (a plain
- * localStorage probe) it resolves to signedOut and never imports aws-amplify —
+ * localStorage probe) it resolves to signedOut and never imports aws-amplify -
  * challenge pages stay as light as before accounts existed. /account/ calls
  * `useAuth.init()` itself, so the full flow still works there.
  */

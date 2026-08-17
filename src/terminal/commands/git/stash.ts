@@ -14,10 +14,11 @@ type StashOp = (typeof SUBCOMMANDS)[number];
 
 export const STASH_SUBCOMMANDS: readonly string[] = SUBCOMMANDS;
 
-const isOp = (s: string): s is StashOp => (SUBCOMMANDS as readonly string[]).includes(s);
+const isOp = (s: string): s is StashOp =>
+  (SUBCOMMANDS as readonly string[]).includes(s);
 
 /**
- * `git stash` — a sub-dispatcher: the shell hands us everything after `stash`,
+ * `git stash` - a sub-dispatcher: the shell hands us everything after `stash`,
  * so positionals[0] is the operation (default `push`) and positionals[1] the
  * `stash@{n}` reference.
  */
@@ -36,7 +37,10 @@ export const stash: ShellCommand = {
     let refArg: string | undefined;
     if (first !== undefined) {
       if (!isOp(first)) {
-        throw new GitOpError(`error: unknown subcommand: \`${first}'\n${USAGE}`, 129);
+        throw new GitOpError(
+          `error: unknown subcommand: \`${first}'\n${USAGE}`,
+          129,
+        );
       }
       op = first;
       refArg = rest[0];
@@ -44,7 +48,10 @@ export const stash: ShellCommand = {
 
     switch (op) {
       case "push": {
-        const message = typeof args.flags.message === "string" ? args.flags.message : undefined;
+        const message =
+          typeof args.flags.message === "string"
+            ? args.flags.message
+            : undefined;
         const result = await engine.stashPush({
           message,
           includeUntracked: Boolean(args.flags.includeUntracked),
@@ -53,13 +60,17 @@ export const stash: ShellCommand = {
           ctx.stdout("No local changes to save");
           return 0;
         }
-        ctx.stdout(`Saved working directory and index state ${result.entry!.label}`);
+        ctx.stdout(
+          `Saved working directory and index state ${result.entry!.label}`,
+        );
         return 0;
       }
 
       case "list": {
         if (engine.stash.length > 0) {
-          ctx.stdout(engine.stash.map((e, i) => `stash@{${i}}: ${e.label}`).join("\n"));
+          ctx.stdout(
+            engine.stash.map((e, i) => `stash@{${i}}: ${e.label}`).join("\n"),
+          );
         }
         return 0;
       }
@@ -98,7 +109,8 @@ function requireEntry(count: number, refArg: string | undefined): number {
   if (count === 0) throw new GitOpError("No stash entries found.", 1);
   if (refArg === undefined) return 0;
   const match = refArg.match(/^(?:stash@\{(\d+)\}|(\d+))$/);
-  if (!match) throw new GitOpError(`error: ${refArg} is not a valid reference`, 1);
+  if (!match)
+    throw new GitOpError(`error: ${refArg} is not a valid reference`, 1);
   return parseInt(match[1] ?? match[2], 10);
 }
 

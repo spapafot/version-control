@@ -55,7 +55,7 @@ def test_verify_valid(client, auth_headers):
     assert body["status"] == "valid"
     assert body["credentialId"] == cred_id
     assert body["recipientName"] == "Ada Lovelace"
-    assert body["achievementName"] == "Git Foundations — VersionControl.gr"
+    assert body["achievementName"] == "Git Foundations - VersionControl.gr"
     assert len(body["skills"]) == 11
     assert body["urls"]["verify"].endswith(f"/verify/{cred_id}/")
 

@@ -5,7 +5,14 @@ import { useGame } from "@/lib/game-store";
 import { layoutGraph } from "@/git/graph";
 import { HudLabel } from "@/components/ui/pixel";
 
-const LANE_COLORS = ["#3dff74", "#35e0e0", "#ff5ca8", "#ffb000", "#8affb0", "#7fecec"];
+const LANE_COLORS = [
+  "#3dff74",
+  "#35e0e0",
+  "#ff5ca8",
+  "#ffb000",
+  "#8affb0",
+  "#7fecec",
+];
 const LANE_W = 34;
 const ROW_H = 46;
 const PAD_X = 22;
@@ -20,7 +27,8 @@ export function GitGraph() {
   const state = useGame((s) => s.state);
 
   const layout = useMemo(
-    () => (state && state.commits.length > 0 ? layoutGraph(state.commits) : null),
+    () =>
+      state && state.commits.length > 0 ? layoutGraph(state.commits) : null,
     [state],
   );
 
@@ -105,14 +113,22 @@ export function GitGraph() {
               : []),
             ...refs.map((ref) => {
               const isHeadRef = isHead && state.head.ref === ref;
-              return { key: ref, label: isHeadRef ? `HEAD → ${ref}` : ref, hot: isHeadRef };
+              return {
+                key: ref,
+                label: isHeadRef ? `HEAD → ${ref}` : ref,
+                hot: isHeadRef,
+              };
             }),
           ];
           let tx = labelX;
           const tags = tagDefs.map(({ key, label, hot }) => {
             const w = label.length * 6.4 + 12;
-            // remote-tracking refs render muted — they're knowledge, not position
-            const tone = hot ? "#ffb000" : key.startsWith("origin/") ? "#7d93a8" : c;
+            // remote-tracking refs render muted - they're knowledge, not position
+            const tone = hot
+              ? "#ffb000"
+              : key.startsWith("origin/")
+                ? "#7d93a8"
+                : c;
             const el = (
               <g key={key}>
                 <rect
@@ -179,10 +195,18 @@ export function GitGraph() {
                 />
               )}
               {tags}
-              <text x={tx + 2} y={y + 4} fontSize={12} fontFamily="var(--font-mono)">
+              <text
+                x={tx + 2}
+                y={y + 4}
+                fontSize={12}
+                fontFamily="var(--font-mono)"
+              >
                 <tspan fill="#c9e8ce">
                   {n.commit.isMerge ? "⧉ " : ""}
-                  {truncate(n.commit.message.split("\n")[0], Math.max(10, 46 - Math.round((tx - labelX) / 7)))}
+                  {truncate(
+                    n.commit.message.split("\n")[0],
+                    Math.max(10, 46 - Math.round((tx - labelX) / 7)),
+                  )}
                 </tspan>
                 <tspan fill="#7ea98a" dx={8} fontSize={10.5}>
                   {n.commit.oid.slice(0, 7)}

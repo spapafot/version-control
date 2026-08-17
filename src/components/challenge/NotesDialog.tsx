@@ -15,7 +15,7 @@ const FOCUSABLE =
  * (MissionBrief, the playground About section), so they are rendered either
  * way: closed, they sit in the HTML under `hidden`, which keeps the h1 and the
  * body text that `pnpm seo:check` reads while leaving the screen to the game.
- * Do not swap this for conditional rendering — that empties the page again.
+ * Do not swap this for conditional rendering - that empties the page again.
  */
 export function NotesDialog({
   label,
@@ -50,7 +50,8 @@ export function NotesDialog({
         return;
       }
       if (e.key !== "Tab") return;
-      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
+      const focusable =
+        panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
       if (!focusable?.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];

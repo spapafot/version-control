@@ -1,4 +1,4 @@
-"""Sanitize + monotone merge of course progress — the sync contract.
+"""Sanitize + monotone merge of course progress - the sync contract.
 
 ``merge(server, client)`` is a join over {completed, hintsUsed, achievements}:
   - completed:    min timestamp per key (earliest completion wins)

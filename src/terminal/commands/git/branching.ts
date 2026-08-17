@@ -20,7 +20,9 @@ export const branch: ShellCommand = {
       const target = state.branches.find((b) => b.name === name);
       if (!target) throw new GitOpError(`error: branch '${name}' not found.`);
       if (state.head.ref === name) {
-        throw new GitOpError(`error: cannot delete branch '${name}' checked out at '${engine.dir}'`);
+        throw new GitOpError(
+          `error: cannot delete branch '${name}' checked out at '${engine.dir}'`,
+        );
       }
       if (args.flags.delete && !args.flags.forceDelete) {
         const merged = isReachable(state.commits, state.head.oid, target.oid);
@@ -41,12 +43,16 @@ export const branch: ShellCommand = {
       // leaves the "* " marker itself plain
       const detached =
         state.head.ref === null && state.head.oid !== null
-          ? [`* ${ctx.paint("green", `(HEAD detached at ${state.head.oid.slice(0, 7)})`)}`]
+          ? [
+              `* ${ctx.paint("green", `(HEAD detached at ${state.head.oid.slice(0, 7)})`)}`,
+            ]
           : [];
       const lines = [
         ...detached,
         ...state.branches.map((b) =>
-          b.name === state.head.ref ? `* ${ctx.paint("green", b.name)}` : `  ${b.name}`,
+          b.name === state.head.ref
+            ? `* ${ctx.paint("green", b.name)}`
+            : `  ${b.name}`,
         ),
       ].join("\n");
       if (lines) ctx.stdout(lines);
@@ -55,7 +61,10 @@ export const branch: ShellCommand = {
 
     const [name, startPoint] = args.positionals;
     if (state.head.oid === null) {
-      throw new GitOpError(`fatal: not a valid object name: '${state.head.ref ?? "main"}'`, 128);
+      throw new GitOpError(
+        `fatal: not a valid object name: '${state.head.ref ?? "main"}'`,
+        128,
+      );
     }
     await engine.branch(name, { startPoint });
     return 0;
@@ -79,12 +88,16 @@ export const switchCmd: ShellCommand = {
     }
     if (typeof args.flags.create === "string") {
       const name = args.flags.create;
-      await engine.switchTo(name, { create: true, startPoint: args.positionals[0] });
+      await engine.switchTo(name, {
+        create: true,
+        startPoint: args.positionals[0],
+      });
       ctx.stdout(`Switched to a new branch '${name}'`);
       return 0;
     }
     const target = args.positionals[0];
-    if (!target) throw new GitOpError("fatal: missing branch or commit argument", 128);
+    if (!target)
+      throw new GitOpError("fatal: missing branch or commit argument", 128);
     const current = await engine.currentBranch();
     if (target === current) {
       ctx.stdout(`Already on '${target}'`);
@@ -102,12 +115,16 @@ export const checkout: ShellCommand = {
     const engine = ctx.engine;
     if (typeof args.flags.branch === "string") {
       const name = args.flags.branch;
-      await engine.switchTo(name, { create: true, startPoint: args.positionals[0] });
+      await engine.switchTo(name, {
+        create: true,
+        startPoint: args.positionals[0],
+      });
       ctx.stdout(`Switched to a new branch '${name}'`);
       return 0;
     }
     const target = args.positionals[0];
-    if (!target) throw new GitOpError("fatal: you must specify a branch or file", 128);
+    if (!target)
+      throw new GitOpError("fatal: you must specify a branch or file", 128);
 
     const branches = await engine.listBranches();
     if (branches.includes(target)) {
@@ -127,7 +144,7 @@ export const checkout: ShellCommand = {
       try {
         oid = await engine.resolve(target);
       } catch {
-        // not a revision either — fall through to the file-restore path
+        // not a revision either - fall through to the file-restore path
       }
       if (oid) {
         await engine.detach(oid);
@@ -148,7 +165,8 @@ async function detachNotice(
   oid: string,
 ): Promise<string> {
   const state = await ctx.engine.snapshot();
-  const msg = state.commits.find((c) => c.oid === oid)?.message.split("\n")[0] ?? "";
+  const msg =
+    state.commits.find((c) => c.oid === oid)?.message.split("\n")[0] ?? "";
   return (
     `Note: switching to '${short(oid)}'.\n\n` +
     "You are in 'detached HEAD' state. You can look around, but any branch\n" +

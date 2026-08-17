@@ -25,7 +25,11 @@ import { RichText } from "./RichText";
  * page renders it inside NotesDialog, which keeps it in the HTML but out of
  * the layout until then.
  */
-export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) {
+export function MissionBrief({
+  challenge,
+}: {
+  challenge: ChallengeDefinition;
+}) {
   const seo = CHALLENGE_SEO[challenge.id];
   const section = sectionOf(challenge.id);
   const number = String(challengeNumber(challenge.id)).padStart(2, "0");
@@ -36,7 +40,7 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
     // no page-level container: this only ever renders inside NotesDialog,
     // which owns the width and the padding
     <section aria-labelledby="lesson-notes" className="w-full">
-      <PixelPanel tone="line" title={`▪ Lesson notes — Mission ${number}`}>
+      <PixelPanel tone="line" title={`▪ Lesson notes - Mission ${number}`}>
         <div className="flex flex-col gap-5 p-5">
           <div>
             {section && (
@@ -51,7 +55,8 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
               {seo.title}
             </h1>
             <p className="mt-2 text-xs text-muted">
-              Mission {number} of the course, called {challenge.title} in the game.
+              Mission {number} of the course, called {challenge.title} in the
+              game.
             </p>
           </div>
 
@@ -93,7 +98,9 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
             <ol className="mt-3 flex flex-col gap-2">
               {challenge.hints.map((hint, i) => (
                 <li key={i} className="text-xs leading-relaxed text-fg">
-                  <span className="hud mr-1.5 text-[9px] text-amber">Hint {i + 1}</span>
+                  <span className="hud mr-1.5 text-[9px] text-amber">
+                    Hint {i + 1}
+                  </span>
                   <RichText text={hint} className="mb-0 inline" />
                 </li>
               ))}
@@ -115,7 +122,11 @@ export function MissionBrief({ challenge }: { challenge: ChallengeDefinition }) 
             ) : (
               <span className="text-muted">This is the first mission.</span>
             )}
-            <Link prefetch={false} href="/stages/" className="text-muted hover:text-phos">
+            <Link
+              prefetch={false}
+              href="/stages/"
+              className="text-muted hover:text-phos"
+            >
               All {ALL_CHALLENGES.length} missions
             </Link>
             {next && (

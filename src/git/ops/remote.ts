@@ -6,8 +6,8 @@ import type { Persona } from "../types";
 /**
  * The simulated remote: a second GitEngine at /origin on the SAME memfs
  * volume. fetch/push copy objects directly between the two object stores
- * (deflated-format read/write is byte-identical, so oids — and therefore the
- * deterministic setup hashes — are preserved). No network, no pack protocol.
+ * (deflated-format read/write is byte-identical, so oids - and therefore the
+ * deterministic setup hashes - are preserved). No network, no pack protocol.
  *
  * Invariant: origin is logically bare after setup. Learner pushes move
  * `refs/heads/*` only; origin's worktree and index go stale and nothing ever
@@ -18,8 +18,11 @@ import type { Persona } from "../types";
 export const REMOTE_DIR = "/origin";
 /** what `git remote -v` prints as the address */
 export const REMOTE_URL = "/origin";
-/** Maria — the café's co-manager; author of everything pushed "from her laptop" */
-export const REMOTE_AUTHOR: Persona = { name: "Maria", email: "maria@versioncontrol.gr" };
+/** Maria - the café's co-manager; author of everything pushed "from her laptop" */
+export const REMOTE_AUTHOR: Persona = {
+  name: "Maria",
+  email: "maria@versioncontrol.gr",
+};
 
 export interface FetchUpdate {
   branch: string;
@@ -40,11 +43,16 @@ const common = (e: GitEngine) => ({ fs: e.fsp.fs, dir: e.dir, cache: e.cache });
  * An oid already present in dst is skipped along with its whole subgraph:
  * this system only ever writes complete closures.
  */
-export async function copyObjects(src: GitEngine, dst: GitEngine, wants: string[]): Promise<void> {
-  const queue: Array<{ oid: string; type: "commit" | "tree" | "blob" }> = wants.map((oid) => ({
-    oid,
-    type: "commit",
-  }));
+export async function copyObjects(
+  src: GitEngine,
+  dst: GitEngine,
+  wants: string[],
+): Promise<void> {
+  const queue: Array<{ oid: string; type: "commit" | "tree" | "blob" }> =
+    wants.map((oid) => ({
+      oid,
+      type: "commit",
+    }));
   const seen = new Set<string>();
 
   while (queue.length > 0) {
@@ -57,18 +65,27 @@ export async function copyObjects(src: GitEngine, dst: GitEngine, wants: string[
       await git.readObject({ ...common(dst), oid, format: "deflated" });
       continue; // present ⇒ subgraph present
     } catch {
-      const r = await git.readObject({ ...common(src), oid, format: "deflated" });
+      const r = await git.readObject({
+        ...common(src),
+        oid,
+        format: "deflated",
+      });
       deflated = r.object as Uint8Array;
     }
 
     if (type === "commit") {
       const { commit } = await git.readCommit({ ...common(src), oid });
       queue.push({ oid: commit.tree, type: "tree" });
-      queue.push(...commit.parent.map((p) => ({ oid: p, type: "commit" as const })));
+      queue.push(
+        ...commit.parent.map((p) => ({ oid: p, type: "commit" as const })),
+      );
     } else if (type === "tree") {
       const { tree } = await git.readTree({ ...common(src), oid });
       queue.push(
-        ...tree.map((e) => ({ oid: e.oid, type: e.type === "tree" ? ("tree" as const) : ("blob" as const) })),
+        ...tree.map((e) => ({
+          oid: e.oid,
+          type: e.type === "tree" ? ("tree" as const) : ("blob" as const),
+        })),
       );
     }
 
@@ -83,7 +100,9 @@ export async function copyObjects(src: GitEngine, dst: GitEngine, wants: string[
 }
 
 /** `git fetch`: copy origin's news, move `refs/remotes/origin/*`. Touches nothing else. */
-export async function fetchFromOrigin(engine: GitEngine): Promise<FetchUpdate[]> {
+export async function fetchFromOrigin(
+  engine: GitEngine,
+): Promise<FetchUpdate[]> {
   const origin = engine.remote;
   if (!origin) {
     throw new GitOpError(
@@ -95,7 +114,10 @@ export async function fetchFromOrigin(engine: GitEngine): Promise<FetchUpdate[]>
 
   const updates: FetchUpdate[] = [];
   for (const name of await git.listBranches(common(origin))) {
-    const newOid = await git.resolveRef({ ...common(origin), ref: `refs/heads/${name}` });
+    const newOid = await git.resolveRef({
+      ...common(origin),
+      ref: `refs/heads/${name}`,
+    });
     const old = await git
       .resolveRef({ ...common(engine), ref: `refs/remotes/origin/${name}` })
       .catch(() => null);
@@ -114,7 +136,10 @@ export async function fetchFromOrigin(engine: GitEngine): Promise<FetchUpdate[]>
 }
 
 /** `git push`: fast-forward-only ref update on origin, plus the local tracking ref. */
-export async function pushToOrigin(engine: GitEngine, branch: string): Promise<PushResult> {
+export async function pushToOrigin(
+  engine: GitEngine,
+  branch: string,
+): Promise<PushResult> {
   const origin = engine.remote;
   if (!origin) {
     throw new GitOpError(
@@ -130,7 +155,10 @@ export async function pushToOrigin(engine: GitEngine, branch: string): Promise<P
   const localOid = await git
     .resolveRef({ ...common(engine), ref: `refs/heads/${branch}` })
     .catch(() => {
-      throw new GitOpError(`error: src refspec ${branch} does not match any`, 1);
+      throw new GitOpError(
+        `error: src refspec ${branch} does not match any`,
+        1,
+      );
     });
   const remoteOid = await git
     .resolveRef({ ...common(origin), ref: `refs/heads/${branch}` })
@@ -165,7 +193,12 @@ export async function pushToOrigin(engine: GitEngine, branch: string): Promise<P
   // fast-forward check; a NotFound (origin has commits we never fetched)
   // is exactly the "fetch first" situation
   const ff = await git
-    .isDescendent({ ...common(engine), oid: localOid, ancestor: remoteOid, depth: -1 })
+    .isDescendent({
+      ...common(engine),
+      oid: localOid,
+      ancestor: remoteOid,
+      depth: -1,
+    })
     .catch(() => false);
   if (!ff) return { kind: "rejected", branch };
 
@@ -178,11 +211,17 @@ export async function pushToOrigin(engine: GitEngine, branch: string): Promise<P
  * Setup-time publish: mirror <branch> onto origin and check its worktree out,
  * so subsequent `onRemote` steps can stage and commit there.
  */
-export async function mirrorToOrigin(engine: GitEngine, branch: string): Promise<void> {
+export async function mirrorToOrigin(
+  engine: GitEngine,
+  branch: string,
+): Promise<void> {
   const origin = engine.remote;
   if (!origin) throw new Error("mirrorToOrigin: origin engine not attached");
 
-  const localOid = await git.resolveRef({ ...common(engine), ref: `refs/heads/${branch}` });
+  const localOid = await git.resolveRef({
+    ...common(engine),
+    ref: `refs/heads/${branch}`,
+  });
   await copyObjects(engine, origin, [localOid]);
   await git.writeRef({
     fs: origin.fsp.fs,

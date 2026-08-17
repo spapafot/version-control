@@ -46,7 +46,7 @@ def test_two_device_union(client, auth_headers):
     )
     device_b = _payload(
         completed={
-            "first-repository": "2025-05-02T09:00:00Z",  # later — min keeps device A's
+            "first-repository": "2025-05-02T09:00:00Z",  # later - min keeps device A's
             "check-status": "2025-05-02T10:00:00Z",
         },
         hints={"first-repository": 7},

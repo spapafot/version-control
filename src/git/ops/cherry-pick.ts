@@ -4,11 +4,14 @@ import type { GitEngine } from "../engine";
 import { blobOidAt, diffTrees } from "../blobs";
 
 /**
- * `git cherry-pick <commit>` — the forward twin of ops/revert.ts.
+ * `git cherry-pick <commit>` - the forward twin of ops/revert.ts.
  * Single-parent targets, clean applies only (each touched path in HEAD must
  * still match the target commit's parent); challenge content guarantees this.
  */
-export async function cherryPick(engine: GitEngine, target: string): Promise<string> {
+export async function cherryPick(
+  engine: GitEngine,
+  target: string,
+): Promise<string> {
   const common = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
 
   const oid = await engine.resolve(target);
@@ -53,7 +56,11 @@ export async function cherryPick(engine: GitEngine, target: string): Promise<str
       await engine.deleteFile(ch.path);
       await git.remove({ ...common, filepath: ch.path });
     } else {
-      const { blob } = await git.readBlob({ ...common, oid, filepath: ch.path });
+      const { blob } = await git.readBlob({
+        ...common,
+        oid,
+        filepath: ch.path,
+      });
       await engine.writeFile(ch.path, new TextDecoder().decode(blob));
       await git.add({ ...common, filepath: ch.path });
     }

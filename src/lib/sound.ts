@@ -1,4 +1,4 @@
-/** WebAudio-synthesized 8-bit bleeps — no audio assets. */
+/** WebAudio-synthesized 8-bit bleeps - no audio assets. */
 
 let ctx: AudioContext | null = null;
 
@@ -26,7 +26,10 @@ function note(
   osc.type = type;
   osc.frequency.value = freq;
   g.gain.setValueAtTime(gain, ac.currentTime + start);
-  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + start + duration);
+  g.gain.exponentialRampToValueAtTime(
+    0.0001,
+    ac.currentTime + start + duration,
+  );
   osc.connect(g).connect(ac.destination);
   osc.start(ac.currentTime + start);
   osc.stop(ac.currentTime + start + duration + 0.02);
@@ -35,7 +38,9 @@ function note(
 export function playSuccess(): void {
   const ac = audio();
   if (!ac) return;
-  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(ac, f, i * 0.09, 0.14));
+  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) =>
+    note(ac, f, i * 0.09, 0.14),
+  );
 }
 
 export function playAchievement(): void {

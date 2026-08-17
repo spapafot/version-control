@@ -212,6 +212,6 @@ def issue_certificate(user: AuthedUser = Depends(require_user)) -> CertificateOu
                 cert_item = db.get_cert(existing["certId"])
                 if cert_item:
                     return credential.certificate_out_from_item(cert_item)
-            continue  # reasons were ambiguous — treat as id collision
+            continue  # reasons were ambiguous - treat as id collision
 
     raise HTTPException(status_code=500, detail={"code": "certificate_issue_failed"})

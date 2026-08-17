@@ -36,7 +36,7 @@ def get_jwks_client():
 
 
 def reset_jwks_client(client=None) -> None:
-    """Replace (or clear) the JWKS client — used by tests and key rotation."""
+    """Replace (or clear) the JWKS client - used by tests and key rotation."""
     global _jwks_client
     _jwks_client = client
 

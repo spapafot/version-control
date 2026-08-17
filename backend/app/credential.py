@@ -20,11 +20,11 @@ CROCKFORD_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 CREDENTIAL_ID_RANDOM_CHARS = 8
 
 CREDENTIAL_NAME = "Git Foundations Certificate"
-ACHIEVEMENT_NAME = "Git Foundations — VersionControl.gr"
+ACHIEVEMENT_NAME = "Git Foundations - VersionControl.gr"
 ACHIEVEMENT_DESCRIPTION = (
     "Awarded for having completed all 74 hands-on challenges of the "
-    "VersionControl.gr Git course — from the command line and `git init` to "
-    "reflog recovery — solved against a real Git engine running in the browser."
+    "VersionControl.gr Git course - from the command line and `git init` to "
+    "reflog recovery - solved against a real Git engine running in the browser."
 )
 CRITERIA_NARRATIVE = (
     "The recipient completed every challenge across all 11 course sections of "
@@ -35,7 +35,7 @@ CRITERIA_NARRATIVE = (
 )
 
 # Per OB 3.0 / VC-JOSE the JWS typ should be "vc+jwt"; some validators still
-# expect plain "JWT" — kept as a module constant so it can be flipped after a
+# expect plain "JWT" - kept as a module constant so it can be flipped after a
 # 1EdTech validator run (see README).
 CREDENTIAL_JWT_TYP = "vc+jwt"
 

@@ -4,9 +4,12 @@ import type { GitEngine } from "./engine";
 
 /**
  * Resolve HEAD / branch / short-oid revisions with ~N and ^ suffixes to a full oid.
- * Supported grammar: <base>(~N | ^)* — first-parent only (challenge repos never need ^2).
+ * Supported grammar: <base>(~N | ^)* - first-parent only (challenge repos never need ^2).
  */
-export async function revparse(engine: GitEngine, revish: string): Promise<string> {
+export async function revparse(
+  engine: GitEngine,
+  revish: string,
+): Promise<string> {
   const match = revish.match(/^([^~^]+)((?:~\d*|\^)*)$/);
   if (!match) throw unknownRevision(revish);
   const [, base, suffix] = match;
@@ -30,7 +33,11 @@ export async function revparse(engine: GitEngine, revish: string): Promise<strin
   return oid;
 }
 
-async function resolveBase(engine: GitEngine, base: string, revish: string): Promise<string> {
+async function resolveBase(
+  engine: GitEngine,
+  base: string,
+  revish: string,
+): Promise<string> {
   const common = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
   const reflogRef = base.match(/^HEAD@\{(\d+)\}$/i);
   if (reflogRef) {
@@ -41,7 +48,7 @@ async function resolveBase(engine: GitEngine, base: string, revish: string): Pro
   try {
     return await git.resolveRef({ ...common, ref: base });
   } catch {
-    // not a ref — maybe a (short) commit hash
+    // not a ref - maybe a (short) commit hash
   }
   if (/^[0-9a-f]{4,40}$/i.test(base)) {
     try {

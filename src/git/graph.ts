@@ -20,7 +20,7 @@ export interface GraphLayout {
 
 /**
  * Assign lanes to a commit DAG (input newest-first, parents always after
- * children — guaranteed by our monotonic setup/user timestamps).
+ * children - guaranteed by our monotonic setup/user timestamps).
  */
 export function layoutGraph(commits: CommitNode[]): GraphLayout {
   const nodes: GraphNode[] = [];

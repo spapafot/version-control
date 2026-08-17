@@ -6,7 +6,7 @@ import { HudLabel, PixelPanel } from "@/components/ui/pixel";
  * What the playground is, rendered on the server.
  *
  * The sandbox itself is behind a next/dynamic ssr:false boundary, so this is
- * the only thing a crawler reads on /playground/ — it owns the page's single
+ * the only thing a crawler reads on /playground/ - it owns the page's single
  * h1 and the body text `pnpm seo:check` insists on. A reader reaches it
  * through the About button in the header; NotesDialog keeps it in the HTML
  * but out of the layout until then.
@@ -23,7 +23,10 @@ export function PlaygroundAbout() {
             <HudLabel tone="line" className="mb-2 block">
               Git sandbox
             </HudLabel>
-            <h1 id="about-playground" className="hud glow-text text-xl text-phos">
+            <h1
+              id="about-playground"
+              className="hud glow-text text-xl text-phos"
+            >
               A Git sandbox that runs in your browser
             </h1>
           </div>

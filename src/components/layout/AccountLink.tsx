@@ -7,7 +7,7 @@ import { startSyncEngine, useSync } from "@/lib/sync";
 
 /**
  * The header's account entry. Also boots the sync engine, which is a no-op
- * for visitors without a stored session (a plain localStorage probe — no
+ * for visitors without a stored session (a plain localStorage probe - no
  * aws-amplify code loads for anonymous visitors, see startSyncEngine).
  */
 export function AccountLink() {
@@ -40,7 +40,11 @@ export function AccountLink() {
       href="/account/"
       className="hud flex items-center gap-1.5 border border-line px-2 py-1 text-[10px] text-muted hover:border-phos-dim hover:text-phos"
     >
-      <span aria-hidden title={dotTitle} className={`inline-block size-1.5 ${dot}`} />
+      <span
+        aria-hidden
+        title={dotTitle}
+        className={`inline-block size-1.5 ${dot}`}
+      />
       account
     </Link>
   );

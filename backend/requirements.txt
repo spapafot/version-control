@@ -1,7 +1,7 @@
 fastapi==0.141.1
 mangum==0.21.0
 PyJWT[crypto]==2.13.0
-# 12.2.0 is the newest Pillow with a cp312 manylinux2014 wheel — 12.3.0+ has
+# 12.2.0 is the newest Pillow with a cp312 manylinux2014 wheel - 12.3.0+ has
 # none, which breaks scripts/aws/40-build-lambda.sh's binary-only install.
 Pillow==12.2.0
 boto3==1.43.68

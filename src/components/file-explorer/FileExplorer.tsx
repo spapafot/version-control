@@ -18,7 +18,7 @@ export function FileExplorer() {
   const files = state.workdir.map((f) => f.path);
   const staged = state.status.filter((f) => f.staged && !f.conflicted);
   const deletedStaged = staged.filter((f) => !files.includes(f.path));
-  // folders with nothing inside — invisible to git, but the learner just made
+  // folders with nothing inside - invisible to git, but the learner just made
   // one with mkdir and needs to see it happened
   const emptyDirs = state.dirs.filter(
     (d) =>
@@ -37,7 +37,9 @@ export function FileExplorer() {
           Working Directory
         </HudLabel>
         {entries.length === 0 ? (
-          <p className="px-1 text-xs text-muted">No files yet. Create one with `echo "..." &gt; file.txt`</p>
+          <p className="px-1 text-xs text-muted">
+            No files yet. Create one with `echo "..." &gt; file.txt`
+          </p>
         ) : (
           <ul className="flex flex-col gap-[3px]">
             {entries.map(({ path, isDir }) => {
@@ -88,14 +90,21 @@ export function FileExplorer() {
           </p>
         ) : (
           <ul className="flex flex-col gap-[3px]">
-            {[...staged.filter((f) => files.includes(f.path)), ...deletedStaged].map((f) => (
+            {[
+              ...staged.filter((f) => files.includes(f.path)),
+              ...deletedStaged,
+            ].map((f) => (
               <li
                 key={f.path}
                 className="flex items-center justify-between gap-2 border border-phos-dim/40 bg-raised px-2 py-1.5 font-mono text-xs text-phos"
               >
                 <span className="truncate">{f.path}</span>
                 <span className="hud shrink-0 text-[10px] text-phos-dim">
-                  {f.staged === "added" ? "new" : f.staged === "deleted" ? "deleted" : "modified"}
+                  {f.staged === "added"
+                    ? "new"
+                    : f.staged === "deleted"
+                      ? "deleted"
+                      : "modified"}
                 </span>
               </li>
             ))}
@@ -122,7 +131,8 @@ export function FileExplorer() {
                   stash@{`{${i}}`}: {entry.label}
                 </span>
                 <span className="hud shrink-0 text-[10px] text-amber-dim">
-                  {entry.files.length} {entry.files.length === 1 ? "file" : "files"}
+                  {entry.files.length}{" "}
+                  {entry.files.length === 1 ? "file" : "files"}
                 </span>
               </li>
             ))}
@@ -135,20 +145,49 @@ export function FileExplorer() {
 
 function StatusBadge({ st }: { st: FileStatus }) {
   if (st.conflicted)
-    return <Badge text="conflict" className="bg-crt-red/20 text-crt-red border-crt-red/60" />;
+    return (
+      <Badge
+        text="conflict"
+        className="bg-crt-red/20 text-crt-red border-crt-red/60"
+      />
+    );
   if (st.untracked)
-    return <Badge text="untracked" className="bg-amber/10 text-amber border-amber-dim/60" />;
+    return (
+      <Badge
+        text="untracked"
+        className="bg-amber/10 text-amber border-amber-dim/60"
+      />
+    );
   if (st.unstaged === "modified")
-    return <Badge text="modified" className="bg-amber/10 text-amber border-amber-dim/60" />;
+    return (
+      <Badge
+        text="modified"
+        className="bg-amber/10 text-amber border-amber-dim/60"
+      />
+    );
   if (st.unstaged === "deleted")
-    return <Badge text="deleted" className="bg-crt-red/15 text-crt-red border-crt-red/50" />;
+    return (
+      <Badge
+        text="deleted"
+        className="bg-crt-red/15 text-crt-red border-crt-red/50"
+      />
+    );
   if (st.staged)
-    return <Badge text="staged" className="bg-phos/10 text-phos border-phos-dim/60" />;
+    return (
+      <Badge
+        text="staged"
+        className="bg-phos/10 text-phos border-phos-dim/60"
+      />
+    );
   return <Badge text="ok" className="text-muted border-line" />;
 }
 
 function Badge({ text, className }: { text: string; className: string }) {
   return (
-    <span className={`hud shrink-0 border px-1.5 py-0.5 text-[9px] ${className}`}>{text}</span>
+    <span
+      className={`hud shrink-0 border px-1.5 py-0.5 text-[9px] ${className}`}
+    >
+      {text}
+    </span>
   );
 }

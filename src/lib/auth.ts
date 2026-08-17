@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { authConfigured, COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "./auth-config";
+import {
+  authConfigured,
+  COGNITO_CLIENT_ID,
+  COGNITO_USER_POOL_ID,
+} from "./auth-config";
 
 /**
  * Account state for the optional certification features. Tokens live in
@@ -169,7 +173,10 @@ export const useAuth = create<AuthState>((set, get) => {
         set({ status: "signedIn", email });
         const { Hub } = await import("aws-amplify/utils");
         Hub.listen("auth", ({ payload }) => {
-          if (payload.event === "signedOut" || payload.event === "tokenRefresh_failure") {
+          if (
+            payload.event === "signedOut" ||
+            payload.event === "tokenRefresh_failure"
+          ) {
             set({ status: "signedOut", email: null });
           }
         });
@@ -199,13 +206,17 @@ export const useAuth = create<AuthState>((set, get) => {
         const email = get().pendingEmail;
         if (!email) return;
         const { confirmSignUp, autoSignIn, signIn } = await amplifyAuth();
-        const { nextStep } = await confirmSignUp({ username: email, confirmationCode: code.trim() });
+        const { nextStep } = await confirmSignUp({
+          username: email,
+          confirmationCode: code.trim(),
+        });
         if (nextStep.signUpStep === "COMPLETE_AUTO_SIGN_IN") {
           try {
             await autoSignIn();
           } catch {
             // auto-sign-in window expired; fall back to the retained password
-            if (pendingPassword) await signIn({ username: email, password: pendingPassword });
+            if (pendingPassword)
+              await signIn({ username: email, password: pendingPassword });
             else {
               set({ status: "signedOut", pendingEmail: null });
               return;
@@ -228,7 +239,10 @@ export const useAuth = create<AuthState>((set, get) => {
     signIn: (email, password) =>
       run(async () => {
         const { signIn } = await amplifyAuth();
-        const { isSignedIn, nextStep } = await signIn({ username: email, password });
+        const { isSignedIn, nextStep } = await signIn({
+          username: email,
+          password,
+        });
         if (isSignedIn) {
           await finishSignIn(email);
         } else if (nextStep.signInStep === "CONFIRM_SIGN_UP") {
@@ -237,7 +251,9 @@ export const useAuth = create<AuthState>((set, get) => {
           await resendSignUpCode({ username: email });
           set({ status: "confirmCode", pendingEmail: email });
         } else {
-          set({ error: "This sign-in needs a step the site does not support yet." });
+          set({
+            error: "This sign-in needs a step the site does not support yet.",
+          });
         }
       }),
 
@@ -250,7 +266,11 @@ export const useAuth = create<AuthState>((set, get) => {
     confirmReset: (email, code, newPassword) =>
       run(async () => {
         const { confirmResetPassword } = await amplifyAuth();
-        await confirmResetPassword({ username: email, confirmationCode: code.trim(), newPassword });
+        await confirmResetPassword({
+          username: email,
+          confirmationCode: code.trim(),
+          newPassword,
+        });
       }),
 
     signOut: () =>
@@ -258,7 +278,7 @@ export const useAuth = create<AuthState>((set, get) => {
         const { signOut } = await amplifyAuth();
         await signOut();
         // Local progress deliberately survives sign-out ("your progress stays
-        // in this browser") — only the session ends here.
+        // in this browser") - only the session ends here.
         set({ status: "signedOut", email: null, pendingEmail: null });
       }),
   };

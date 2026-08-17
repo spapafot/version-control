@@ -3,7 +3,7 @@ import { GitOpError } from "../errors";
 import type { GitEngine } from "../engine";
 
 /**
- * `git reset --soft|--mixed|--hard <target>` — implemented on isomorphic-git
+ * `git reset --soft|--mixed|--hard <target>` - implemented on isomorphic-git
  * primitives (it has no reset). Only while on a branch; no reflog.
  */
 export async function reset(

@@ -1,4 +1,4 @@
-# vc-api-proxy — Cloudflare Worker for api.versioncontrol.gr
+# vc-api-proxy - Cloudflare Worker for api.versioncontrol.gr
 
 Thin proxy in front of the certification backend (FastAPI on an AWS Lambda
 Function URL, AuthType `NONE`). The Worker is the only usable front door: it
@@ -8,7 +8,7 @@ handles CORS for versioncontrol.gr, forwards the real client IP as
 `GET /v1/credentials/*` responses (only when the backend sends
 `Cache-Control`, and only for 200/404).
 
-This Worker is deployed separately from the site Worker in the repo root —
+This Worker is deployed separately from the site Worker in the repo root -
 do not mix the two configs.
 
 ## Deploy
@@ -23,10 +23,10 @@ npx wrangler deploy
 # 2. Set BOTH runtime values BY HAND in the Cloudflare dashboard:
 #    Workers & Pages -> vc-api-proxy -> Settings -> Variables ->
 #    add two plaintext variables with values from scripts/aws/out/stack.env:
-#      LAMBDA_URL   — the FUNCTION_URL, no trailing slash
-#      PROXY_SECRET — the shared secret
+#      LAMBDA_URL   - the FUNCTION_URL, no trailing slash
+#      PROXY_SECRET - the shared secret
 #    Neither is in wrangler.jsonc, so neither lands in git. `keep_vars: true`
-#    makes later deploys preserve dashboard-set variables — without it every
+#    makes later deploys preserve dashboard-set variables - without it every
 #    deploy would wipe them and the API would start failing.
 ```
 
@@ -35,7 +35,7 @@ then this dashboard variable, back to back (single-value check on the backend,
 so requests 403 in the seconds between the two edits).
 
 The `custom_domain: true` route creates `api.versioncontrol.gr` automatically
-(DNS + cert) — this requires the versioncontrol.gr zone to be on the same
+(DNS + cert) - this requires the versioncontrol.gr zone to be on the same
 Cloudflare account as the Worker, which it is. The hostname must not already
 have a conflicting DNS record.
 
@@ -51,11 +51,11 @@ curl -i https://api.versioncontrol.gr/v1/health
 npx wrangler dev
 ```
 
-Dashboard variables do not apply to `wrangler dev` — put both values in a
+Dashboard variables do not apply to `wrangler dev` - put both values in a
 `.dev.vars` file instead:
 
 ```
-# workers/api/.dev.vars   (gitignored — never commit)
+# workers/api/.dev.vars   (gitignored - never commit)
 LAMBDA_URL=<FUNCTION_URL from scripts/aws/out/stack.env>
 PROXY_SECRET=<value from scripts/aws/out/stack.env>
 ```

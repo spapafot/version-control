@@ -1,4 +1,4 @@
-"""Generate app/assets/badge-template.png — the 600x600 Open Badge artwork.
+"""Generate app/assets/badge-template.png - the 600x600 Open Badge artwork.
 
 Retro CRT pixel-art: a phosphor-green shield containing a monitor motif with a
 git commit-graph on screen, on the site's ink background, with amber accents.

@@ -3,7 +3,7 @@ import { headCommit, isReachable, reachableFromHead } from "@/git/queries";
 
 /**
  * Challenge validators: pure predicates over the RepoState snapshot.
- * A challenge passes when ALL of its validators pass — commands are never
+ * A challenge passes when ALL of its validators pass - commands are never
  * inspected, so every correct route to the final state counts.
  */
 export type ValidatorSpec =
@@ -77,7 +77,11 @@ function committedText(state: RepoState, file: string): string | null {
 
 const squeeze = (s: string) => s.trim().replace(/\s+/g, " ");
 
-function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolean {
+function check(
+  spec: ValidatorSpec,
+  state: RepoState,
+  history: string[],
+): boolean {
   switch (spec.type) {
     case "repoInitialized":
       return state.initialized;
@@ -91,7 +95,9 @@ function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolea
       return (
         state.initialized &&
         !state.merge.inProgress &&
-        state.status.every((f) => !f.staged && !f.unstaged && !f.untracked && !f.conflicted)
+        state.status.every(
+          (f) => !f.staged && !f.unstaged && !f.untracked && !f.conflicted,
+        )
       );
     case "fileIsStaged": {
       const st = fileStatus(state, spec.file);
@@ -164,7 +170,10 @@ function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolea
       return !state.merge.inProgress;
     case "headMessageContains": {
       const head = headCommit(state);
-      return head !== null && head.message.toLowerCase().includes(spec.text.toLowerCase());
+      return (
+        head !== null &&
+        head.message.toLowerCase().includes(spec.text.toLowerCase())
+      );
     }
     case "fileExists":
       return workdirContent(state, spec.file) !== null;
@@ -175,19 +184,25 @@ function check(spec: ValidatorSpec, state: RepoState, history: string[]): boolea
     case "directoryMissing":
       return !state.dirs.includes(spec.dir.replace(/\/+$/, ""));
     case "stashCount":
-      return spec.atLeast ? state.stash.length >= spec.count : state.stash.length === spec.count;
+      return spec.atLeast
+        ? state.stash.length >= spec.count
+        : state.stash.length === spec.count;
     case "branchPushed": {
       const local = state.branches.find((b) => b.name === spec.branch);
       const origin = state.remote?.branches.find((b) => b.name === spec.branch);
       return Boolean(local && origin && local.oid === origin.oid);
     }
     case "trackingUpToDate": {
-      const tracking = state.remote?.tracking.find((t) => t.name === spec.branch);
+      const tracking = state.remote?.tracking.find(
+        (t) => t.name === spec.branch,
+      );
       const origin = state.remote?.branches.find((b) => b.name === spec.branch);
       return Boolean(tracking && origin && tracking.oid === origin.oid);
     }
     case "ranCommand":
-      return history.some((line) => squeeze(line).startsWith(squeeze(spec.match)));
+      return history.some((line) =>
+        squeeze(line).startsWith(squeeze(spec.match)),
+      );
   }
 }
 

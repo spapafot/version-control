@@ -47,11 +47,13 @@ export function verifyUrl(credentialId: string): string {
  * documented URL prefills the certification form, and `certUrl` becomes the
  * "Show credential" button pointing at our verify page.
  */
-export function linkedInAddToProfileUrl(cert: Pick<Certificate, "credentialId" | "issuedOn">): string {
+export function linkedInAddToProfileUrl(
+  cert: Pick<Certificate, "credentialId" | "issuedOn">,
+): string {
   const issued = new Date(cert.issuedOn);
   const params = new URLSearchParams({
     startTask: "CERTIFICATION_NAME",
-    name: `${ACHIEVEMENT_NAME} — ${SITE.name}`,
+    name: `${ACHIEVEMENT_NAME} - ${SITE.name}`,
     issueYear: String(issued.getUTCFullYear()),
     issueMonth: String(issued.getUTCMonth() + 1),
     certUrl: verifyUrl(cert.credentialId),

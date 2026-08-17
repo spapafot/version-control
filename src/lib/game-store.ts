@@ -18,7 +18,7 @@ interface GameStore {
   evaluation: Evaluation | null;
   completed: boolean;
   hintsShown: number;
-  /** bumps on every (re)load — terminal remounts on change */
+  /** bumps on every (re)load - terminal remounts on change */
   sessionId: number;
   /** file open in the editor modal */
   editingFile: string | null;
@@ -103,7 +103,9 @@ export const useGame = create<GameStore>((set, get) => ({
     const code = await shell.execute(line, io);
     const nextHistory = [...history, line];
     const state = await engine.snapshot();
-    const evaluation = challenge ? evaluate(challenge.validators, state, nextHistory) : null;
+    const evaluation = challenge
+      ? evaluate(challenge.validators, state, nextHistory)
+      : null;
     set({
       state,
       history: nextHistory,
@@ -117,7 +119,9 @@ export const useGame = create<GameStore>((set, get) => ({
     const { engine, challenge, history, completed } = get();
     if (!engine) return;
     const state = await engine.snapshot();
-    const evaluation = challenge ? evaluate(challenge.validators, state, history) : null;
+    const evaluation = challenge
+      ? evaluate(challenge.validators, state, history)
+      : null;
     set({
       state,
       evaluation,

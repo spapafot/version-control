@@ -5,7 +5,12 @@ import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import { useGame } from "@/lib/game-store";
 import { useProgress } from "@/lib/progress";
-import { ACHIEVEMENTS, ALL_CHALLENGES, challengeNumber, nextChallenge } from "@/challenges";
+import {
+  ACHIEVEMENTS,
+  ALL_CHALLENGES,
+  challengeNumber,
+  nextChallenge,
+} from "@/challenges";
 import { playAchievement, playSuccess } from "@/lib/sound";
 import { HudLabel, PixelButton, PixelPanel } from "@/components/ui/pixel";
 
@@ -18,13 +23,16 @@ export function SuccessOverlay() {
   const celebrated = useRef<string | null>(null);
 
   const isNewAchievement =
-    challenge?.achievement && !progress.achievements.includes(challenge.achievement);
+    challenge?.achievement &&
+    !progress.achievements.includes(challenge.achievement);
 
   useEffect(() => {
     if (!completed || !challenge || celebrated.current === challenge.id) return;
     celebrated.current = challenge.id;
 
-    const grantAchievement = challenge.achievement && !useProgress.getState().achievements.includes(challenge.achievement);
+    const grantAchievement =
+      challenge.achievement &&
+      !useProgress.getState().achievements.includes(challenge.achievement);
     progress.markCompleted(challenge.id);
     if (challenge.achievement) progress.grant(challenge.achievement);
 
@@ -61,7 +69,7 @@ export function SuccessOverlay() {
     // by a command whose output is the thing worth reading ("git status" says
     // the branch is up to date with origin/main), and a centred dialog with a
     // dimmed backdrop hid exactly that. Nothing here dims, blocks or takes
-    // focus — the terminal stays live and keeps the caret, so the player can
+    // focus - the terminal stays live and keeps the caret, so the player can
     // read the last output, run more commands, and continue when ready.
     // On lg it is absolute inside the game grid, so it tucks under the header
     // and over the graph; below that it pins to the top of the viewport.
@@ -74,13 +82,20 @@ export function SuccessOverlay() {
         className="power-on max-h-[calc(100dvh-1rem)] w-full overflow-y-auto"
       >
         <div className="flex flex-col items-center gap-3 p-5 text-center">
-          <HudLabel tone="phos">Mission {String(challengeNumber(challenge.id)).padStart(2, "0")}</HudLabel>
+          <HudLabel tone="phos">
+            Mission {String(challengeNumber(challenge.id)).padStart(2, "0")}
+          </HudLabel>
           <h2 className="hud glow-text text-2xl text-phos">Completed!</h2>
-          <p className="font-mono text-2xl tracking-[0.3em] text-amber" aria-hidden>
+          <p
+            className="font-mono text-2xl tracking-[0.3em] text-amber"
+            aria-hidden
+          >
             ★ ★ ★
           </p>
           {challenge.successMessage && (
-            <p className="text-sm leading-relaxed text-fg">{challenge.successMessage}</p>
+            <p className="text-sm leading-relaxed text-fg">
+              {challenge.successMessage}
+            </p>
           )}
           {achievement && (
             <div className="w-full border border-amber-dim/60 bg-raised p-3">
@@ -88,19 +103,24 @@ export function SuccessOverlay() {
                 {isNewAchievement ? "New achievement!" : "Achievement"}
               </HudLabel>
               <p className="hud text-sm text-amber">🏅 {achievement.title}</p>
-              <p className="mt-1 text-xs text-muted">{achievement.description}</p>
+              <p className="mt-1 text-xs text-muted">
+                {achievement.description}
+              </p>
             </div>
           )}
           {allDone && (
             <p className="text-sm leading-relaxed text-fg">
-              That was the last one: all {ALL_CHALLENGES.length} missions complete. 🏆
+              That was the last one: all {ALL_CHALLENGES.length} missions
+              complete. 🏆
             </p>
           )}
           <div className="mt-1 flex flex-wrap justify-center gap-2">
             {allDone ? (
               <>
                 <Link prefetch={false} href="/account/">
-                  <PixelButton tone="amber">Claim your certificate ▸</PixelButton>
+                  <PixelButton tone="amber">
+                    Claim your certificate ▸
+                  </PixelButton>
                 </Link>
                 <Link prefetch={false} href="/stages/">
                   <PixelButton variant="ghost" tone="line">

@@ -2,12 +2,12 @@ import type { RepoState } from "@/git/types";
 import { painter } from "./color";
 
 /**
- * `(main) $ ` — the shell prompt, carrying the current branch the way Git Bash
+ * `(main) $ ` - the shell prompt, carrying the current branch the way Git Bash
  * does: cyan, in parentheses, in front of the sigil.
  *
  * "Which branch am I on" is the question every branching mission turns on, and
  * a learner who has to run `git branch` to answer it never builds the habit of
- * reading it off the prompt — which is where they will read it for the rest of
+ * reading it off the prompt - which is where they will read it for the rest of
  * their career. Kept to ONE line and one segment (no user@host, no path: the
  * path is always /repo) because the terminal shares a viewport with the graph
  * and the file panels, and the input line has to stay short enough not to wrap.

@@ -2,7 +2,7 @@ import type { CommandContext, ShellCommand } from "./types";
 
 /**
  * Collapse a user-typed path to a repo-relative one: strips trailing slashes,
- * resolves `.`/`..` segments, and never escapes the sandbox root — `..` at the
+ * resolves `.`/`..` segments, and never escapes the sandbox root - `..` at the
  * top collapses to the root itself (there is no cd in this course).
  */
 function collapse(p: string): string {
@@ -126,9 +126,12 @@ export const mkdir: ShellCommand = {
     let code = 0;
     for (const d of args.positionals) {
       try {
-        await ctx.engine.makeDir(collapse(d), { parents: Boolean(args.flags.parents) });
+        await ctx.engine.makeDir(collapse(d), {
+          parents: Boolean(args.flags.parents),
+        });
       } catch (e: any) {
-        const why = e?.code === "EEXIST" ? "File exists" : "No such file or directory";
+        const why =
+          e?.code === "EEXIST" ? "File exists" : "No such file or directory";
         ctx.stderr(`mkdir: cannot create directory '${d}': ${why}`);
         code = 1;
       }
@@ -148,7 +151,9 @@ export const rm: ShellCommand = {
     for (const f of args.positionals) {
       const rel = collapse(f);
       if (rel === "") {
-        ctx.stderr(`rm: refusing to remove '.' or '..' directory: skipping '${f}'`);
+        ctx.stderr(
+          `rm: refusing to remove '.' or '..' directory: skipping '${f}'`,
+        );
         code = 1;
         continue;
       }
@@ -182,7 +187,9 @@ async function moveOrCopy(
     return 1;
   }
   if (positionals.length === 1) {
-    ctx.stderr(`${tool}: missing destination file operand after '${positionals[0]}'`);
+    ctx.stderr(
+      `${tool}: missing destination file operand after '${positionals[0]}'`,
+    );
     return 1;
   }
   const engine = ctx.engine;
@@ -203,7 +210,7 @@ async function moveOrCopy(
       continue;
     }
     const srcIsDir = await engine.isDirectory(srcRel);
-    // a trailing slash promises the target is a directory — only a directory
+    // a trailing slash promises the target is a directory - only a directory
     // source may still claim that name as a rename (real mv semantics)
     if (!destIsDir && dest.endsWith("/") && !srcIsDir) {
       ctx.stderr(
@@ -227,18 +234,28 @@ async function moveOrCopy(
         continue;
       }
       if (final.startsWith(`${srcRel}/`)) {
-        ctx.stderr(`mv: cannot move '${src}' to a subdirectory of itself, '${final}'`);
+        ctx.stderr(
+          `mv: cannot move '${src}' to a subdirectory of itself, '${final}'`,
+        );
         code = 1;
         continue;
       }
-      if ((await engine.exists(absOf(ctx, final))) && !(await engine.isDirectory(final))) {
-        ctx.stderr(`mv: cannot overwrite non-directory '${final}' with directory '${src}'`);
+      if (
+        (await engine.exists(absOf(ctx, final))) &&
+        !(await engine.isDirectory(final))
+      ) {
+        ctx.stderr(
+          `mv: cannot overwrite non-directory '${final}' with directory '${src}'`,
+        );
         code = 1;
         continue;
       }
       await engine.makeDir(final, { parents: true });
       for (const f of await engine.listFilesUnder(srcRel)) {
-        await engine.writeFile(`${final}/${f}`, await engine.readFile(`${srcRel}/${f}`));
+        await engine.writeFile(
+          `${final}/${f}`,
+          await engine.readFile(`${srcRel}/${f}`),
+        );
       }
       await engine.deleteDir(srcRel);
       continue;

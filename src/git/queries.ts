@@ -42,7 +42,7 @@ export function headCommit(state: RepoState): CommitNode | null {
 
 /**
  * Commits each side has that the other doesn't (`main` vs `origin/main`).
- * Both tips must be present in `commits` — tracking tips always are, since
+ * Both tips must be present in `commits` - tracking tips always are, since
  * the snapshot walk starts from them.
  */
 export function aheadBehind(

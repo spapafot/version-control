@@ -3,10 +3,10 @@ import { GitOpError } from "../errors";
 import type { GitEngine } from "../engine";
 
 /**
- * `git stash` — implemented on primitives, like the rest of `ops/`.
+ * `git stash` - implemented on primitives, like the rest of `ops/`.
  *
  * isomorphic-git 1.41 ships a native `git.stash`, and we deliberately do NOT
- * use it: it restores files with raw fs writes (racy index — see AGENTS.md),
+ * use it: it restores files with raw fs writes (racy index - see AGENTS.md),
  * stamps `new Date()` into its intermediate commit messages (so setup stashes
  * would not be reproducible), and takes no `cache` parameter.
  *
@@ -109,29 +109,41 @@ export async function stashPush(
     } catch {
       // not in the index
     }
-    if (await engine.exists(`${engine.dir}/${f.path}`)) await engine.deleteFile(f.path);
+    if (await engine.exists(`${engine.dir}/${f.path}`))
+      await engine.deleteFile(f.path);
   }
 
   return { saved: true, entry };
 }
 
 /**
- * `git stash apply` — restores the working tree only. Real git leaves the index
+ * `git stash apply` - restores the working tree only. Real git leaves the index
  * alone without `--index`, so staged changes come back unstaged and staged-new
  * files come back untracked.
  */
-export async function stashApply(engine: GitEngine, index: number): Promise<StashEntry> {
+export async function stashApply(
+  engine: GitEngine,
+  index: number,
+): Promise<StashEntry> {
   const entry = engine.stash[index];
   if (!entry) throw noSuchEntry(index);
 
   const matrix = await engine.statusMatrix();
   const dirty = new Set(
     matrix
-      .filter(([, head, workdir, stage]) => !(head === 1 && workdir === 1 && stage === 1))
-      .filter(([, head, workdir, stage]) => !(head === 0 && workdir === 2 && stage === 0))
+      .filter(
+        ([, head, workdir, stage]) =>
+          !(head === 1 && workdir === 1 && stage === 1),
+      )
+      .filter(
+        ([, head, workdir, stage]) =>
+          !(head === 0 && workdir === 2 && stage === 0),
+      )
       .map(([path]) => path),
   );
-  const clobbered = entry.files.filter((f) => dirty.has(f.path)).map((f) => f.path);
+  const clobbered = entry.files
+    .filter((f) => dirty.has(f.path))
+    .map((f) => f.path);
   if (clobbered.length > 0) {
     throw new GitOpError(
       "error: Your local changes to the following files would be overwritten by merge:\n" +
@@ -142,7 +154,8 @@ export async function stashApply(engine: GitEngine, index: number): Promise<Stas
 
   for (const f of entry.files) {
     if (f.workdir === null) {
-      if (await engine.exists(`${engine.dir}/${f.path}`)) await engine.deleteFile(f.path);
+      if (await engine.exists(`${engine.dir}/${f.path}`))
+        await engine.deleteFile(f.path);
     } else {
       // through engine.writeFile: the mtime bump is what makes a same-size
       // restore (1.90 → 2.00) visible to statusMatrix
@@ -159,12 +172,18 @@ export function stashDrop(engine: GitEngine, index: number): StashEntry {
   return entry;
 }
 
-export async function stashPop(engine: GitEngine, index: number): Promise<StashEntry> {
+export async function stashPop(
+  engine: GitEngine,
+  index: number,
+): Promise<StashEntry> {
   const entry = await stashApply(engine, index);
   stashDrop(engine, index);
   return entry;
 }
 
 function noSuchEntry(index: number): GitOpError {
-  return new GitOpError(`error: refs/stash@{${index}} is not a valid reference`, 1);
+  return new GitOpError(
+    `error: refs/stash@{${index}} is not a valid reference`,
+    1,
+  );
 }

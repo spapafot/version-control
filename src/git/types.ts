@@ -26,9 +26,9 @@ export interface FileStatus {
 }
 
 export interface RemoteState {
-  /** origin's ACTUAL refs/heads — the ground truth validators check against */
+  /** origin's ACTUAL refs/heads - the ground truth validators check against */
   branches: Array<{ name: string; oid: string }>;
-  /** local refs/remotes/origin/* — what fetch/push move; feeds graph + status */
+  /** local refs/remotes/origin/* - what fetch/push move; feeds graph + status */
   tracking: Array<{ name: string; oid: string }>;
   /** current branch vs its tracking ref; null when HEAD has no tracking ref */
   ahead: number | null;

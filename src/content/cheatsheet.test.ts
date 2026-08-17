@@ -11,20 +11,30 @@ const entries = CHEATSHEET.flatMap((g) => g.entries);
  */
 describe("cheatsheet", () => {
   it("documents every git command the engine implements", () => {
-    expect(entries.map((e) => e.name).sort()).toEqual(Object.keys(gitCommands).sort());
+    expect(entries.map((e) => e.name).sort()).toEqual(
+      Object.keys(gitCommands).sort(),
+    );
   });
 
   it("links each command to a mission that exists", () => {
     for (const e of entries) {
-      expect(challengeBySlug.has(e.mission), `${e.command} points at "${e.mission}"`).toBe(true);
+      expect(
+        challengeBySlug.has(e.mission),
+        `${e.command} points at "${e.mission}"`,
+      ).toBe(true);
     }
   });
 
   it("gives every command at least one example", () => {
     for (const e of entries) {
-      expect(e.examples.length, `${e.command} has no examples`).toBeGreaterThan(0);
+      expect(e.examples.length, `${e.command} has no examples`).toBeGreaterThan(
+        0,
+      );
       for (const ex of e.examples) {
-        expect(ex.code.startsWith("git "), `${ex.code} is not a git command`).toBe(true);
+        expect(
+          ex.code.startsWith("git "),
+          `${ex.code} is not a git command`,
+        ).toBe(true);
       }
     }
   });
@@ -34,6 +44,6 @@ describe("cheatsheet", () => {
       ...CHEATSHEET.map((g) => `${g.title} ${g.intro}`),
       ...entries.flatMap((e) => [e.summary, ...e.examples.map((x) => x.note)]),
     ].join(" ");
-    expect(prose).not.toMatch(/[—–“”‘’]/);
+    expect(prose).not.toMatch(/[-–“”‘’]/);
   });
 });

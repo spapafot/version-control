@@ -26,7 +26,7 @@ export function MissionPanel() {
   return (
     <PixelPanel
       tone={completed ? "phos" : "amber"}
-      title={`Mission ${number} — ${section?.title ?? ""}`}
+      title={`Mission ${number} - ${section?.title ?? ""}`}
       className="h-full"
       bodyClassName="overflow-auto"
     >
@@ -78,8 +78,13 @@ export function MissionPanel() {
           </HudLabel>
           <div className="flex flex-col gap-2">
             {challenge.hints.slice(0, hintsShown).map((hint, i) => (
-              <div key={i} className="border border-line bg-raised p-2.5 text-xs text-fg">
-                <span className="hud mr-1.5 text-[9px] text-amber">Hint {i + 1}</span>
+              <div
+                key={i}
+                className="border border-line bg-raised p-2.5 text-xs text-fg"
+              >
+                <span className="hud mr-1.5 text-[9px] text-amber">
+                  Hint {i + 1}
+                </span>
                 <RichText text={hint} className="mb-0 inline" />
               </div>
             ))}
