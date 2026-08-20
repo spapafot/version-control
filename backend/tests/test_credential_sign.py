@@ -48,6 +48,9 @@ def test_credential_shape(credential_and_salt):
     assert issuer["url"] == "https://versioncontrol.gr"
 
     subject = cred["credentialSubject"]
+    assert subject["id"] == (
+        f"https://api.versioncontrol.gr/v1/credentials/{CRED_ID}#recipient"
+    )
     assert subject["type"] == ["AchievementSubject"]
 
     achievement = subject["achievement"]
@@ -90,6 +93,7 @@ def test_verify_roundtrip(credential_and_salt, ed25519_key):
     claims = pyjwt.decode(jws, ed25519_key.public_key(), algorithms=["EdDSA"])
     assert claims["iss"] == "did:web:versioncontrol.gr"
     assert claims["jti"] == cred["id"]
+    assert claims["sub"] == cred["credentialSubject"]["id"]
     from datetime import datetime, timezone
 
     expected_epoch = int(

@@ -94,12 +94,14 @@ def build_credential(
     settings: Optional[Settings] = None,
 ) -> dict:
     s = settings or get_settings()
+    credential_url = f"{s.api_base}/v1/credentials/{cred_id}"
+    subject_url = credential_url + "#recipient"
     return {
         "@context": [
             "https://www.w3.org/ns/credentials/v2",
             "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json",
         ],
-        "id": f"{s.api_base}/v1/credentials/{cred_id}",
+        "id": credential_url,
         "type": ["VerifiableCredential", "OpenBadgeCredential"],
         "name": CREDENTIAL_NAME,
         "validFrom": issued_on,
@@ -111,6 +113,7 @@ def build_credential(
             "description": "Interactive, browser-based Git course.",
         },
         "credentialSubject": {
+            "id": subject_url,
             "type": ["AchievementSubject"],
             "identifier": [hash_email_identity(email, salt)],
             "achievement": {
@@ -148,6 +151,7 @@ def sign_credential(credential: dict, settings: Optional[Settings] = None) -> st
     payload = dict(credential)
     payload["iss"] = credential["issuer"]["id"]
     payload["jti"] = credential["id"]
+    payload["sub"] = credential["credentialSubject"]["id"]
     payload["nbf"] = epoch
     payload["iat"] = epoch
 
