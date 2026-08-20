@@ -60,6 +60,11 @@ export type MergeOutcome =
   | { kind: "already-up-to-date" }
   | { kind: "conflict"; conflicted: string[] };
 
+export type RebaseOutcome =
+  | { kind: "already-up-to-date" }
+  | { kind: "fast-forward"; oid: string }
+  | { kind: "rebased"; oid: string; count: number };
+
 export interface MergeState {
   theirsRef: string;
   theirsOid: string;

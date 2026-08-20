@@ -7,7 +7,7 @@ SECTION_SKILLS = {
     "branches": "Branching",
     "merge": "Merging",
     "conflicts": "Conflict resolution",
-    "remotes": "Remote collaboration (fetch, pull, push)",
+    "remotes": "Remote collaboration (fetch, pull, push, rebase)",
     "undo": "History manipulation & undo",
     "stash": "Stashing work in progress",
     "final": "Applied Git workflows",

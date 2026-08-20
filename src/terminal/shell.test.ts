@@ -490,8 +490,8 @@ describe("plain shell commands", () => {
     let r = await run(shell, "npm install");
     expect(r.err).toContain("npm: command not found");
     expect(r.code).toBe(127);
-    r = await run(shell, "git rebase");
-    expect(r.err).toContain("'rebase' is not a git command");
+    r = await run(shell, "git frobnicate");
+    expect(r.err).toContain("'frobnicate' is not a git command");
   });
 });
 

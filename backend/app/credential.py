@@ -22,13 +22,13 @@ CREDENTIAL_ID_RANDOM_CHARS = 8
 CREDENTIAL_NAME = "Git Foundations Certificate"
 ACHIEVEMENT_NAME = "Git Foundations - VersionControl.gr"
 ACHIEVEMENT_DESCRIPTION = (
-    "Awarded for having completed all 77 hands-on challenges of the "
+    "Awarded for having completed all 78 hands-on challenges of the "
     "VersionControl.gr Git course - from the command line and `git init` to "
     "reflog recovery - solved against a real Git engine running in the browser."
 )
 CRITERIA_NARRATIVE = (
     "The recipient completed every challenge across all 11 course sections of "
-    "VersionControl.gr (77/77): command-line basics, repository basics, "
+    "VersionControl.gr (78/78): command-line basics, repository basics, "
     "staging & commits, branching, merging, conflict resolution, remote "
     "collaboration, undoing mistakes, stashing, applied workflows, and "
     "disaster recovery."

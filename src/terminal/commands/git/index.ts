@@ -1,6 +1,6 @@
 import type { ShellCommand } from "../types";
 import { add, commit, init, log, status } from "./basics";
-import { branch, checkout, merge, switchCmd } from "./branching";
+import { branch, checkout, merge, rebase, switchCmd } from "./branching";
 import { reset, restore, revert } from "./undo";
 import { diff } from "./diff";
 import { cherryPick, reflog } from "./history";
@@ -17,6 +17,7 @@ export const gitCommands: Record<string, ShellCommand> = {
   switch: switchCmd,
   checkout,
   merge,
+  rebase,
   restore,
   reset,
   revert,
@@ -44,6 +45,7 @@ export const GIT_USAGE = [
   "   switch     Switch branch",
   "   checkout   Switch branch or restore files",
   "   merge      Merge branches",
+  "   rebase     Replay local commits on top of another branch",
   "   restore    Restore files",
   "   reset      Move HEAD and the branch",
   "   revert     Safely undo a commit with a new commit",

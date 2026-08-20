@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (9 top-level pages plus 77 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 78 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -25,8 +25,8 @@ written short enough to leave room for it.
 
 | URL | Primary keyword | Secondary | Title | Description |
 | --- | --- | --- | --- | --- |
-| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 77 missions, a live commit graph, an optional free certificate. |
-| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 77 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
+| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 78 missions, a live commit graph, an optional free certificate. |
+| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 78 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
 | `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
@@ -37,7 +37,7 @@ written short enough to leave room for it.
 
 ## Mission pages
 
-77 long-tail pages, one per mission, and the main reason this site can rank at all.
+78 long-tail pages, one per mission, and the main reason this site can rank at all.
 
 Two things are deliberate here. Mission titles are **absolute**, with no site-name
 suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
@@ -133,7 +133,7 @@ Why they happen, how to read them, and how to resolve them.
 
 ### World 7: The Remote
 
-A second copy of the repo lives on the café's server. fetch, pull, push: where your work meets Maria's.
+A second copy of the repo lives on the café's server. Fetch, pull, push, and rebase: where your work meets Maria's.
 
 | URL | Primary keyword | Title | Teaches |
 | --- | --- | --- | --- |
@@ -142,6 +142,7 @@ A second copy of the repo lives on the café's server. fetch, pull, push: where 
 | `/challenge/pull-it-in/` | git pull | git pull: bring the remote's work into yours | git pull; fetch plus merge |
 | `/challenge/push-your-work/` | git push | git push: publish your commits to the server | git push; origin/main |
 | `/challenge/the-rejected-push/` | git push rejected non-fast-forward | Push rejected? Fix non-fast-forward properly | rejected push; non-fast-forward; git pull before push |
+| `/challenge/rebase-before-push/` | git rebase vs merge | Git rebase vs merge: replay before you push | git rebase; git rebase vs merge; rewriting local commits |
 | `/challenge/pull-with-conflict/` | git pull merge conflict | git pull with a merge conflict, start to end | git pull; merge conflicts; git push |
 | `/challenge/closing-time/` | complete git workflow commit pull push | The full Git workflow: commit, pull, push, clean | git commit; git pull; git push; clean working tree |
 
@@ -208,7 +209,7 @@ Each of these is a thing a checklist would tell you to add, left out on purpose:
 - **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.
 - **`SearchAction` in `WebSite`.** There is no site search to point it at.
 - **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.
-- **Per-mission OG images.** Social cards do not affect ranking, and 77 build-time images buy little over one good site-wide card.
+- **Per-mission OG images.** Social cards do not affect ranking, and 78 build-time images buy little over one good site-wide card.
 
 ## Known gap: apex vs www
 

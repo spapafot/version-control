@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import * as git from "isomorphic-git";
 import { createMemFs } from "./fs";
 import { GitEngine } from "./engine";
 import { runSetup, type SetupStep } from "./setup";
@@ -86,6 +87,74 @@ describe("cherry-pick", () => {
       { do: "commit", message: "main edit" },
     ]);
     await expect(engine.cherryPick("feature/experiment")).rejects.toThrow(/could not apply/);
+  });
+});
+
+describe("rebase", () => {
+  const DIVERGED: SetupStep[] = [
+    { do: "file", path: "index.html", content: "<h1>Cafe</h1>\n" },
+    { do: "init" },
+    { do: "add", paths: "*" },
+    { do: "commit", message: "base" },
+    { do: "publish" },
+    { do: "file", path: "events.html", content: "events\n" },
+    { do: "add", paths: ["events.html"] },
+    { do: "commit", message: "local events" },
+    {
+      do: "onRemote",
+      steps: [
+        { do: "file", path: "hours.html", content: "hours\n" },
+        { do: "add", paths: ["hours.html"] },
+        { do: "commit", message: "remote hours" },
+      ],
+    },
+  ];
+
+  it("replays unpublished local commits on top of a fetched upstream", async () => {
+    const engine = await seeded(DIVERGED);
+    const oldLocal = await engine.resolve("HEAD");
+    await engine.fetch();
+    const upstream = await engine.resolve("origin/main");
+
+    const outcome = await engine.rebase("origin/main");
+    expect(outcome.kind).toBe("rebased");
+    const head = await engine.resolve("HEAD");
+    expect(head).not.toBe(oldLocal);
+    expect((await git.readCommit({ fs: engine.fsp.fs, dir: engine.dir, oid: head })).commit.parent).toEqual([
+      upstream,
+    ]);
+    expect(await engine.readFile("events.html")).toBe("events\n");
+    expect(await engine.readFile("hours.html")).toBe("hours\n");
+    expect(engine.reflog[0].action).toBe("rebase (finish): main onto origin/main");
+  });
+
+  it("restores the original branch and files when a replay would conflict", async () => {
+    const engine = await seeded([
+      { do: "file", path: "menu.html", content: "price: 1\n" },
+      { do: "init" },
+      { do: "add", paths: "*" },
+      { do: "commit", message: "base" },
+      { do: "publish" },
+      { do: "file", path: "menu.html", content: "price: 2\n" },
+      { do: "add", paths: ["menu.html"] },
+      { do: "commit", message: "local price" },
+      {
+        do: "onRemote",
+        steps: [
+          { do: "file", path: "menu.html", content: "price: 3\n" },
+          { do: "add", paths: ["menu.html"] },
+          { do: "commit", message: "remote price" },
+        ],
+      },
+    ]);
+    await engine.fetch();
+    const original = await engine.resolve("HEAD");
+    const reflog = [...engine.reflog];
+
+    await expect(engine.rebase("origin/main")).rejects.toThrow(/rebase failed/);
+    expect(await engine.resolve("HEAD")).toBe(original);
+    expect(await engine.readFile("menu.html")).toBe("price: 2\n");
+    expect(engine.reflog).toEqual(reflog);
   });
 });
 

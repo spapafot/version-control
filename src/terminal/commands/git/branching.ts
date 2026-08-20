@@ -192,3 +192,21 @@ export const merge: ShellCommand = {
     return printMergeOutcome(ctx, outcome, before);
   },
 };
+
+export const rebase: ShellCommand = {
+  spec: { flags: {} },
+  async run(ctx, args) {
+    const target = args.positionals[0];
+    if (!target) {
+      throw new GitOpError("fatal: no upstream configured for rebase", 128);
+    }
+    const branch = await ctx.engine.currentBranch();
+    const outcome = await ctx.engine.rebase(target);
+    if (outcome.kind === "already-up-to-date") {
+      ctx.stdout(`Current branch ${branch} is up to date.`);
+      return 0;
+    }
+    ctx.stdout(`Successfully rebased and updated refs/heads/${branch}.`);
+    return 0;
+  },
+};

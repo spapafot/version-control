@@ -53,7 +53,9 @@ export function linkedInAddToProfileUrl(
   const issued = new Date(cert.issuedOn);
   const params = new URLSearchParams({
     startTask: "CERTIFICATION_NAME",
-    name: `${ACHIEVEMENT_NAME} - ${SITE.name}`,
+    name: ACHIEVEMENT_NAME,
+    // LinkedIn resolves the issuing organization and its logo from this Page.
+    organizationId: "144607950",
     issueYear: String(issued.getUTCFullYear()),
     issueMonth: String(issued.getUTCMonth() + 1),
     certUrl: verifyUrl(cert.credentialId),

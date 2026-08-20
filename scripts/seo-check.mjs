@@ -105,7 +105,7 @@ for (const file of walk(OUT)) {
       fail(
         "description contains a backtick, which renders literally in a snippet",
       );
-    if (/[-–]/.test(desc)) fail("description contains an em or en dash");
+    if (/[—–]/.test(desc)) fail("description contains an em or en dash");
   }
 
   // ── canonical ──────────────────────────────────────────────────────────

@@ -44,6 +44,6 @@ describe("cheatsheet", () => {
       ...CHEATSHEET.map((g) => `${g.title} ${g.intro}`),
       ...entries.flatMap((e) => [e.summary, ...e.examples.map((x) => x.note)]),
     ].join(" ");
-    expect(prose).not.toMatch(/[-–“”‘’]/);
+    expect(prose).not.toMatch(/[—–“”‘’]/);
   });
 });

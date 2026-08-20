@@ -34,7 +34,9 @@ describe("linkedInAddToProfileUrl", () => {
       "https://www.linkedin.com/profile/add",
     );
     expect(url.searchParams.get("startTask")).toBe("CERTIFICATION_NAME");
-    expect(url.searchParams.get("name")).toContain("Git Foundations");
+    expect(url.searchParams.get("name")).toBe("Git Foundations");
+    expect(url.searchParams.get("organizationId")).toBe("144607950");
+    expect(url.searchParams.has("organizationName")).toBe(false);
     expect(url.searchParams.get("issueYear")).toBe("2026");
     expect(url.searchParams.get("issueMonth")).toBe("8");
     expect(url.searchParams.get("certUrl")).toBe(
@@ -43,12 +45,10 @@ describe("linkedInAddToProfileUrl", () => {
     expect(url.searchParams.get("certId")).toBe("VC-GIT-F-7K4M9P2X");
   });
 
-  it("URL-encodes reserved characters so the query survives round-tripping", () => {
+  it("URL-encodes the nested credential URL so the query survives round-tripping", () => {
     const raw = linkedInAddToProfileUrl(cert);
     // the verify URL's "://" must be percent-encoded inside certUrl
     expect(raw).toContain("certUrl=https%3A%2F%2F");
-    // the em-dash in the certification name must be encoded, not literal
-    expect(raw).not.toContain("-");
   });
 
   it("uses the UTC issue month across year boundaries", () => {

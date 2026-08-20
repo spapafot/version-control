@@ -84,7 +84,7 @@ class TestValidator:
 
     def test_rejects_an_em_dash(self):
         bank = _bank()
-        bank[0]["prompt"] = "A scenario with an em dash - which is not allowed here."
+        bank[0]["prompt"] = "A scenario with an em dash — which is not allowed here."
         with pytest.raises(seed_quiz.BankError, match="em/en dash"):
             seed_quiz.validate(bank)
 

@@ -1,11 +1,18 @@
 import * as git from "isomorphic-git";
 import type { FsProvider } from "./fs";
 import { GitOpError } from "./errors";
-import type { MergeOutcome, MergeState, Persona, RepoState } from "./types";
+import type {
+  MergeOutcome,
+  MergeState,
+  Persona,
+  RebaseOutcome,
+  RepoState,
+} from "./types";
 import { buildRepoState } from "./state";
 import { reset as resetOp } from "./ops/reset";
 import { revert as revertOp } from "./ops/revert";
 import { cherryPick as cherryPickOp } from "./ops/cherry-pick";
+import { rebase as rebaseOp } from "./ops/rebase";
 import { restore as restoreOp } from "./ops/restore";
 import { switchBranch } from "./ops/switch";
 import {
@@ -270,6 +277,7 @@ export class GitEngine {
     message: string;
     author?: Persona;
     timestamp?: number;
+    reflogAction?: string;
   }): Promise<string> {
     const author = {
       ...(opts.author ?? (await this.author())),
@@ -340,7 +348,7 @@ export class GitEngine {
     });
     this.recordReflog(
       oid,
-      `commit: ${opts.message.split("\n")[0]}`,
+      opts.reflogAction ?? `commit: ${opts.message.split("\n")[0]}`,
       author.timestamp,
     );
     return oid;
@@ -531,6 +539,10 @@ export class GitEngine {
 
   async cherryPick(target: string): Promise<string> {
     return cherryPickOp(this, target);
+  }
+
+  async rebase(upstream: string): Promise<RebaseOutcome> {
+    return rebaseOp(this, upstream);
   }
 
   async restore(

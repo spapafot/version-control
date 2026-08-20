@@ -1,6 +1,7 @@
 import * as git from "isomorphic-git";
 import { GitOpError } from "../errors";
 import type { GitEngine } from "../engine";
+import type { Persona } from "../types";
 import { blobOidAt, diffTrees } from "../blobs";
 
 /**
@@ -11,6 +12,7 @@ import { blobOidAt, diffTrees } from "../blobs";
 export async function cherryPick(
   engine: GitEngine,
   target: string,
+  opts: { author?: Persona; reflogAction?: string } = {},
 ): Promise<string> {
   const common = { fs: engine.fsp.fs, dir: engine.dir, cache: engine.cache };
 
@@ -66,5 +68,9 @@ export async function cherryPick(
     }
   }
 
-  return engine.commit({ message: commit.message });
+  return engine.commit({
+    message: commit.message,
+    author: opts.author,
+    reflogAction: opts.reflogAction,
+  });
 }

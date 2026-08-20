@@ -278,6 +278,19 @@ export const CHEATSHEET: CheatsheetGroup[] = [
         ],
         mission: "push-your-work",
       },
+      {
+        command: "git rebase",
+        name: "rebase",
+        summary:
+          "Replays your local commits on top of another branch, creating new hashes and a linear history. Use it for unpublished work.",
+        examples: [
+          {
+            code: "git rebase origin/main",
+            note: "replay local commits after the latest fetched remote commit",
+          },
+        ],
+        mission: "rebase-before-push",
+      },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 {
   "_note": "Snapshot of the course structure. Regenerate from src/challenges/*.ts (challenge `id:` fields, section order from src/challenges/types.ts SECTIONS, achievement ids from src/challenges/index.ts ACHIEVEMENTS) whenever the course changes.",
-  "total": 77,
+  "total": 78,
   "sections": [
     {
       "id": "terminal",
@@ -90,6 +90,7 @@
         "pull-it-in",
         "push-your-work",
         "the-rejected-push",
+        "rebase-before-push",
         "pull-with-conflict",
         "closing-time"
       ]
