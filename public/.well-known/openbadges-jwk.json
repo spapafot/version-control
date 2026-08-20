@@ -1,0 +1,8 @@
+{
+  "kty": "RSA",
+  "use": "sig",
+  "alg": "RS256",
+  "kid": "https://versioncontrol.gr/.well-known/openbadges-jwk.json",
+  "n": "2yhthKz7-v-DRvLgIglipXkIxa1mDm2bg9mhAIHONRRtPJHdllTyCqS5kh0LRGIR1RVl3kC0cJP6tRSUmEeCCzfrbpy19RSG_zmdqQGKZmCUxKf2vMN_2QYb4evchvsGcUa3Rkt6kUzeRHVOi4i7BJTY6897_3oL_v_Jsz2vz7WRjilpZ-wMILk4onmoRRnjmjg0HCT40g2-ZXfFkvbdOQPTMrDVD4VdxzqR_owfVJePkDMUoT0ggzdE5q2n0pkVL8XZsa0vylpiedZ5mgpc1H9EO01IPjXqyuqpQ1tT-Ue5pfNKO0AgttEZ95_ORJuelCrinFMmGWidqerULUqHnQ",
+  "e": "AQAB"
+}

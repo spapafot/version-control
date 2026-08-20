@@ -5,11 +5,13 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+from pathlib import Path
 
 import jwt as pyjwt
 import pytest
 
 from app.credential import (
+    CREDENTIAL_JWT_ALGORITHM,
     CREDENTIAL_JWT_TYP,
     build_credential,
     generate_credential_id,
@@ -61,7 +63,10 @@ def test_credential_shape(credential_and_salt):
     assert "78/78" in achievement["criteria"]["narrative"]
     assert achievement["image"]["id"] == "https://versioncontrol.gr/badge-git-foundations.png"
 
-    tags = achievement["tags"]
+    # OB 3.0's protected JSON-LD context defines the singular `tag` term as
+    # an @set. `tags` passes the loose JSON Schema but fails JSON-LD expansion.
+    assert "tags" not in achievement
+    tags = achievement["tag"]
     assert len(tags) == 13
     assert tags[:2] == ["Git", "Version Control"]
     assert tags[2:] == SKILLS
@@ -82,15 +87,36 @@ def test_jws_header(credential_and_salt):
     cred, _ = credential_and_salt
     jws = sign_credential(cred)
     header = pyjwt.get_unverified_header(jws)
-    assert header["alg"] == "EdDSA"
-    assert header["kid"] == "did:web:versioncontrol.gr#key-0"
-    assert header["typ"] == CREDENTIAL_JWT_TYP == "vc+jwt"
+    assert set(header) == {"alg", "kid", "typ"}
+    assert header["alg"] == CREDENTIAL_JWT_ALGORITHM == "RS256"
+    assert header["kid"] == (
+        "https://versioncontrol.gr/.well-known/openbadges-jwk.json"
+    )
+    assert header["typ"] == CREDENTIAL_JWT_TYP == "JWT"
 
 
-def test_verify_roundtrip(credential_and_salt, ed25519_key):
+def test_published_jwk_is_an_rs256_public_key():
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "public"
+        / ".well-known"
+        / "openbadges-jwk.json"
+    )
+    jwk = json.loads(path.read_text(encoding="utf-8"))
+    assert set(jwk) == {"kty", "use", "alg", "kid", "n", "e"}
+    assert jwk["kty"] == "RSA"
+    assert jwk["use"] == "sig"
+    assert jwk["alg"] == "RS256"
+    assert jwk["kid"] == (
+        "https://versioncontrol.gr/.well-known/openbadges-jwk.json"
+    )
+    assert pyjwt.PyJWK.from_dict(jwk).key.key_size >= 2048
+
+
+def test_verify_roundtrip(credential_and_salt, rsa_key):
     cred, _ = credential_and_salt
     jws = sign_credential(cred)
-    claims = pyjwt.decode(jws, ed25519_key.public_key(), algorithms=["EdDSA"])
+    claims = pyjwt.decode(jws, rsa_key.public_key(), algorithms=["RS256"])
     assert claims["iss"] == "did:web:versioncontrol.gr"
     assert claims["jti"] == cred["id"]
     assert claims["sub"] == cred["credentialSubject"]["id"]
@@ -106,7 +132,7 @@ def test_verify_roundtrip(credential_and_salt, ed25519_key):
     )
 
 
-def test_tampered_jws_fails(credential_and_salt, ed25519_key):
+def test_tampered_jws_fails(credential_and_salt, rsa_key):
     cred, _ = credential_and_salt
     jws = sign_credential(cred)
     header_b64, payload_b64, sig_b64 = jws.split(".")
@@ -122,7 +148,7 @@ def test_tampered_jws_fails(credential_and_salt, ed25519_key):
     tampered = ".".join([header_b64, tampered_payload, sig_b64])
 
     with pytest.raises(pyjwt.InvalidSignatureError):
-        pyjwt.decode(tampered, ed25519_key.public_key(), algorithms=["EdDSA"])
+        pyjwt.decode(tampered, rsa_key.public_key(), algorithms=["RS256"])
 
 
 def test_generated_ids_match_pattern():

@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import boto3
 import jwt as pyjwt
 import pytest
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from fastapi.testclient import TestClient
@@ -42,8 +43,18 @@ def rsa_key():
     return rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
 
+@pytest.fixture(scope="session")
+def rsa_private_key_b64(rsa_key):
+    der = rsa_key.private_bytes(
+        serialization.Encoding.DER,
+        serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption(),
+    )
+    return base64.b64encode(der).decode("ascii")
+
+
 @pytest.fixture(autouse=True)
-def settings_env(monkeypatch, ed25519_seed_b64):
+def settings_env(monkeypatch, ed25519_seed_b64, rsa_private_key_b64):
     """Point settings (and boto3) at test values; reset all lazy singletons."""
     env = {
         "TABLE_NAME": TABLE_NAME,
@@ -57,10 +68,11 @@ def settings_env(monkeypatch, ed25519_seed_b64):
         "COGNITO_CLIENT_ID": CLIENT_ID,
         "PROXY_SECRET": PROXY_SECRET,
         "ISSUER_PRIVATE_KEY_B64": ed25519_seed_b64,
+        "ISSUER_RSA_PRIVATE_KEY_B64": rsa_private_key_b64,
     }
     for key, value in env.items():
         monkeypatch.setenv(key, value)
-    for key in ("API_BASE", "SITE_BASE", "ISSUER_KID"):
+    for key in ("API_BASE", "SITE_BASE", "ISSUER_KID", "ISSUER_RSA_KID"):
         monkeypatch.delenv(key, raising=False)
 
     from app import auth, config, db, quiz_db

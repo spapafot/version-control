@@ -22,6 +22,8 @@ class Settings:
     proxy_secret: str
     issuer_private_key_b64: str
     issuer_kid: str
+    issuer_rsa_private_key_b64: str
+    issuer_rsa_kid: str
     api_base: str
     site_base: str
 
@@ -37,6 +39,13 @@ def get_settings() -> Settings:
         proxy_secret=os.environ.get("PROXY_SECRET", ""),
         issuer_private_key_b64=os.environ.get("ISSUER_PRIVATE_KEY_B64", ""),
         issuer_kid=os.environ.get("ISSUER_KID", "did:web:versioncontrol.gr#key-0"),
+        issuer_rsa_private_key_b64=os.environ.get(
+            "ISSUER_RSA_PRIVATE_KEY_B64", ""
+        ),
+        issuer_rsa_kid=os.environ.get(
+            "ISSUER_RSA_KID",
+            "https://versioncontrol.gr/.well-known/openbadges-jwk.json",
+        ),
         api_base=os.environ.get("API_BASE", "https://api.versioncontrol.gr").rstrip("/"),
         site_base=os.environ.get("SITE_BASE", "https://versioncontrol.gr").rstrip("/"),
     )

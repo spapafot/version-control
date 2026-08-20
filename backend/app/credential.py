@@ -9,7 +9,8 @@ from datetime import datetime, timezone
 from typing import Optional
 
 import jwt
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from .config import Settings, get_settings
 from .models import CertificateOut
@@ -34,10 +35,10 @@ CRITERIA_NARRATIVE = (
     "disaster recovery."
 )
 
-# Per OB 3.0 / VC-JOSE the JWS typ should be "vc+jwt"; some validators still
-# expect plain "JWT" - kept as a module constant so it can be flipped after a
-# 1EdTech validator run (see README).
-CREDENTIAL_JWT_TYP = "vc+jwt"
+# OB 3.0 requires typ="JWT" when the optional JOSE header is present. RS256 is
+# the baseline algorithm all conforming verifiers are expected to support.
+CREDENTIAL_JWT_TYP = "JWT"
+CREDENTIAL_JWT_ALGORITHM = "RS256"
 
 
 def build_urls(cred_id: str, settings: Optional[Settings] = None) -> dict:
@@ -126,22 +127,30 @@ def build_credential(
                     "id": f"{s.site_base}/badge-git-foundations.png",
                     "type": "Image",
                 },
-                "tags": ["Git", "Version Control"] + SKILLS,
+                "tag": ["Git", "Version Control"] + SKILLS,
             },
         },
     }
 
 
-def load_private_key(settings: Optional[Settings] = None) -> Ed25519PrivateKey:
+def load_private_key(settings: Optional[Settings] = None) -> rsa.RSAPrivateKey:
     s = settings or get_settings()
-    seed = base64.b64decode(s.issuer_private_key_b64)
-    if len(seed) != 32:
-        raise ValueError("ISSUER_PRIVATE_KEY_B64 must decode to a 32-byte Ed25519 seed")
-    return Ed25519PrivateKey.from_private_bytes(seed)
+    try:
+        encoded_key = base64.b64decode(
+            s.issuer_rsa_private_key_b64, validate=True
+        )
+        key = serialization.load_der_private_key(encoded_key, password=None)
+    except Exception as exc:
+        raise ValueError(
+            "ISSUER_RSA_PRIVATE_KEY_B64 must contain a base64 PKCS#8 RSA key"
+        ) from exc
+    if not isinstance(key, rsa.RSAPrivateKey) or key.key_size < 2048:
+        raise ValueError("The Open Badges RSA signing key must be at least 2048 bits")
+    return key
 
 
 def sign_credential(credential: dict, settings: Optional[Settings] = None) -> str:
-    """Sign the credential as a VC-JWT (EdDSA compact JWS)."""
+    """Sign the credential as an RS256 VC-JWT compact JWS."""
     s = settings or get_settings()
     valid_from = datetime.fromisoformat(
         credential["validFrom"].replace("Z", "+00:00")
@@ -158,6 +167,6 @@ def sign_credential(credential: dict, settings: Optional[Settings] = None) -> st
     return jwt.encode(
         payload,
         load_private_key(s),
-        algorithm="EdDSA",
-        headers={"kid": s.issuer_kid, "typ": CREDENTIAL_JWT_TYP},
+        algorithm=CREDENTIAL_JWT_ALGORITHM,
+        headers={"kid": s.issuer_rsa_kid, "typ": CREDENTIAL_JWT_TYP},
     )
