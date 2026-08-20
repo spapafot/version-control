@@ -184,7 +184,7 @@ w(
   "- **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.",
   "- **`SearchAction` in `WebSite`.** There is no site search to point it at.",
   "- **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.",
-  "- **Per-mission OG images.** Social cards do not affect ranking, and 76 build-time images buy little over one good site-wide card.",
+  "- **Per-mission OG images.** Social cards do not affect ranking, and 77 build-time images buy little over one good site-wide card.",
   "",
   "## Known gap: apex vs www",
   "",

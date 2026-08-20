@@ -18,12 +18,12 @@ export const PAGE_SEO = {
     secondary: ["interactive git course", "free git course", "practice git in browser"],
     title: "Learn Git, using Git: a free interactive course",
     description:
-      "A free Git course you work through by running real commands in a browser terminal. 76 missions, a live commit graph, an optional free certificate.",
+      "A free Git course you work through by running real commands in a browser terminal. 77 missions, a live commit graph, an optional free certificate.",
   },
   "/stages/": {
     keyword: "git learning path",
     secondary: ["git course curriculum", "git topics for beginners", "git syllabus"],
-    title: "Git learning path: all 76 missions",
+    title: "Git learning path: all 77 missions",
     description:
       "The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order.",
   },

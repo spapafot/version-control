@@ -3,7 +3,7 @@
 
 # Keyword map
 
-Every indexable URL on versioncontrol.gr (9 top-level pages plus 76 missions),
+Every indexable URL on versioncontrol.gr (9 top-level pages plus 77 missions),
 the query each one is written for, and the metadata it ships.
 
 ## Targeting
@@ -25,8 +25,8 @@ written short enough to leave room for it.
 
 | URL | Primary keyword | Secondary | Title | Description |
 | --- | --- | --- | --- | --- |
-| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 76 missions, a live commit graph, an optional free certificate. |
-| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 76 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
+| `/` | learn git by doing | interactive git course; free git course; practice git in browser | Learn Git, using Git: a free interactive course | A free Git course you work through by running real commands in a browser terminal. 77 missions, a live commit graph, an optional free certificate. |
+| `/stages/` | git learning path | git course curriculum; git topics for beginners; git syllabus | Git learning path: all 77 missions | The full course map, from your first commit through merge conflicts, the reflog and remotes. Pick the topic you need or work straight through in order. |
 | `/playground/` | online git sandbox | practice git commands online; try git in browser; git simulator | Online Git sandbox: practice in-browser | An empty repository, a real terminal and a commit graph that redraws as you type. Try any Git command you like, with nothing at stake if it goes wrong. |
 | `/quiz/` | git quiz | git interview questions; git multiple choice questions; test git knowledge | Git quiz: timed multiple choice | A timed Git quiz built from real scenarios, four answers each. Race the clock for three minutes or take a set of twenty, then compare on the leaderboard. |
 | `/cheatsheet/` | git commands cheat sheet | git command list; git commands with examples; git reference | Git commands cheat sheet you can try | Every Git command worth knowing, what it does, and a link to the mission where you run it yourself. Written for people who keep forgetting the syntax. |
@@ -37,7 +37,7 @@ written short enough to leave room for it.
 
 ## Mission pages
 
-76 long-tail pages, one per mission, and the main reason this site can rank at all.
+77 long-tail pages, one per mission, and the main reason this site can rank at all.
 
 Two things are deliberate here. Mission titles are **absolute**, with no site-name
 suffix, so the whole SERP budget goes to the keyword. And the keyword title runs
@@ -156,6 +156,7 @@ restore, reset, and revert: the right undo for every situation.
 | `/challenge/undo-a-local-commit/` | git undo last commit keep changes | Undo your last Git commit, keep the files | git reset; undoing a local commit |
 | `/challenge/rewrite-the-message/` | git commit --amend message | git commit --amend: fix a commit message | git commit --amend; rewriting a commit message |
 | `/challenge/scorched-earth/` | git reset --hard | git reset --hard: throw the experiment away | git reset --hard; discarding commits and changes |
+| `/challenge/target-a-commit/` | git commit hash short vs full | Git commit hashes: full and short IDs | git commit hashes; git log --oneline; targeting a commit |
 | `/challenge/undo-a-published-commit/` | git revert pushed commit | git revert: safely undo a pushed commit | git revert; undoing a shared commit |
 | `/challenge/choose-your-strategy/` | git reset vs revert vs restore | git reset vs revert vs restore: pick one | git reset; git revert; git restore |
 
@@ -207,7 +208,7 @@ Each of these is a thing a checklist would tell you to add, left out on purpose:
 - **`FAQPage` schema.** The site has no FAQ content. Marking up questions a visitor cannot see is what earns a manual action.
 - **`SearchAction` in `WebSite`.** There is no site search to point it at.
 - **`courseWorkload` in `CourseInstance`.** No completion time has been measured, and inventing one would put a false figure into structured data.
-- **Per-mission OG images.** Social cards do not affect ranking, and 76 build-time images buy little over one good site-wide card.
+- **Per-mission OG images.** Social cards do not affect ranking, and 77 build-time images buy little over one good site-wide card.
 
 ## Known gap: apex vs www
 

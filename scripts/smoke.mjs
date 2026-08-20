@@ -222,7 +222,7 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapText = await page.evaluate(() => document.body.innerText);
-  if (!mapText.includes("76")) fail("level map missing progress counts");
+  if (!mapText.includes("77")) fail("level map missing progress counts");
   await page.screenshot({ path: `${SHOTS}/08-map.png`, fullPage: true });
 
   await page.goto(`${BASE}/playground/`, { waitUntil: "networkidle0" });
@@ -297,8 +297,8 @@ try {
   await page.goto(`${BASE}/stages/`, { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 500));
   const mapAfter = await page.evaluate(() => document.body.innerText);
-  if (!mapAfter.includes("4/76"))
-    fail(`progress not persisted on map (expected 4/76)`);
+  if (!mapAfter.includes("4/77"))
+    fail(`progress not persisted on map (expected 4/77)`);
   if (!mapAfter.includes("THE TERMINAL"))
     fail("terminal world missing from map");
   if (!mapAfter.includes("GIT DISASTERS"))

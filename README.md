@@ -1,7 +1,7 @@
 # VersionControl.gr
 
 **Learn Git, using Git.** A free interactive Git course where a real Git engine runs
-in your browser: 76 missions across 11 worlds, nothing to install.
+in your browser: 77 missions across 11 worlds, nothing to install.
 
 Live at **[versioncontrol.gr](https://versioncontrol.gr)**.
 
@@ -65,6 +65,6 @@ there is no server that could receive it.
 src/git/          GitEngine: isomorphic-git on memfs, plus ops/ for the gap commands
 src/terminal/     Tokenizer, command specs, shell dispatch, readline, git commands
 src/validators/   Pure predicates over a repository snapshot
-src/challenges/   The course content: 76 challenges in 11 sections
+src/challenges/   The course content: 77 challenges in 11 sections
 src/components/   UI, including the CRT arcade design system in ui/pixel.tsx
 ```

@@ -50,7 +50,7 @@ TOPICS = (
 )
 
 ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-BANNED_CHARS = re.compile(r"[-–‘’“”\n\r\t]")
+BANNED_CHARS = re.compile(r"[—–‘’“”\n\r\t]")
 FILLER_RE = re.compile(r"\b(none|all|both) of (the )?(above|these)\b", re.I)
 ENUM_MARKER_RE = re.compile(r"^\s*\(?[a-d1-4][).]\s", re.I)
 
